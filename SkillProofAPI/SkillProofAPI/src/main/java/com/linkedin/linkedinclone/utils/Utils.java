@@ -35,4 +35,8 @@ public class Utils {
 
         return mem[i][j];
     }
+
+    public static String getErrorMessage(String message, Object... args){
+        return String.format(message, args);
+    }
 }
