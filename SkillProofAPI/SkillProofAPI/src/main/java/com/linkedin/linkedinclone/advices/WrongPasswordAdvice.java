@@ -1,6 +1,5 @@
 package com.linkedin.linkedinclone.advices;
 
-import com.linkedin.linkedinclone.exceptions.UserNotFoundException;
 import com.linkedin.linkedinclone.exceptions.WrongPasswordException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

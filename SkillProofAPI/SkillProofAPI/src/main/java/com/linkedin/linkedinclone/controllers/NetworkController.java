@@ -1,225 +1,103 @@
 package com.linkedin.linkedinclone.controllers;
 
 
-import com.linkedin.linkedinclone.exceptions.UserNotFoundException;
-import com.linkedin.linkedinclone.model.*;
-import com.linkedin.linkedinclone.repositories.*;
-import com.linkedin.linkedinclone.services.UserService;
+import com.linkedin.linkedinclone.constants.SwaggerConstants;
+import com.linkedin.linkedinclone.model.User;
+import com.linkedin.linkedinclone.services.network.NetworkService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import static com.google.common.collect.Lists.reverse;
-import static com.linkedin.linkedinclone.utils.PictureSave.decompressBytes;
-import static com.linkedin.linkedinclone.utils.Utils.minDistance;
 
 @RestController
 @AllArgsConstructor
+@Tag(name = "Network", description = "Manages Network of users in skillProof App")
 public class NetworkController {
 
-    @Autowired
-    UserService userService;
-
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final ConnectionRepository connectionRepository;
-    private final NotificationRepository notificationRepository;
-    private final ChatRepository chatRepository;
+    private final NetworkService networkService;
 
     @CrossOrigin(origins = "*")
     //@PreAuthorize("hasRole('PROFESSIONAL')")
-    @GetMapping("/in/{id}/search/{searchQuery}")
-    public List<User> search(@PathVariable Long id,@PathVariable String searchQuery) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with id "+id+"doesn't exist"));
-        List<User> searchResults = new ArrayList<User>();
-        List<User> allUsers = userService.getAllUsers();
-        String[] searchQueries = searchQuery.split("\\W+");
-        MultiValueMap<Integer,User> map = new LinkedMultiValueMap<>();
-
-        for(String s: searchQueries) {
-            String w = s.toLowerCase();
-            System.out.println(">>> Lemma: " + s);
-
-            for(User u: allUsers){
-                if((u.getId() != id) && (!u.getName().equals("admin"))){
-                    int dist;
-                    System.out.println(u.getName());
-                    if ( (dist = minDistance(w, u.getName().toLowerCase(Locale.ROOT))) < 10){
-                        System.out.println("- "+u.getName()+" "+dist);
-                        map.add(dist, u);
-                    } else if ((dist = minDistance(w,u.getSurname().toLowerCase(Locale.ROOT))) < 10) {
-                        System.out.println("- "+u.getSurname()+" "+dist);
-                        map.add(dist,u);
-                    }else if( (u.getCurrentCompany()!=null && u.getCurrentCompany().toLowerCase(Locale.ROOT) == w) ||  (u.getCurrentJob()!=null && u.getCurrentJob().toLowerCase(Locale.ROOT) == w)) {
-                        map.add(1,u);
-                    }
-                }
+    @GetMapping(value = "/in/{userId}/search/{searchQuery}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Search User",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
+                            content = @Content(schema = @Schema(implementation = User.class)))
             }
-        }
-
-        for(Map.Entry m: map.entrySet()){
-            System.out.println("-- "+m.getValue());
-            searchResults.addAll((List<User>)  m.getValue());
-        }
-
-        for(User u: searchResults){
-            System.out.println(u.getName());
-            Picture uPic = u.getProfilePicture();
-            if(uPic!=null && uPic.isCompressed()) {
-                Picture temp = new Picture(uPic.getName(), uPic.getType(), decompressBytes(uPic.getBytes()));
-                u.setProfilePicture(temp);
-            }
-        }
-
+    )
+    public List<User> search(@PathVariable Long userId, @PathVariable String searchQuery) {
+        List<User> searchResults = networkService.search(userId, searchQuery);
         return reverse(searchResults);
     }
 
     @CrossOrigin(origins = "*")
     //@PreAuthorize("hasRole('PROFESSIONAL')")
-    @GetMapping("/in/{id}/network")
-    public Set<User> getNetwork(@PathVariable Long id) {
-
-        User currentUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with id "+id+"doesn't exist"));
-        Set<User> network = new HashSet<>();
-
-        Set<Connection> connectionsFollowing = currentUser.getUsersFollowing();
-        System.out.println("connectionsFollowing");
-        for(Connection con: connectionsFollowing) {
-            if(con.getIsAccepted()){
-                User userinNetwork = con.getUserFollowed();
-                System.out.println(userinNetwork.getName());
-                network.add(userinNetwork);
+    @GetMapping(value = "/in/{userId}/network", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get Network of an User",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
+                            content = @Content(schema = @Schema(implementation = User.class)))
             }
-        }
-
-        Set<Connection> connectionsFollowedBy = currentUser.getUserFollowedBy();
-        System.out.println("connectionsFollowedBy");
-        for(Connection con: connectionsFollowedBy) {
-            if(con.getIsAccepted()){
-                User userinNetwork = con.getUserFollowing();
-                System.out.println(userinNetwork.getName());
-                network.add(userinNetwork);
-            }
-        }
-
-        for(User u: network){
-            System.out.println(u.getName());
-            Picture uPic = u.getProfilePicture();
-            if(uPic!=null && uPic.isCompressed()) {
-                Picture temp = new Picture(uPic.getName(), uPic.getType(), decompressBytes(uPic.getBytes()));
-                temp.setCompressed(false);
-                u.setProfilePicture(temp);
-            }
-        }
-
-        return network;
+    )
+    public Set<User> getNetwork(@PathVariable Long userId) {
+        return networkService.getNetwork(userId);
     }
 
     @CrossOrigin(origins = "*")
     //@PreAuthorize("hasRole('PROFESSIONAL')")
-    @GetMapping("/in/{id}/request/{otherUserId}")
-    public ResponseEntity<String> hasSendRequest(@PathVariable Long id, @PathVariable Long otherUserId) {
-
-        System.out.println("\n\n>Check request");
-        User currentUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with id "+id+"doesn't exist"));
-        User otherUser = userRepository.findById(otherUserId).orElseThrow(() -> new UserNotFoundException("User with id "+id+"doesn't exist"));
-        System.out.println(otherUser.getName());
-
-        Set<Connection> connectionsFollowing = currentUser.getUsersFollowing();
-        System.out.println("connectionsFollowing");
-        for(Connection con: connectionsFollowing) {
-            if(!con.getIsAccepted()  && con.getUserFollowed()==otherUser){
-                User userinNetwork = con.getUserFollowed();
-                System.out.println(userinNetwork.getName());
-                return ResponseEntity.ok("true");
+    @GetMapping(value = "/in/{userId}/request/{otherUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Send Connection Request to User",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
+                            content = @Content(schema = @Schema(implementation = User.class)))
             }
-        }
-
-        connectionsFollowing = currentUser.getUserFollowedBy();
-        System.out.println("----");
-        for(Connection con: connectionsFollowing) {
-            if(!con.getIsAccepted()  && con.getUserFollowing()==otherUser){
-                User userinNetwork = con.getUserFollowing();
-                System.out.println(userinNetwork.getName());
-                return ResponseEntity.ok("true");
-            }
-        }
-        return ResponseEntity.ok("false");
+    )
+    public ResponseEntity<String> hasSendRequest(@PathVariable Long userId, @PathVariable Long otherUserId) {
+        Boolean result = networkService.hasSendRequest(userId, otherUserId);
+        return ResponseEntity.ok(result.toString());
     }
 
     @CrossOrigin(origins = "*")
     //@PreAuthorize("hasRole('PROFESSIONAL')")
-    @PutMapping("/in/{id}/new-connection/{newUserId}")
-    public ResponseEntity addToConnections(@PathVariable Long id,@PathVariable Long newUserId) {
-
-        System.out.println("New connection request:");
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with id "+id+"doesn't exist"));
-
-        userService.newConnection(user,newUserId);
-
-        System.out.println("New connection added with success!");
-
+    @PutMapping(value = "/in/{userId}/new-connection/{newUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Add Connections to User ",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
+                            content = @Content(schema = @Schema(implementation = User.class)))
+            }
+    )
+    public ResponseEntity addToConnections(@PathVariable Long userId, @PathVariable Long newUserId) {
+        networkService.addToConnections(userId, newUserId);
         return ResponseEntity.ok("\"New connection added with success!\"");
     }
 
     @CrossOrigin(origins = "*")
     //@PreAuthorize("hasRole('PROFESSIONAL')")
-    @PutMapping("/in/{id}/notifications/{connectionId}/accept-connection")
-    public ResponseEntity acceptConnection(@PathVariable Long id,@PathVariable Long connectionId) {
-
-        System.out.println("\n\n\n---------");
-
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with id "+id+"doesn't exist"));
-
-        System.out.println(user.getName() + " will accept connection id"+ connectionId);
-
-        Connection conn = connectionRepository.findById(connectionId).orElseThrow(() -> new UserNotFoundException("Notification with id "+id+"doesn't exist"));
-        conn.setIsAccepted(true);
-        connectionRepository.save(conn);
-
-        Notification not = notificationRepository.findByConnectionId(connectionId).orElseThrow(() -> new UserNotFoundException("Notification with id "+id+"doesn't exist"));
-        not.setIsShown(true);
-        notificationRepository.save(not);
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        SimpleDateFormat sdf1 = new SimpleDateFormat("dd.MM.yyyy:HH.mm.ss");
-
-        Chat chat = new Chat();
-        chat.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        Set<User> users = new HashSet<>();
-        users.add(user);
-        if(conn.getUserFollowed()!=user)
-            users.add(conn.getUserFollowed());
-        else if(conn.getUserFollowing()!=user)
-            users.add(conn.getUserFollowing());
-
-        chat.setUsers(users);
-        chatRepository.save(chat);
-        System.out.println("\n\n\n");
-        System.out.println(chat);
-        for(User u: users) {
-            System.out.println(u);
-            System.out.println(u.getChats());}
+    @PutMapping(value = "/in/{userId}/notifications/{connectionId}/accept-connection",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Accept Connection of an User",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
+                            content = @Content(schema = @Schema(implementation = User.class)))
+            }
+    )
+    public ResponseEntity acceptConnection(@PathVariable Long userId, @PathVariable Long connectionId) {
+        networkService.acceptConnection(userId, connectionId);
         return ResponseEntity.ok("\"Connection accepted with success!\"");
     }
-
-/*    @CrossOrigin(origins = "*")
-    //@PreAuthorize("hasRole('PROFESSIONAL')")
-    @GetMapping("/in/{id}/network/users/{userShownId}")
-    public UserProfileDTO getNetwork(@PathVariable Long id) {
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userRepository.findUserByUsername(((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername());
-
-
-        return network;
-    }*/
-
-
 }

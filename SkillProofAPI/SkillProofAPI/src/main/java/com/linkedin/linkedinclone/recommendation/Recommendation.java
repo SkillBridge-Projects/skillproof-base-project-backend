@@ -97,7 +97,6 @@ public class Recommendation {
             for (double col : row) {
                 sj.add(String.format("%02f", col));
             }
-            System.out.println(sj.toString());
         }
     }
 
