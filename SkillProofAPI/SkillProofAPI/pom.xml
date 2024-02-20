@@ -8,11 +8,11 @@
         <version>2.7.11</version> <!-- Update to the latest Spring Boot version -->
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.linkedin</groupId>
-    <artifactId>linkedin-clone</artifactId>
+    <groupId>com.skillproof</groupId>
+    <artifactId>skillproof-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>linkedin-clone</name>
-    <description>Demo project for Spring Boot</description>
+    <name>skillproof-api</name>
+    <description>Social Media App for SkillBridge</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -113,6 +113,26 @@
             <artifactId>springdoc-openapi-security</artifactId>
             <version>1.6.6</version> <!-- Latest version -->
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.modelmapper.extensions/modelmapper-spring -->
+        <dependency>
+            <groupId>org.modelmapper.extensions</groupId>
+            <artifactId>modelmapper-spring</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
