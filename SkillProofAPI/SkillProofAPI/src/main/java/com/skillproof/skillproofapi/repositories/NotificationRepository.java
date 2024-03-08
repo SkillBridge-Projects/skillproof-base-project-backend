@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long>  {
 
-    @Query("SELECT n FROM Notification n WHERE n.connection_request.id  = :id ")
+    @Query("SELECT n FROM Notification n WHERE n.connectionRequest.id  = :id ")
     Optional<Notification> findByConnectionId(@PathVariable Long id);
 }

@@ -39,15 +39,10 @@ public class NetworkServiceImpl implements NetworkService {
         for (String s : searchQueries) {
             String w = s.toLowerCase();
             for (User u : allUsers) {
-                if ((u.getId() != id) && (!u.getName().equals("admin"))) {
+                if ((u.getId() != id) && (!u.getUsername().equals("admin"))) {
                     int dist;
-                    if ((dist = Utils.minDistance(w, u.getName().toLowerCase(Locale.ROOT))) < 10) {
+                    if ((dist = Utils.minDistance(w, u.getUsername().toLowerCase(Locale.ROOT))) < 10) {
                         map.add(dist, u);
-                    } else if ((dist = Utils.minDistance(w, u.getSurname().toLowerCase(Locale.ROOT))) < 10) {
-                        map.add(dist, u);
-                    } else if ((u.getCurrentCompany() != null && u.getCurrentCompany().toLowerCase(Locale.ROOT) == w)
-                            || (u.getCurrentJob() != null && u.getCurrentJob().toLowerCase(Locale.ROOT) == w)) {
-                        map.add(1, u);
                     }
                 }
             }
