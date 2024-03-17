@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -27,15 +28,13 @@ public class Message {
     @NonNull
     private Timestamp timestamp;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = {"messages"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"messages"})
     private Chat chat;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = {"messages","chats","jobApplied","jobsCreated","comments", "posts","usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"messages", "chats", "jobApplied", "jobsCreated", "comments", "posts",
+            "usersFollowing", "userFollowedBy", "posts", "comments", "notifications", "interestReactions",
+            "jobsCreated", "interactions", "jobApplied", "messages", "chats"})
     private User userMadeBy;
 }

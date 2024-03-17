@@ -23,23 +23,23 @@ public class FeedServiceImpl implements FeedService {
 
     private final UserService userService;
     private final UserDao userDao;
-    private final PostRepository postRepository;
-    private final PictureRepository pictureRepository;
-    private final NotificationRepository notificationRepository;
-    private final InterestReactionRepository interestReactionRepository;
+    private final PostDao postDao;
+    private final PictureDao pictureDao;
+    private final NotificationDao notificationDao;
+    private final InterestReactionDao interestReactionDao;
 
     @Override
     public Set<Post> getFeedPosts(Long id) {
         //TODO: need to add log statements
         User user = userService.getUserById(id);
         Set<Post> feedPosts = new HashSet<>(user.getPosts());
-        Set<Connection> connections = user.getUsersFollowing();
+        Collection<Connection> connections = user.getUsers();
         for(Connection con: connections) {
             if(con.getIsAccepted()){
-                User userFollowing = con.getUserFollowed();
+                User userFollowing = con.getUser();
                 feedPosts.addAll(userFollowing.getPosts());
 
-                Set<InterestReaction> interestReactions = userFollowing.getInterestReactions();
+                Collection<InterestReaction> interestReactions = userFollowing.getInterestReactions();
 
                 for(InterestReaction ir: interestReactions){
                     feedPosts.add(ir.getPost());
@@ -47,13 +47,13 @@ public class FeedServiceImpl implements FeedService {
             }
         }
 
-        connections = user.getUserFollowedBy();
+        connections = user.getUsers();
         for(Connection con: connections) {
             if(con.getIsAccepted()){
-                User userFollowing = con.getUserFollowing();
+                User userFollowing = con.getUser();
                 feedPosts.addAll(userFollowing.getPosts());
 
-                Set<InterestReaction> interestReactions = userFollowing.getInterestReactions();
+                Collection<InterestReaction> interestReactions = userFollowing.getInterestReactions();
 
                 for(InterestReaction ir: interestReactions){
                     feedPosts.add(ir.getPost());
@@ -62,32 +62,32 @@ public class FeedServiceImpl implements FeedService {
         }
 
         for (Post post : feedPosts) {
-            User owner = post.getOwner();
-            Picture pic = owner.getProfilePicture();
-            if (pic != null) {
-                if (pic.isCompressed()) {
-                    Picture dbPic = pictureRepository.findById(pic.getId())
-                            .orElseThrow(() -> new ResourceNotFoundException(
-                                    String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.PICTURE, pic.getId())));
-                    Picture tempPicture = new Picture(dbPic.getId(), dbPic.getName(), dbPic.getType(),
-                            PictureSave.decompressBytes(dbPic.getBytes()));
-                    tempPicture.setCompressed(false);
-                    owner.setProfilePicture(tempPicture);
-                }
-            }
-            Set<Comment> comments = post.getComments();
-            for (Comment c : comments) {
-                User commentOwner = c.getUserMadeBy();
-                Picture profilePicture = commentOwner.getProfilePicture();
-                if (profilePicture != null) {
-                    if (profilePicture.isCompressed()) {
-                        Picture tempPicture = new Picture(profilePicture.getId(), profilePicture.getName(),
-                                profilePicture.getType(), PictureSave.decompressBytes(profilePicture.getBytes()));
-                        tempPicture.setCompressed(false);
-                        commentOwner.setProfilePicture(tempPicture);
-                    }
-                }
-            }
+            User owner = post.getUser();
+//            Picture pic = owner.getProfilePicture();
+//            if (pic != null) {
+//                if (pic.isCompressed()) {
+//                    Picture dbPic = pictureDao.findById(pic.getId())
+//                            .orElseThrow(() -> new ResourceNotFoundException(
+//                                    String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.PICTURE, pic.getId())));
+//                    Picture tempPicture = new Picture(dbPic.getId(), dbPic.getName(), dbPic.getType(),
+//                            PictureSave.decompressBytes(dbPic.getBytes()));
+//                    tempPicture.setCompressed(false);
+//                    owner.setProfilePicture(tempPicture);
+//                }
+//            }
+            Collection<Comment> comments = post.getComments();
+//            for (Comment c : comments) {
+//                User commentOwner = c.getUserMadeBy();
+//                Picture profilePicture = commentOwner.getProfilePicture();
+//                if (profilePicture != null) {
+//                    if (profilePicture.isCompressed()) {
+//                        Picture tempPicture = new Picture(profilePicture.getId(), profilePicture.getName(),
+//                                profilePicture.getType(), PictureSave.decompressBytes(profilePicture.getBytes()));
+//                        tempPicture.setCompressed(false);
+//                        commentOwner.setProfilePicture(tempPicture);
+//                    }
+//                }
+//            }
             Set<Picture> newPics = new HashSet<>();
             for (Picture pict : post.getPictures()) {
                 if (pict != null) {
@@ -107,9 +107,9 @@ public class FeedServiceImpl implements FeedService {
     private void setFeedPosts(Set<Connection> connections, Set<Post> feedPosts) {
         for (Connection con : connections) {
             if (con.getIsAccepted()) {
-                User userFollowing = con.getUserFollowing();
+                User userFollowing = con.getUser();
                 feedPosts.addAll(userFollowing.getPosts());
-                Set<InterestReaction> interestReactions = userFollowing.getInterestReactions();
+                Collection<InterestReaction> interestReactions = userFollowing.getInterestReactions();
                 for (InterestReaction ir : interestReactions) {
                     feedPosts.add(ir.getPost());
                 }
@@ -120,22 +120,22 @@ public class FeedServiceImpl implements FeedService {
     @Override
     public void newPost(Long userId, Post post, MultipartFile[] files) throws IOException {
         User currentUser = userService.getUserById(userId);
-        post.setOwner(currentUser);
+        post.setUser(currentUser);
         if (files != null) {
             for (MultipartFile file : files) {
                 Picture pic = new Picture(file.getOriginalFilename(), file.getContentType(), PictureSave.compressBytes(file.getBytes()));
                 pic.setCompressed(true);
                 pic.setPost(post);
-                pictureRepository.save(pic);
+                pictureDao.save(pic);
             }
         }
-        postRepository.save(post);
+        postDao.save(post);
     }
 
     @Override
     public void newInterestedPost(Long userId, Long postId) {
         User currentUser = userService.getUserById(userId);
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(
+        Post post = postDao.findById(postId).orElseThrow(() -> new PostNotFoundException(
                 String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.POST, postId)));
 
         // IF reaction exists delete it
@@ -148,24 +148,24 @@ public class FeedServiceImpl implements FeedService {
                 ir.setUserMadeBy(null);
                 ir.setPost(null);
                 userDao.save(currentUser);
-                postRepository.save(post);
-                interestReactionRepository.delete(ir);
+                postDao.save(post);
+                interestReactionDao.delete(ir);
                 return;
             }
         }
         InterestReaction newReaction = new InterestReaction(currentUser, post);
-        User postOwner = post.getOwner();
+        User postOwner = post.getUser();
         if (postOwner != currentUser) {
             Notification notification = new Notification(NotificationType.INTEREST, postOwner, newReaction);
-            notificationRepository.save(notification);
+            notificationDao.save(notification);
         }
-        interestReactionRepository.save(newReaction);
+        interestReactionDao.save(newReaction);
     }
 
     @Override
     public void newComment(Long userId, Long postId, Comment comment) {
         User currentUser = userService.getUserById(userId);
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(
+        Post post = postDao.findById(postId).orElseThrow(() -> new PostNotFoundException(
                 String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.POST, postId)));
         userService.newPostComment(currentUser, post, comment);
     }
@@ -174,7 +174,7 @@ public class FeedServiceImpl implements FeedService {
     public List<Post> getRecommendedPosts(Long userId) {
         RecommendationAlgos recAlgos = new RecommendationAlgos();
         List<Post> recommendedPosts = new ArrayList<>();
-        recAlgos.recommendedPosts(userDao, postRepository, userService);
+        recAlgos.recommendedPosts(userDao, postDao, userService);
         User currentUser = userService.getUserById(userId);
 
         if (!currentUser.getRecommendedPosts().isEmpty()) {
@@ -191,30 +191,30 @@ public class FeedServiceImpl implements FeedService {
         }
         Collections.reverse(recommendedPosts);
         for (Post post : recommendedPosts) {
-            User owner = post.getOwner();
-            Picture pic = owner.getProfilePicture();
-            if (pic != null) {
-                if (pic.isCompressed()) {
-                    Picture dbPic = pictureRepository.findById(pic.getId())
-                            .orElseThrow(() -> new ResourceNotFoundException(
-                                    String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.PICTURE, pic.getId())));
-                    Picture tempPicture = new Picture(dbPic.getId(), dbPic.getName(), dbPic.getType(), PictureSave.decompressBytes(dbPic.getBytes()));
-                    tempPicture.setCompressed(false);
-                    owner.setProfilePicture(tempPicture);
-                }
-            }
-            Set<Comment> comments = post.getComments();
-            for (Comment c : comments) {
-                User commentOwner = c.getUserMadeBy();
-                Picture cpic = commentOwner.getProfilePicture();
-                if (cpic != null) {
-                    if (cpic.isCompressed()) {
-                        Picture tempPicture = new Picture(cpic.getId(), cpic.getName(), cpic.getType(), PictureSave.decompressBytes(cpic.getBytes()));
-                        tempPicture.setCompressed(false);
-                        commentOwner.setProfilePicture(tempPicture);
-                    }
-                }
-            }
+            User owner = post.getUser();
+//            Picture pic = owner.getProfilePicture();
+//            if (pic != null) {
+//                if (pic.isCompressed()) {
+//                    Picture dbPic = pictureDao.findById(pic.getId())
+//                            .orElseThrow(() -> new ResourceNotFoundException(
+//                                    String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.PICTURE, pic.getId())));
+//                    Picture tempPicture = new Picture(dbPic.getId(), dbPic.getName(), dbPic.getType(), PictureSave.decompressBytes(dbPic.getBytes()));
+//                    tempPicture.setCompressed(false);
+//                    owner.setProfilePicture(tempPicture);
+//                }
+//            }
+//            Collection<Comment> comments = post.getComments();
+//            for (Comment c : comments) {
+//                User commentOwner = c.getUserMadeBy();
+//                Picture cpic = commentOwner.getProfilePicture();
+//                if (cpic != null) {
+//                    if (cpic.isCompressed()) {
+//                        Picture tempPicture = new Picture(cpic.getId(), cpic.getName(), cpic.getType(), PictureSave.decompressBytes(cpic.getBytes()));
+//                        tempPicture.setCompressed(false);
+//                        commentOwner.setProfilePicture(tempPicture);
+//                    }
+//                }
+//            }
             Set<Picture> newPics = new HashSet<>();
             for (Picture pict : post.getPictures()) {
                 if (pict != null) {
@@ -233,7 +233,7 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     public InterestReaction isInterestedPost(Long userId, Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(
+        Post post = postDao.findById(postId).orElseThrow(() -> new PostNotFoundException(
                 String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.POST, postId)));
         User currentUser = userService.getUserById(userId);
         for (InterestReaction ir : post.getInterestReactions()) {

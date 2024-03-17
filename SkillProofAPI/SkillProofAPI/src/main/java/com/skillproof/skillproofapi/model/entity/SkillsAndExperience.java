@@ -2,47 +2,45 @@ package com.skillproof.skillproofapi.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.skillproof.skillproofapi.enumerations.SkillType;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
-@AllArgsConstructor
-@RequiredArgsConstructor
-@NoArgsConstructor
+@Table(name = "skills_experiences")
 public class SkillsAndExperience {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated
-    @Column(name = "type") @NonNull
-    private SkillType type;
+    @NonNull
+    @Column(name = "type")
+    private SkillType skillType;
 
-    @Column(name = "description") @NonNull
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "isPublic") @NonNull
-    private Integer isPublic;
+    @NonNull
+    @Column(name = "is_public")
+    private Boolean isPublic;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"education","workExperience","skills"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private User userExp;
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"education","workExperience","skills"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private User userEdu;
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
 
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"education","workExperience","skills"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private User userSk;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value = {"education", "workExperience", "skills"}, allowSetters = true)
+    private User user;
 
 }

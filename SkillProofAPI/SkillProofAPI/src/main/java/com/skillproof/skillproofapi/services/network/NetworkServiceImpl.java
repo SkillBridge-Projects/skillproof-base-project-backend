@@ -4,91 +4,85 @@ import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
 import com.skillproof.skillproofapi.exceptions.ResourceNotFoundException;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
-import com.skillproof.skillproofapi.repositories.ChatRepository;
-import com.skillproof.skillproofapi.repositories.ConnectionRepository;
-import com.skillproof.skillproofapi.repositories.NotificationRepository;
+import com.skillproof.skillproofapi.repositories.ChatDao;
+import com.skillproof.skillproofapi.repositories.ConnectionDao;
+import com.skillproof.skillproofapi.repositories.NotificationDao;
 import com.skillproof.skillproofapi.services.user.UserServiceImpl;
 import com.skillproof.skillproofapi.model.entity.*;
-import com.skillproof.skillproofapi.utils.PictureSave;
 import com.skillproof.skillproofapi.utils.Utils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class NetworkServiceImpl implements NetworkService {
 
     private final UserServiceImpl userService;
-    private final ConnectionRepository connectionRepository;
-    private final ChatRepository chatRepository;
-    private final NotificationRepository notificationRepository;
+    private final ConnectionDao connectionDao;
+    private final ChatDao chatDao;
+    private final NotificationDao notificationDao;
     @Override
     public List<User> search(Long id, String searchQuery) {
-        User user = userService.getUserById(id);
-        List<User> searchResults = new ArrayList<User>();
         List<User> allUsers = userService.getAllUsers();
-        String[] searchQueries = searchQuery.split("\\W+");
-        MultiValueMap<Integer, User> map = new LinkedMultiValueMap<>();
 
-        for (String s : searchQueries) {
-            String w = s.toLowerCase();
-            for (User u : allUsers) {
-                if ((u.getId() != id) && (!u.getUsername().equals("admin"))) {
-                    int dist;
-                    if ((dist = Utils.minDistance(w, u.getUsername().toLowerCase(Locale.ROOT))) < 10) {
-                        map.add(dist, u);
-                    }
-                }
-            }
-        }
-
-        for (Map.Entry m : map.entrySet()) {
-            searchResults.addAll((List<User>) m.getValue());
-        }
-
-        for (User u : searchResults) {
-            Picture uPic = u.getProfilePicture();
-            if (uPic != null && uPic.isCompressed()) {
-                Picture temp = new Picture(uPic.getName(), uPic.getType(), PictureSave.decompressBytes(uPic.getBytes()));
-                u.setProfilePicture(temp);
-            }
-        }
-        return searchResults;
+        return allUsers.stream()
+                .filter(u -> u.getId() != id && !"admin".equals(u.getUserName()))
+                .filter(u -> isMatch(searchQuery, u.getUserName().toLowerCase()))
+//                .map(this::updateProfilePicture)
+                .collect(Collectors.toList());
     }
+
+    private boolean isMatch(String searchQuery, String username) {
+        String[] searchQueries = searchQuery.toLowerCase().split("\\W+");
+        for (String query : searchQueries) {
+            if (Utils.minDistance(query, username) < 10) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+//    private User updateProfilePicture(User user) {
+//        Picture profilePicture = user.getProfilePicture();
+//        if (profilePicture != null && profilePicture.isCompressed()) {
+//            Picture decompressedPicture = new Picture(profilePicture.getName(), profilePicture.getType(), PictureSave.decompressBytes(profilePicture.getBytes()));
+//            user.setProfilePicture(decompressedPicture);
+//        }
+//        return user;
+//    }
 
     @Override
     public Set<User> getNetwork(Long userId) {
         User currentUser = userService.getUserById(userId);
         Set<User> network = new HashSet<>();
-        Set<Connection> connectionsFollowing = currentUser.getUsersFollowing();
+        Collection<Connection> connectionsFollowing = currentUser.getUsers();
         for (Connection con : connectionsFollowing) {
             if (con.getIsAccepted()) {
-                User userinNetwork = con.getUserFollowed();
+                User userinNetwork = con.getUser();
                 network.add(userinNetwork);
             }
         }
 
-        Set<Connection> connectionsFollowedBy = currentUser.getUserFollowedBy();
+        Collection<Connection> connectionsFollowedBy = currentUser.getUsers();
         for (Connection con : connectionsFollowedBy) {
             if (con.getIsAccepted()) {
-                User userinNetwork = con.getUserFollowing();
+                User userinNetwork = con.getUser();
                 network.add(userinNetwork);
             }
         }
-        for (User u : network) {
-            Picture uPic = u.getProfilePicture();
-            if (uPic != null && uPic.isCompressed()) {
-                Picture temp = new Picture(uPic.getName(), uPic.getType(), PictureSave.decompressBytes(uPic.getBytes()));
-                temp.setCompressed(false);
-                u.setProfilePicture(temp);
-            }
-        }
+//        for (User u : network) {
+//            Picture uPic = u.getProfilePicture();
+//            if (uPic != null && uPic.isCompressed()) {
+//                Picture temp = new Picture(uPic.getName(), uPic.getType(), PictureSave.decompressBytes(uPic.getBytes()));
+//                temp.setCompressed(false);
+//                u.setProfilePicture(temp);
+//            }
+//        }
         return network;
     }
 
@@ -97,16 +91,16 @@ public class NetworkServiceImpl implements NetworkService {
         User currentUser = userService.getUserById(id);
         User otherUser = userService.getUserById(otherUserId);
 
-        Set<Connection> connectionsFollowing = currentUser.getUsersFollowing();
+        Collection<Connection> connectionsFollowing = currentUser.getUsers();
         for (Connection con : connectionsFollowing) {
-            if (!con.getIsAccepted() && con.getUserFollowed() == otherUser) {
+            if (!con.getIsAccepted() && con.getUser() == otherUser) {
                 return true;
             }
         }
 
-        connectionsFollowing = currentUser.getUserFollowedBy();
+        connectionsFollowing = currentUser.getUsers();
         for (Connection con : connectionsFollowing) {
-            if (!con.getIsAccepted() && con.getUserFollowing() == otherUser) {
+            if (!con.getIsAccepted() && con.getUser() == otherUser) {
                 return true;
             }
         }
@@ -122,17 +116,17 @@ public class NetworkServiceImpl implements NetworkService {
     @Override
     public void acceptConnection(Long userId, Long connectionId) {
         User user = userService.getUserById(userId);
-        Connection conn = connectionRepository.findById(connectionId)
+        Connection conn = connectionDao.findById(connectionId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.NOTIFICATION, connectionId)));
         conn.setIsAccepted(true);
-        connectionRepository.save(conn);
+        connectionDao.save(conn);
 
-        Notification not = notificationRepository.findByConnectionId(connectionId)
+        Notification not = notificationDao.findByConnectionId(connectionId)
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.NOTIFICATION, connectionId)));
         not.setIsShown(true);
-        notificationRepository.save(not);
+        notificationDao.save(not);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         SimpleDateFormat sdf1 = new SimpleDateFormat("dd.MM.yyyy:HH.mm.ss");
 
@@ -140,11 +134,9 @@ public class NetworkServiceImpl implements NetworkService {
         chat.setTimestamp(new Timestamp(System.currentTimeMillis()));
         Set<User> users = new HashSet<>();
         users.add(user);
-        if (conn.getUserFollowed() != user)
-            users.add(conn.getUserFollowed());
-        else if (conn.getUserFollowing() != user)
-            users.add(conn.getUserFollowing());
+        if (conn.getUser() != user)
+            users.add(conn.getUser());
         chat.setUsers(users);
-        chatRepository.save(chat);
+        chatDao.save(chat);
     }
 }

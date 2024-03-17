@@ -82,7 +82,7 @@ public class JobsController {
                             content = @Content(schema = @Schema(implementation = Job.class)))
             }
     )
-    public Set<User> getJobApplicants(@PathVariable Long userId, @PathVariable Long jobId) {
+    public Collection<User> getJobApplicants(@PathVariable Long userId, @PathVariable Long jobId) {
         return jobsService.getJobApplicants(userId, jobId);
     }
 

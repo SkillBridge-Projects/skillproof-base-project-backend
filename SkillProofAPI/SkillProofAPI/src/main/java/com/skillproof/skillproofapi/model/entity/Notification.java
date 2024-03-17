@@ -1,20 +1,15 @@
 package com.skillproof.skillproofapi.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.skillproof.skillproofapi.enumerations.NotificationType;
 import lombok.*;
-import org.hibernate.proxy.HibernateProxy;
 
 import javax.persistence.*;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@ToString
-@AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "notification")
 public class Notification {
 
@@ -23,48 +18,50 @@ public class Notification {
     private Long id;
 
     @Column(name = "isShown")
-    private Boolean isShown = false;
+    private Boolean isShown;
 
-    @Column(name = "type", nullable = false)
+    @Column(name = "notification_type", nullable = false)
+    @Enumerated
     @NonNull
-    private NotificationType type;
+    private NotificationType notificationType;
 
-    @ManyToOne
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "connection_request_id")
-    @JsonIgnoreProperties(value = {"notification"}, allowSetters = true)
+    @JoinColumn(name = "connection_request_id", referencedColumnName = "id")
     private Connection connectionRequest;
 
     @OneToOne
-    @JoinColumn(name = "new_comment_id")
-    @JsonIgnoreProperties(value = {"notification"}, allowSetters = true)
+    @JoinColumn(name = "new_comment_id", referencedColumnName = "id")
     private Comment newComment;
 
     @OneToOne
-    @JoinColumn(name = "new_interest_id")
-    @JsonIgnoreProperties(value = {"notification"}, allowSetters = true)
+    @JoinColumn(name = "new_interest_id", referencedColumnName = "id")
     private InterestReaction newInterest;
 
-    public Notification(@NonNull NotificationType type, User user, Connection connectionRequest) {
-        this.type = type;
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
+
+    public Notification(@NonNull NotificationType notificationType, User user, Connection connectionRequest) {
+        this.notificationType = notificationType;
         this.user = user;
         this.connectionRequest = connectionRequest;
     }
 
-    public Notification(@NonNull NotificationType type, User user, Comment newComment) {
-        this.type = type;
+    public Notification(@NonNull NotificationType notificationType, User user, Comment newComment) {
+        this.notificationType = notificationType;
         this.user = user;
         this.newComment = newComment;
     }
 
-    public Notification(@NonNull NotificationType type, User user, InterestReaction newInterest) {
-        this.type = type;
+    public Notification(@NonNull NotificationType notificationType, User user, InterestReaction newInterest) {
+        this.notificationType = notificationType;
         this.user = user;
         this.newInterest = newInterest;
     }
-
 }

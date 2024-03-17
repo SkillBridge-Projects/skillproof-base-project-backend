@@ -5,12 +5,11 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@RequiredArgsConstructor
+@Getter
+@Setter
 @Table(name = "comment")
 public class Comment {
 
@@ -18,31 +17,30 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "content", nullable = false) @NonNull
+    @Column(name = "content", nullable = false)
+    @NonNull
     private String content;
 
     @Column(name = "timestamp")
     private Timestamp timestamp;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"usersFollowing", "userFollowedBy", "posts", "comments",
+            "notifications", "interestReactions", "jobsCreated", "interactions", "jobApplied",
+            "messages", "chats"})
     private User userMadeBy;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"usersFollowing", "userFollowedBy", "posts", "comments", "notifications",
+            "interestReactions", "jobsCreated", "interactions", "jobApplied", "messages", "chats"})
     private Post post;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "newComment")
     private Notification notification;
 
-    public Comment(@NonNull String content, User userMadeBy, Post post) {
-        this.content = content;
-        this.userMadeBy = userMadeBy;
-        this.post = post;
-    }
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
 }

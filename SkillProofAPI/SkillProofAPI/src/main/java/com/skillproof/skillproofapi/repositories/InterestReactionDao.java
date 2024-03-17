@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Optional;
 
-public interface InterestReactionRepository extends JpaRepository<InterestReaction, Long>  {
+public interface InterestReactionDao extends JpaRepository<InterestReaction, Long>  {
 
     @Query("SELECT ir FROM InterestReaction ir WHERE ir.post.id  = :postId AND ir.userMadeBy.id = :userId ")
     Optional<InterestReaction> isInterested(@PathVariable Long userId,@PathVariable Long postId);

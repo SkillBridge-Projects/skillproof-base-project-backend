@@ -54,6 +54,9 @@ public interface UserService {
     User saveUser(User user);
 
     User findUserByUsername(String userName);
+    UserResponse getUserByUsername(String userName);
 
     UserResponse createUser(CreateUserRequest createUserRequest);
+
+    List<UserResponse> listAllUsers();
 }

@@ -1,42 +1,36 @@
 package com.skillproof.skillproofapi.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "connection")
+@NoArgsConstructor
 public class Connection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Boolean isAccepted=false;
+    private Boolean isAccepted = false;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private User userFollowing;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private User userFollowed;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"connection_request"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "connectionRequest")
     private Notification notification;
 
-    public Connection(User userFollowing, User userFollowed) {
-        this.userFollowing = userFollowing;
-        this.userFollowed = userFollowed;
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
+
+    public Connection(User user) {
+        this.user = user;
     }
 }

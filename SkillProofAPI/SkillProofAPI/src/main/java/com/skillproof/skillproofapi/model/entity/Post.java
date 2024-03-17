@@ -2,16 +2,15 @@ package com.skillproof.skillproofapi.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "post")
@@ -21,44 +20,35 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "content", nullable = false) @NonNull
+    @Column(name = "content", nullable = false)
+    @NonNull
     private String content;
 
     @Column(name = "timestamp")
     private Timestamp timestamp;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"posts","usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private User owner;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private User user;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy="post", orphanRemoval=true)
-    @JsonIgnoreProperties(value = {"post","usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<Comment> comments = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", orphanRemoval = true)
+    @JsonIgnoreProperties(value = {"post", "usersFollowing", "userFollowedBy", "posts", "comments",
+            "notifications", "interestReactions", "jobsCreated", "interactions", "jobApplied", "messages",
+            "chats"}, allowSetters = true)
+    private Collection<Comment> comments;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy="post", orphanRemoval=true)
-    @JsonIgnoreProperties(value = {"post"},allowSetters = true)
-    @Fetch(value = FetchMode.SELECT)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<InterestReaction> interestReactions = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy="post")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", orphanRemoval = true)
     @JsonIgnoreProperties(value = {"post"})
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<Picture> pictures = new HashSet<>();
+    private Collection<InterestReaction> interestReactions;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
+    private Collection<Picture> pictures;
 
 
-    @ManyToMany(mappedBy="recommendedPosts",fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = {"recommendedPosts","posts","interestReactions","posts","usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @Fetch(value= FetchMode.SELECT)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<User> recommendedTo = new HashSet<User>();
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "recommendedPosts")
+    @JsonIgnoreProperties(value = {"recommendedPosts", "posts", "interestReactions", "posts",
+            "usersFollowing", "userFollowedBy", "posts", "comments", "notifications", "interestReactions",
+            "jobsCreated", "interactions", "jobApplied", "messages", "chats"}, allowSetters = true)
+    private Collection<User> recommendedTo;
 
     public Post(String content) {
         this.content = content;

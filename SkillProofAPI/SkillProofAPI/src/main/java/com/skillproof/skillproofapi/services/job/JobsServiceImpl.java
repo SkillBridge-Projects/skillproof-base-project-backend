@@ -7,7 +7,7 @@ import com.skillproof.skillproofapi.model.entity.Job;
 import com.skillproof.skillproofapi.model.entity.Picture;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.recommendation.RecommendationAlgos;
-import com.skillproof.skillproofapi.repositories.JobsRepository;
+import com.skillproof.skillproofapi.repositories.JobsDao;
 import com.skillproof.skillproofapi.repositories.UserDao;
 import com.skillproof.skillproofapi.services.user.UserService;
 import com.skillproof.skillproofapi.utils.PictureSave;
@@ -22,7 +22,7 @@ public class JobsServiceImpl implements JobsService {
 
     private final UserService userService;
     private final UserDao userDao;
-    private final JobsRepository jobRepository;
+    private final JobsDao jobRepository;
 
     @Override
     public void newJob(Long userId, Job job) {
@@ -44,26 +44,26 @@ public class JobsServiceImpl implements JobsService {
 
         for (Job j : jobs) {
             User owner = j.getUserMadeBy();
-            Picture pic = owner.getProfilePicture();
-            if (pic != null) {
-                if (pic.isCompressed()) {
-                    Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(),
-                            PictureSave.decompressBytes(pic.getBytes()));
-                    pic.setCompressed(false);
-                    owner.setProfilePicture(tempPicture);
-                }
-            }
-            Set<User> usersApplied = j.getUsersApplied();
+//            Picture pic = owner.getProfilePicture();
+//            if (pic != null) {
+//                if (pic.isCompressed()) {
+//                    Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(),
+//                            PictureSave.decompressBytes(pic.getBytes()));
+//                    pic.setCompressed(false);
+//                    owner.setProfilePicture(tempPicture);
+//                }
+//            }
+            Collection<User> usersApplied = j.getUsersApplied();
             for (User user : usersApplied) {
-                Picture cpic = user.getProfilePicture();
-                if (cpic != null) {
-                    if (cpic.isCompressed()) {
-                        Picture tempPicture = new Picture(cpic.getId(), cpic.getName(), cpic.getType(),
-                                PictureSave.decompressBytes(cpic.getBytes()));
-                        cpic.setCompressed(false);
-                        user.setProfilePicture(tempPicture);
-                    }
-                }
+//                Picture cpic = user.getProfilePicture();
+//                if (cpic != null) {
+//                    if (cpic.isCompressed()) {
+//                        Picture tempPicture = new Picture(cpic.getId(), cpic.getName(), cpic.getType(),
+//                                PictureSave.decompressBytes(cpic.getBytes()));
+//                        cpic.setCompressed(false);
+//                        user.setProfilePicture(tempPicture);
+//                    }
+//                }
             }
         }
         return jobs;
@@ -73,7 +73,7 @@ public class JobsServiceImpl implements JobsService {
     public boolean newApplication(Long userId, Long jobId) {
         User currentUser = userService.getUserById(userId);
         Job job = getJobById(jobId);
-        Set<User> usersApplied = job.getUsersApplied();
+        Collection<User> usersApplied = job.getUsersApplied();
         if (!usersApplied.contains(currentUser)) {
             usersApplied.add(currentUser);
             job.setUsersApplied(usersApplied);
@@ -84,7 +84,7 @@ public class JobsServiceImpl implements JobsService {
     }
 
     @Override
-    public Set<User> getJobApplicants(Long userId, Long jobId) {
+    public Collection<User> getJobApplicants(Long userId, Long jobId) {
 //        userService.getUserById(userId); //this line is not required i guess
         Job job = getJobById(jobId);
         return job.getUsersApplied();
@@ -97,34 +97,34 @@ public class JobsServiceImpl implements JobsService {
         User currentUser = userService.getUserById(userId);
         List<Job> recommendedJobs;
         if (!currentUser.getRecommendedJobs().isEmpty()) {
-            recommendedJobs = currentUser.getRecommendedJobs();
+            recommendedJobs = (List<Job>) currentUser.getRecommendedJobs();
         } else {
             return new ArrayList<>(getJobs(userId));
         }
         Collections.reverse(recommendedJobs);
-        for (Job j : recommendedJobs) {
-            User owner = j.getUserMadeBy();
-            Picture pic = owner.getProfilePicture();
-            if (pic != null) {
-                if (pic.isCompressed()) {
-                    Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(),
-                            PictureSave.decompressBytes(pic.getBytes()));
-                    tempPicture.setCompressed(false);
-                    owner.setProfilePicture(tempPicture);
-                }
-            }
-            Set<User> usersApplied = j.getUsersApplied();
-            for (User user : usersApplied) {
-                Picture cpic = user.getProfilePicture();
-                if (cpic != null) {
-                    if (cpic.isCompressed()) {
-                        Picture tempPicture = new Picture(cpic.getId(), cpic.getName(), cpic.getType(), PictureSave.decompressBytes(cpic.getBytes()));
-                        tempPicture.setCompressed(false);
-                        user.setProfilePicture(tempPicture);
-                    }
-                }
-            }
-        }
+//        for (Job j : recommendedJobs) {
+//            User owner = j.getUserMadeBy();
+//            Picture pic = owner.getProfilePicture();
+//            if (pic != null) {
+//                if (pic.isCompressed()) {
+//                    Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(),
+//                            PictureSave.decompressBytes(pic.getBytes()));
+//                    tempPicture.setCompressed(false);
+//                    owner.setProfilePicture(tempPicture);
+//                }
+//            }
+//            Collection<User> usersApplied = j.getUsersApplied();
+//            for (User user : usersApplied) {
+//                Picture cpic = user.getProfilePicture();
+//                if (cpic != null) {
+//                    if (cpic.isCompressed()) {
+//                        Picture tempPicture = new Picture(cpic.getId(), cpic.getName(), cpic.getType(), PictureSave.decompressBytes(cpic.getBytes()));
+//                        tempPicture.setCompressed(false);
+//                        user.setProfilePicture(tempPicture);
+//                    }
+//                }
+//            }
+//        }
         return recommendedJobs;
     }
 

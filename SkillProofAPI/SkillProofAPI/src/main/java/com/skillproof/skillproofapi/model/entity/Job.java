@@ -6,16 +6,13 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "job")
 public class Job {
 
@@ -23,31 +20,34 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column @NonNull
+    @Column
+    @NonNull
     private String title;
 
-    @Column @NonNull @Size(max = 1500)
+    @Column
+    @NonNull
+    @Size(max = 1500)
     private String description;
 
     @Column
     private Timestamp timestamp;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"jobsCreated","jobApplied","recommendedJobs","interestReactions"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"jobsCreated", "jobApplied", "recommendedJobs", "interestReactions"})
     private User userMadeBy;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = {"jobApplied","jobsCreated","recommendedJobs","interestReactions"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<User> usersApplied = new HashSet<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"jobApplied", "jobsCreated", "recommendedJobs", "interestReactions"})
+    private Collection<User> usersApplied;
 
-    @ManyToMany(mappedBy="recommendedJobs",fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = {"recommendedJobs","jobsCreated","jobApplied","interestReactions","usersFollowing","userFollowedBy","posts"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private List<User> recommendedTo = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "recommendedJobs")
+    @JsonIgnoreProperties({"recommendedJobs", "jobsCreated", "jobApplied", "interestReactions",
+            "usersFollowing", "userFollowedBy", "posts"})
+    private Collection<User> recommendedTo;
 
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
 }

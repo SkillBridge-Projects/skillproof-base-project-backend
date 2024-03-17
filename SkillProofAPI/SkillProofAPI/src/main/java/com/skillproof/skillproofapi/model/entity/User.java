@@ -1,8 +1,6 @@
 package com.skillproof.skillproofapi.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -10,21 +8,18 @@ import org.hibernate.annotations.FetchMode;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "user")
 public class User {
 
-    // ------------ SIMPLE MEMBERS ------------------ //
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,7 +27,7 @@ public class User {
     @Column(name = "email", nullable = false)
     @NonNull
     @Email
-    private String username;
+    private String userName;
 
     @Column(name = "password")
     @NotBlank
@@ -40,7 +35,7 @@ public class User {
 
     @Column(name = "first_name", nullable = false)
     @NonNull
-    private String fisrtName;
+    private String firstName;
 
     @Column(name = "last_name", nullable = false)
     @NonNull
@@ -49,121 +44,85 @@ public class User {
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
-//    @Column(name = "city")
-//    private String city;
-//
-//    @Column(name = "currentJob")
-//    private String currentJob;
-//
-//    @Column(name = "currentCompany")
-//    private String currentCompany;
-//
-//    @Column(name = "github")
-//    private String github;
-//
-//    @Column(name = "website")
-//    private String website;
-//
-//    @Column(name = "twitter")
-//    private String twitter;
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
 
     // ------------ DATA MEMBERS WITH RELATIONS ------------------ //
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties("user")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Picture profilePicture;
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JsonIgnoreProperties("user")
+//    private Picture profilePicture;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JsonIgnoreProperties("users")
-    private Set<Role> roles = new HashSet<>();
+    @OneToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private Role role;
 
     /* ----------- SKILLS/EDUCATION/EXPERIENCE ----------- */
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userEdu")
-    @JsonIgnoreProperties("userEdu")
-    private Set<SkillsAndExperience> education = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userExp")
-    @JsonIgnoreProperties("userExp")
-    private Set<SkillsAndExperience> workExperience = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userSk")
-    @JsonIgnoreProperties("userSk")
-    private Set<SkillsAndExperience> skills = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private Collection<SkillsAndExperience> skillsAndExperiences;
 
     /* ----------- NETWORK ----------- */
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userFollowing")
-    @JsonIgnoreProperties("userFollowing")
-    private Set<Connection> usersFollowing = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userFollowed")
-    @JsonIgnoreProperties("userFollowed")
-    private Set<Connection> userFollowedBy = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private Collection<Connection> users;
 
     /* ----------- FEED ----------- */
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @JsonIgnoreProperties("owner")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<Post> posts = new HashSet<>();
+    private Collection<Post> posts;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = {"recommendedTo", "interestReactions", "comments", "owner"}, allowSetters = true)
     @Fetch(value = FetchMode.SELECT)
-    private List<Post> recommendedPosts = new ArrayList<>();
+    private Collection<Post> recommendedPosts;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userMadeBy")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userMadeBy")
     @JsonIgnoreProperties("userMadeBy")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<Comment> comments = new HashSet<>();
+    private Collection<Comment> comments;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @JsonIgnoreProperties("user")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<Notification> notifications = new HashSet<>();
+    private Collection<Notification> notifications;
 
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnoreProperties("usersInterested")
     @Fetch(value = FetchMode.SELECT)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<InterestReaction> interestReactions = new HashSet<>();
+    private Collection<InterestReaction> interestReactions;
 
     /* ----------- JOBS ----------- */
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userMadeBy")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userMadeBy")
     @JsonIgnoreProperties(value = {"usersApplied", "userMadeBy", "recommendedTo"})
-    private Set<Job> jobsCreated = new HashSet<>();
+    private Collection<Job> jobsCreated;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = {"usersApplied", "userMadeBy", "recommendedTo"})
-    private Set<Job> jobApplied = new HashSet<>();
+    private Collection<Job> jobApplied;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = {"usersApplied", "userMadeBy", "recommendedTo"}, allowSetters = true)
-    private List<Job> recommendedJobs = new ArrayList<>();
+    private Collection<Job> recommendedJobs;
 
     /* ----------- CHAT ----------- */
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userMadeBy")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userMadeBy")
     @JsonIgnoreProperties("userMadeBy")
-    private Set<Message> messages = new HashSet<>();
+    private Collection<Message> messages;
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
     @JsonIgnoreProperties("users")
-    private Set<Chat> chats = new HashSet<>();
+    private Collection<Chat> chats;
 
-
-    public User(@NonNull @Email String username, @NotBlank String password, @NonNull String firstName, @NonNull String lastName) {
-        this.username = username;
+    public User(@NonNull @Email String userName, @NotBlank String password,
+                @NonNull String firstName, @NonNull String lastName) {
+        this.userName = userName;
         this.password = password;
-        this.fisrtName = firstName;
+        this.firstName = firstName;
         this.lastName = lastName;
     }
 }

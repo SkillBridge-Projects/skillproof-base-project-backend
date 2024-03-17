@@ -9,19 +9,21 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
+import java.util.List;
 
 @RestController
-@AllArgsConstructor
 @Tag(name = "Chat", description = "Manages chats of users in skillProof App")
 public class ChatController {
 
     private final ChatService chatService;
+
+    public ChatController(ChatService chatService) {
+        this.chatService = chatService;
+    }
 
     @CrossOrigin(origins = "*")
     @GetMapping(value = "/in/{userId}/chats", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -32,7 +34,7 @@ public class ChatController {
                             content = @Content(schema = @Schema(implementation = Chat.class)))
             }
     )
-    public Set<Chat> getAllChats(@PathVariable Long userId) {
+    public List<Chat> getAllChats(@PathVariable Long userId) {
         return chatService.getAllChats(userId);
     }
 

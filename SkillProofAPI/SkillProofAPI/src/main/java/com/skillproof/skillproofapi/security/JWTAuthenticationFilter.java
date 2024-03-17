@@ -3,7 +3,8 @@ package com.skillproof.skillproofapi.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.skillproof.skillproofapi.repositories.UserDao;
+import com.skillproof.skillproofapi.services.user.UserService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,12 +24,12 @@ import java.util.Date;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private AuthenticationManager authenticationManager;
-    private UserDao userDao;
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserDao userDao) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserService userService) {
         this.authenticationManager = authenticationManager;
-        this.userDao = userDao;
+        this.userService = userService;
         super.setAuthenticationFailureHandler(new AuthenticationFailureHandlerCustom());
     }
 
@@ -41,7 +42,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            creds.getUsername(),
+                            creds.getUserName(),
                             creds.getPassword())
             );
         } catch (IOException e) {
@@ -63,10 +64,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
         PrintWriter out = res.getWriter();
         String username = ((User) auth.getPrincipal()).getUsername();
-        com.skillproof.skillproofapi.model.entity.User user = userDao.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException(username));
-        user.setPassword(null);
-        String userJsonString = new ObjectMapper().writeValueAsString(user);
-        out.print(userJsonString);
+        com.skillproof.skillproofapi.model.entity.User user = userService.findUserByUsername(username);
+        if (ObjectUtils.isEmpty(user)){
+            throw new UsernameNotFoundException("User with username " + username + "does not exists");
+        }
+//        user.setPassword(null);
+//        String userJsonString = new ObjectMapper().writeValueAsString(user);
+//        out.print(userJsonString);
         out.flush();
     }
 }

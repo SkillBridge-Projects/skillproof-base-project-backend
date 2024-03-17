@@ -4,12 +4,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.skillproof.skillproofapi.constants.SwaggerConstants;
 import com.skillproof.skillproofapi.dto.NewUserInfo;
-import com.skillproof.skillproofapi.enumerations.RoleType;
-import com.skillproof.skillproofapi.model.entity.Role;
 import com.skillproof.skillproofapi.model.entity.SkillsAndExperience;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.model.request.user.CreateUserRequest;
-import com.skillproof.skillproofapi.repositories.RoleRepository;
+import com.skillproof.skillproofapi.model.request.user.UserResponse;
+import com.skillproof.skillproofapi.repositories.RoleDao;
 import com.skillproof.skillproofapi.repositories.UserDao;
 import com.skillproof.skillproofapi.security.SecurityConstants;
 import com.skillproof.skillproofapi.services.user.UserService;
@@ -24,20 +23,21 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
 @Tag(name = "User", description = "Manages Users in skillProof App")
-public class UserController {
+@Transactional
+public class UserController extends AbstractController {
 
     private final UserDao userDao;
     private final UserService userService;
-    private final RoleRepository roleRepository;
+    private final RoleDao roleDao;
 
     @Autowired
     private final BCryptPasswordEncoder encoder;
@@ -52,44 +52,9 @@ public class UserController {
             }
     )
     public ResponseEntity<?> signup(@RequestBody CreateUserRequest createUserRequest) {
-        //TODO: Need to refactor this code after creating global response object
-        User existingUser = userService.findUserByUsername(createUserRequest.getUserName());
-        User user = new User();
-        if (existingUser == null) {
-            user.setUsername(createUserRequest.getUserName());
-            user.setFisrtName(createUserRequest.getFirstName());
-            user.setLastName(createUserRequest.getLastName());
-            user.setPhoneNumber(createUserRequest.getPhoneNumber());
-            user.setPassword(encoder.encode(createUserRequest.getPassword()));
-            Set<Role> roles = new HashSet<>();
-            Role r = roleRepository.findByName(RoleType.valueOf(createUserRequest.getRole()));
-            roles.add(r);
-            user.setRoles(roles);
-//                if (file != null) {
-//                    Picture pic = new Picture(file.getOriginalFilename(), file.getContentType(), compressBytes(file.getBytes()));
-//                    pic.setCompressed(true);
-//                    user.setProfilePicture(pic);
-//                }
-            user = userDao.save(user);
-        } else {
-            return ResponseEntity
-                    .badRequest()
-                    .body("{\"timestamp\": " + "\"" + new Date() + "\","
-                            + "\"status\": 400, "
-                            + "\"error\": \"Bad Request\", "
-                            + "\"message\": \"User with Email already exists!\"}"
-                    );
-        }
-
-        String token = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes()));
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
-        responseHeaders.set("Content-Type", "application/json");
+        UserResponse user = userService.createUser(createUserRequest);
         user.setPassword(null);
-        return ResponseEntity.ok().headers(responseHeaders).body(user);
+        return ResponseEntity.ok().headers(createToken(user.getUserName())).body(user);
     }
 
     @CrossOrigin(origins = "*")
@@ -226,11 +191,24 @@ public class UserController {
                 .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes()));
         token = SecurityConstants.TOKEN_PREFIX + token;
-        existingUser.setUsername(details.getNewUsername());
+        existingUser.setUserName(details.getNewUsername());
         userService.saveUser(existingUser);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set(SecurityConstants.HEADER_STRING, token);
         return ResponseEntity.ok().headers(responseHeaders).body("\"Successful edit!\"");
     }
 
+    @CrossOrigin(origins = "*")
+    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "List all Users",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
+                            content = @Content(schema = @Schema(implementation = UserResponse.class)))
+            }
+    )
+    public List<UserResponse> listAllUsers(){
+        List<UserResponse> userResponses = userService.listAllUsers();
+        return userResponses;
+    }
 }

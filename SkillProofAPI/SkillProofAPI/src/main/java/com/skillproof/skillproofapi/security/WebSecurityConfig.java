@@ -1,7 +1,7 @@
 package com.skillproof.skillproofapi.security;
 
-import com.skillproof.skillproofapi.repositories.UserDao;
 import com.skillproof.skillproofapi.services.UserDetailsServiceImp;
+import com.skillproof.skillproofapi.services.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,13 +23,13 @@ import java.util.Arrays;
 @EnableWebSecurity
 @AllArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true) //pre-authorized
-public class WebSecurity extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserDetailsServiceImp userDetailsService;
     private BCryptPasswordEncoder  passwordEncoder;
 
     @Autowired
-    private UserDao userDao;
+    private UserService userService;
 
 //    public void configure(WebSecurity web) {
 //        web.ignoring()
@@ -58,14 +58,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "swagger-resources/**",
                         "/configuration/**",
                         "/v3/api-docs/swagger-config",
-                        "/v3/api-docs")
+                        "/v3/api-docs",
+                        "/skills-experiences/**",
+                        "/accessToken/**")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .permitAll()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), userDao))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), userService))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager()))
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

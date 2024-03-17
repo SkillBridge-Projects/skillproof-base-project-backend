@@ -1,15 +1,16 @@
 package com.skillproof.skillproofapi.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "interest_reaction")
@@ -21,28 +22,25 @@ public class InterestReaction {
     @Column(name = "timestamp")
     private Timestamp timestamp;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private User userMadeBy;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private Post post;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value = {"usersFollowing","userFollowedBy","posts","comments","notifications","interestReactions","jobsCreated","interactions","jobApplied","messages","chats"},allowSetters = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
+    @OneToOne(mappedBy = "newInterest")
     private Notification notification;
 
     public InterestReaction(User userMadeBy, Post post) {
         this.userMadeBy = userMadeBy;
         this.post = post;
     }
+
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
 }

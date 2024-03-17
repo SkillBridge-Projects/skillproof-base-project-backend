@@ -4,8 +4,8 @@ package com.skillproof.skillproofapi.recommendation;
 import com.skillproof.skillproofapi.model.entity.Job;
 import com.skillproof.skillproofapi.model.entity.Post;
 import com.skillproof.skillproofapi.model.entity.User;
-import com.skillproof.skillproofapi.repositories.JobsRepository;
-import com.skillproof.skillproofapi.repositories.PostRepository;
+import com.skillproof.skillproofapi.repositories.JobsDao;
+import com.skillproof.skillproofapi.repositories.PostDao;
 import com.skillproof.skillproofapi.repositories.UserDao;
 import com.skillproof.skillproofapi.services.user.UserService;
 
@@ -13,10 +13,10 @@ import java.util.*;
 
 public class RecommendationAlgos {
 
-    public void recommendedJobs(UserDao userDao, JobsRepository jobsRepository, UserService userService) {
+    public void recommendedJobs(UserDao userDao, JobsDao jobsDao, UserService userService) {
 
         List<User> userList = userService.getUsersWithOutAdmin();
-        List<Job> jobList = jobsRepository.findAll();
+        List<Job> jobList = jobsDao.findAll();
 
         if(userList.size() > 0 && jobList.size() > 0) {
             double[][] matrix = new double[userList.size()][jobList.size()];
@@ -77,10 +77,10 @@ public class RecommendationAlgos {
 
     }
 
-    public void recommendedPosts(UserDao userDao, PostRepository postRepository, UserService userService) {
+    public void recommendedPosts(UserDao userDao, PostDao postDao, UserService userService) {
 
         List<User> userList = userService.getUsersWithOutAdmin();
-        List<Post> postList = postRepository.findAll();
+        List<Post> postList = postDao.findAll();
 
         if(userList.size() > 0 && postList.size() > 0) {
             double[][] matrix = new double[userList.size()][postList.size()];

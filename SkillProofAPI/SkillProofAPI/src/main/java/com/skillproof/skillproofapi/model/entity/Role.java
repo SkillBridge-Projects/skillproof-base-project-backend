@@ -1,32 +1,42 @@
 package com.skillproof.skillproofapi.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.skillproof.skillproofapi.enumerations.RoleType;
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@RequiredArgsConstructor
+@Getter
+@Setter
+@ToString
 @Table(name = "role")
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Enumerated(EnumType.STRING) @NonNull
+    @Size(max = 100)
+    @Column(name = "description")
+    private String description;
+
+    @NonNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "name", nullable = false)
     private RoleType name;
 
-    @ManyToMany(mappedBy = "roles")
-    @JsonIgnoreProperties("roles")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Set<User> users = new HashSet<User>();
+    @OneToOne(mappedBy = "role")
+    private User user;
 
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
 }

@@ -1,14 +1,11 @@
 package com.skillproof.skillproofapi.model.request.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.skillproof.skillproofapi.enumerations.RoleType;
+import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@ToString
 public class CreateUserRequest {
 
     private String userName;
@@ -16,7 +13,4 @@ public class CreateUserRequest {
     private String lastName;
     private String password;
     private String phoneNumber;
-    private String role;
-
-
 }

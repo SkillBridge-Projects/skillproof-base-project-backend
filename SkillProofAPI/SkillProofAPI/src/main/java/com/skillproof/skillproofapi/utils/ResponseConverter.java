@@ -1,10 +1,15 @@
 package com.skillproof.skillproofapi.utils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class ResponseConverter {
 
@@ -26,5 +31,17 @@ public final class ResponseConverter {
         }
         LOG.info("End of copyProperties method.");
         return targetObject;
+    }
+
+    public static <S, T> List<T> copyListProperties(List<S> sourceObject, Class<T> targetClass){
+        LOG.info("Start of copyListProperties method.");
+        List<T> responseList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(sourceObject)){
+            responseList = sourceObject.stream()
+                    .map(entity -> MODEL_MAPPER.map(entity, targetClass))
+                    .collect(Collectors.toList());
+        }
+        LOG.info("End of copyListProperties method.");
+        return responseList;
     }
 }

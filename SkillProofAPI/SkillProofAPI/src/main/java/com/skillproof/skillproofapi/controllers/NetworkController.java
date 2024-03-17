@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +19,16 @@ import java.util.Set;
 import static com.google.common.collect.Lists.reverse;
 
 @RestController
-@AllArgsConstructor
+@CrossOrigin(origins = "*")
 @Tag(name = "Network", description = "Manages Network of users in skillProof App")
 public class NetworkController {
 
     private final NetworkService networkService;
 
-    @CrossOrigin(origins = "*")
-    //@PreAuthorize("hasRole('PROFESSIONAL')")
+    public NetworkController(NetworkService networkService) {
+        this.networkService = networkService;
+    }
+
     @GetMapping(value = "/in/{userId}/search/{searchQuery}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Search User",
             responses = {
@@ -41,8 +42,6 @@ public class NetworkController {
         return reverse(searchResults);
     }
 
-    @CrossOrigin(origins = "*")
-    //@PreAuthorize("hasRole('PROFESSIONAL')")
     @GetMapping(value = "/in/{userId}/network", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get Network of an User",
             responses = {
@@ -55,8 +54,6 @@ public class NetworkController {
         return networkService.getNetwork(userId);
     }
 
-    @CrossOrigin(origins = "*")
-    //@PreAuthorize("hasRole('PROFESSIONAL')")
     @GetMapping(value = "/in/{userId}/request/{otherUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Send Connection Request to User",
             responses = {
@@ -70,8 +67,6 @@ public class NetworkController {
         return ResponseEntity.ok(result.toString());
     }
 
-    @CrossOrigin(origins = "*")
-    //@PreAuthorize("hasRole('PROFESSIONAL')")
     @PutMapping(value = "/in/{userId}/new-connection/{newUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Add Connections to User ",
             responses = {
@@ -85,8 +80,6 @@ public class NetworkController {
         return ResponseEntity.ok("\"New connection added with success!\"");
     }
 
-    @CrossOrigin(origins = "*")
-    //@PreAuthorize("hasRole('PROFESSIONAL')")
     @PutMapping(value = "/in/{userId}/notifications/{connectionId}/accept-connection",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Accept Connection of an User",

@@ -2,18 +2,20 @@ package com.skillproof.skillproofapi.services.user;
 
 import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
+import com.skillproof.skillproofapi.enumerations.NotificationType;
 import com.skillproof.skillproofapi.enumerations.RoleType;
 import com.skillproof.skillproofapi.enumerations.SkillType;
 import com.skillproof.skillproofapi.exceptions.EmailAlreadyExistsException;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
+import com.skillproof.skillproofapi.model.entity.*;
+import com.skillproof.skillproofapi.model.request.skillsAndExperience.SkillsAndExperienceResponse;
 import com.skillproof.skillproofapi.model.request.user.CreateUserRequest;
 import com.skillproof.skillproofapi.model.request.user.UserResponse;
+import com.skillproof.skillproofapi.repositories.*;
+import com.skillproof.skillproofapi.repositories.user.UserRepository;
+import com.skillproof.skillproofapi.utils.PictureSave;
 import com.skillproof.skillproofapi.utils.ResponseConverter;
 import com.skillproof.skillproofapi.utils.Utils;
-import com.skillproof.skillproofapi.enumerations.NotificationType;
-import com.skillproof.skillproofapi.model.entity.*;
-import com.skillproof.skillproofapi.repositories.*;
-import com.skillproof.skillproofapi.utils.PictureSave;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -30,12 +33,13 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
-    private final SkillsAndExperienceRepository skillsAndExperienceRepository;
-    private final CommentRepository commentRepository;
-    private final NotificationRepository notificationRepository;
-    private final ConnectionRepository connectionRepository;
-    private final InterestReactionRepository interestReactionRepository;
-    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final SkillsAndExperienceDao skillsAndExperienceDao;
+    private final CommentDao commentDao;
+    private final NotificationDao notificationDao;
+    private final ConnectionDao connectionDao;
+    private final InterestReactionDao interestReactionDao;
+    private final RoleDao roleDao;
 
     @Autowired
     private final BCryptPasswordEncoder encoder;
@@ -45,10 +49,10 @@ public class UserServiceImpl implements UserService {
 
     public void newConnection(User user, Long userFollowingId) {
         User userToBeFollowed = getUserById(userFollowingId);
-        Connection newConnection = new Connection(user, userToBeFollowed);
+        Connection newConnection = new Connection(userToBeFollowed);
         Notification notification = new Notification(NotificationType.CONNECTION_REQUEST, userToBeFollowed, newConnection);
-        notificationRepository.save(notification);
-        connectionRepository.save(newConnection);
+        notificationDao.save(notification);
+        connectionDao.save(newConnection);
     }
 
     /* --------- FEED --------- */
@@ -56,23 +60,23 @@ public class UserServiceImpl implements UserService {
     public Set<Post> getFeedPosts(User user) {
         Set<Post> feedPosts = new HashSet<>(user.getPosts());
 
-        Set<Connection> connections = user.getUsersFollowing();
+        Collection<Connection> connections = user.getUsers();
         for (Connection con : connections) {
             if (con.getIsAccepted()) {
-                User userFollowing = con.getUserFollowed();
+                User userFollowing = con.getUser();
                 feedPosts.addAll(userFollowing.getPosts());
-                Set<InterestReaction> interestReactions = userFollowing.getInterestReactions();
+                Collection<InterestReaction> interestReactions = userFollowing.getInterestReactions();
                 for (InterestReaction ir : interestReactions) {
                     feedPosts.add(ir.getPost());
                 }
             }
         }
-        connections = user.getUserFollowedBy();
+        connections = user.getUsers();
         for (Connection con : connections) {
             if (con.getIsAccepted()) {
-                User userFollowing = con.getUserFollowing();
+                User userFollowing = con.getUser();
                 feedPosts.addAll(userFollowing.getPosts());
-                Set<InterestReaction> interestReactions = userFollowing.getInterestReactions();
+                Collection<InterestReaction> interestReactions = userFollowing.getInterestReactions();
                 for (InterestReaction ir : interestReactions) {
                     feedPosts.add(ir.getPost());
                 }
@@ -80,29 +84,29 @@ public class UserServiceImpl implements UserService {
         }
 
         for (Post p : feedPosts) {
-            User owner = p.getOwner();
+            User owner = p.getUser();
 
-            Picture pic = owner.getProfilePicture();
-            if (pic != null) {
-                if (pic.isCompressed()) {
-                    Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(), PictureSave.decompressBytes(pic.getBytes()));
-                    pic.setCompressed(false);
-                    owner.setProfilePicture(tempPicture);
-                }
-            }
+//            Picture pic = owner.getProfilePicture();
+//            if (pic != null) {
+//                if (pic.isCompressed()) {
+//                    Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(), PictureSave.decompressBytes(pic.getBytes()));
+//                    pic.setCompressed(false);
+//                    owner.setProfilePicture(tempPicture);
+//                }
+//            }
 
-            Set<Comment> comments = p.getComments();
-            for (Comment c : comments) {
-                User commentOwner = c.getUserMadeBy();
-                Picture cpic = commentOwner.getProfilePicture();
-                if (cpic != null) {
-                    if (cpic.isCompressed()) {
-                        Picture tempPicture = new Picture(cpic.getId(), cpic.getName(), cpic.getType(), PictureSave.decompressBytes(cpic.getBytes()));
-                        cpic.setCompressed(false);
-                        commentOwner.setProfilePicture(tempPicture);
-                    }
-                }
-            }
+//            Collection<Comment> comments = p.getComments();
+//            for (Comment c : comments) {
+//                User commentOwner = c.getUserMadeBy();
+//                Picture cpic = commentOwner.getProfilePicture();
+//                if (cpic != null) {
+//                    if (cpic.isCompressed()) {
+//                        Picture tempPicture = new Picture(cpic.getId(), cpic.getName(), cpic.getType(), PictureSave.decompressBytes(cpic.getBytes()));
+//                        cpic.setCompressed(false);
+//                        commentOwner.setProfilePicture(tempPicture);
+//                    }
+//                }
+//            }
 
             Set<Picture> newPicts = new HashSet<>();
             for (Picture pict : p.getPictures()) {
@@ -122,52 +126,52 @@ public class UserServiceImpl implements UserService {
 
     public void newPostInterested(User user, Post post) {
         InterestReaction newReaction = new InterestReaction(user, post);
-        User postOwner = post.getOwner();
+        User postOwner = post.getUser();
         if (postOwner != user) {
             Notification notification = new Notification(NotificationType.INTEREST, postOwner, newReaction);
-            notificationRepository.save(notification);
+            notificationDao.save(notification);
         }
-        interestReactionRepository.save(newReaction);
+        interestReactionDao.save(newReaction);
     }
 
     public void newPostComment(User user, Post post, Comment comment) {
         comment.setUserMadeBy(user);
         comment.setPost(post);
-        User postOwner = post.getOwner();
+        User postOwner = post.getUser();
         if (postOwner != user) {
             Notification notification = new Notification(NotificationType.COMMENT, postOwner, comment);
-            notificationRepository.save(notification);
+            notificationDao.save(notification);
         }
-        commentRepository.save(comment);
+        commentDao.save(comment);
     }
 
 
     public Set<User> getUserNetwork(User currentUser) {
         Set<User> network = new HashSet<>();
 
-        Set<Connection> connectionsFollowing = currentUser.getUsersFollowing();
+        Collection<Connection> connectionsFollowing = currentUser.getUsers();
         for (Connection con : connectionsFollowing) {
             if (con.getIsAccepted()) {
-                User userinNetwork = con.getUserFollowed();
+                User userinNetwork = con.getUser();
                 network.add(userinNetwork);
             }
         }
 
-        Set<Connection> connectionsFollowedBy = currentUser.getUserFollowedBy();
+        Collection<Connection> connectionsFollowedBy = currentUser.getUsers();
         for (Connection con : connectionsFollowedBy) {
             if (con.getIsAccepted()) {
-                User userinNetwork = con.getUserFollowing();
+                User userinNetwork = con.getUser();
                 network.add(userinNetwork);
             }
         }
 
-        for (User user : network) {
-            Picture uPic = user.getProfilePicture();
-            if (uPic != null && uPic.isCompressed()) {
-                Picture temp = new Picture(uPic.getName(), uPic.getType(), PictureSave.decompressBytes(uPic.getBytes()));
-                user.setProfilePicture(temp);
-            }
-        }
+//        for (User user : network) {
+//            Picture uPic = user.getProfilePicture();
+//            if (uPic != null && uPic.isCompressed()) {
+//                Picture temp = new Picture(uPic.getName(), uPic.getType(), PictureSave.decompressBytes(uPic.getBytes()));
+//                user.setProfilePicture(temp);
+//            }
+//        }
         return network;
     }
 
@@ -179,7 +183,7 @@ public class UserServiceImpl implements UserService {
         Set<User> usersWithoutAdmin = new HashSet<>();
         List<User> users = userDao.findAll();
         for (User user : users) {
-            if (!user.getUsername().equals("admin")) {
+            if (!user.getUserName().equals("admin")) {
                 usersWithoutAdmin.add(user);
             }
         }
@@ -217,7 +221,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Integer matchingSkills(User u, Job j) {
-        Set<SkillsAndExperience> skills = u.getSkills();
+        Collection<SkillsAndExperience> skills = u.getSkillsAndExperiences();
         Integer avgDistance = 0;
         for (SkillsAndExperience s : skills) {
             Integer editDist = Utils.minDistance(s.getDescription().toLowerCase(), j.getTitle().toLowerCase());
@@ -233,7 +237,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Integer matchingSkills(User u, Post p) {
-        Set<SkillsAndExperience> skills = u.getSkills();
+        Collection<SkillsAndExperience> skills = u.getSkillsAndExperiences();
         Integer avgDistance = 0;
         for (SkillsAndExperience s : skills) {
             Integer editDist = Utils.minDistance(s.getDescription().toLowerCase(), p.getContent().toLowerCase());
@@ -259,14 +263,16 @@ public class UserServiceImpl implements UserService {
     }
 
     public User getUserById(Long id) {
-        return userDao.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, id)));
+        User user = userRepository.getUserById(id);
+        if (user == null){
+            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, id));
+        }
+        return user;
     }
 
     @Override
     public User signup(User user, MultipartFile file) throws IOException {
-        User existingUser = findUserByUsername(user.getUsername());
+        User existingUser = findUserByUsername(user.getUserName());
 
         return null;
     }
@@ -274,38 +280,38 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getProfile(Long id) {
         User user = getUserById(id);
-        Picture pic = user.getProfilePicture();
-        if (pic != null && pic.isCompressed()) {
-            Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(), PictureSave.decompressBytes(pic.getBytes()));
-            tempPicture.setCompressed(false);
-            user.setProfilePicture(tempPicture);
-        }
+//        Picture pic = user.getProfilePicture();
+//        if (pic != null && pic.isCompressed()) {
+//            Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(), PictureSave.decompressBytes(pic.getBytes()));
+//            tempPicture.setCompressed(false);
+//            user.setProfilePicture(tempPicture);
+//        }
         return user;
     }
 
     @Override
     public User getPersonalProfile(Long id, Long otherId) {
         User user = getUserById(otherId);
-        Picture pic = user.getProfilePicture();
-        if (pic != null && pic.isCompressed()) {
-            Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(), PictureSave.decompressBytes(pic.getBytes()));
-            pic.setCompressed(false);
-            user.setProfilePicture(tempPicture);
-        }
+//        Picture pic = user.getProfilePicture();
+//        if (pic != null && pic.isCompressed()) {
+//            Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(), PictureSave.decompressBytes(pic.getBytes()));
+//            pic.setCompressed(false);
+//            user.setProfilePicture(tempPicture);
+//        }
         return user;
     }
 
     @Override
     public void informPersonalProfile(Long id, SkillsAndExperience skill) {
         User user = getUserById(id);
-        if (skill.getType() == SkillType.EXPERIENCE) {
-            skill.setUserExp(user);
-        } else if (skill.getType() == SkillType.SKILL) {
-            skill.setUserSk(user);
-        } else if (skill.getType() == SkillType.EDUCATION) {
-            skill.setUserEdu(user);
+        if (skill.getSkillType() == SkillType.EXPERIENCE) {
+            skill.setUser(user);
+        } else if (skill.getSkillType() == SkillType.SKILL) {
+            skill.setUser(user);
+        } else if (skill.getSkillType() == SkillType.EDUCATION) {
+            skill.setUser(user);
         }
-        skillsAndExperienceRepository.save(skill);
+        skillsAndExperienceDao.save(skill);
     }
 
     @Override
@@ -330,12 +336,12 @@ public class UserServiceImpl implements UserService {
     public User showProfile(Long id, Long otherUserId) {
         getUserById(id);
         User userPreview = getUserById(otherUserId);
-        Picture pic = userPreview.getProfilePicture();
-        if (pic != null && pic.isCompressed()) {
-            Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(), PictureSave.decompressBytes(pic.getBytes()));
-            userPreview.setProfilePicture(tempPicture);
-            pic.setCompressed(false);
-        }
+//        Picture pic = userPreview.getProfilePicture();
+//        if (pic != null && pic.isCompressed()) {
+//            Picture tempPicture = new Picture(pic.getId(), pic.getName(), pic.getType(), PictureSave.decompressBytes(pic.getBytes()));
+//            userPreview.setProfilePicture(tempPicture);
+//            pic.setCompressed(false);
+//        }
         return userPreview;
     }
 
@@ -346,7 +352,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByUsername(String userName) {
-        return userDao.findUserByUsername(userName);
+        return userDao.findUserByUserName(userName);
+    }
+
+    @Override
+    public UserResponse getUserByUsername(String userName) {
+        User user = userRepository.getUserByUsername(userName);
+        if (user == null){
+            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER,
+                    userName));
+        }
+        return getUserResponse(user);
     }
 
     @Override
@@ -354,25 +370,29 @@ public class UserServiceImpl implements UserService {
         User existingUser = findUserByUsername(createUserRequest.getUserName());
         User user = new User();
         if (existingUser == null) {
-            user.setUsername(createUserRequest.getUserName());
-            user.setFisrtName(createUserRequest.getFirstName());
+            user.setUserName(createUserRequest.getUserName());
+            user.setFirstName(createUserRequest.getFirstName());
             user.setLastName(createUserRequest.getLastName());
             user.setPhoneNumber(createUserRequest.getPhoneNumber());
             user.setPassword(encoder.encode(createUserRequest.getPassword()));
-            Set<Role> roles = new HashSet<>();
-            Role r = roleRepository.findByName(RoleType.valueOf(createUserRequest.getRole()));
-            roles.add(r);
-            user.setRoles(roles);
-//                if (file != null) {
-//                    Picture pic = new Picture(file.getOriginalFilename(), file.getContentType(), compressBytes(file.getBytes()));
-//                    pic.setCompressed(true);
-//                    user.setProfilePicture(pic);
-//                }
-            user = userDao.save(user);
+            user = userRepository.createUser(user);
         } else {
             throw new EmailAlreadyExistsException(createUserRequest.getUserName());
         }
         return getUserResponse(user);
+    }
+
+    @Override
+    public List<UserResponse> listAllUsers() {
+        List<User> users = userRepository.listAllUsers();
+        return getResponseList(users);
+    }
+
+    private List<UserResponse> getResponseList(List<User> users){
+        return users.stream()
+                .filter(entity -> entity.getRole().getName() != RoleType.ADMIN)
+                .map(entity -> ResponseConverter.copyProperties(entity, UserResponse.class))
+                .collect(Collectors.toList());
     }
 
     private UserResponse getUserResponse(User user) {

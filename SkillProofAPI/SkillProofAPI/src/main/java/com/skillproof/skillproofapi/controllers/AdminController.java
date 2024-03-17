@@ -3,6 +3,7 @@ package com.skillproof.skillproofapi.controllers;
 
 import com.skillproof.skillproofapi.constants.SwaggerConstants;
 import com.skillproof.skillproofapi.model.entity.User;
+import com.skillproof.skillproofapi.model.request.user.UserResponse;
 import com.skillproof.skillproofapi.services.admin.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,10 +31,10 @@ public class AdminController {
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
                             responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
-                            content = @Content(schema = @Schema(implementation = User.class)))
+                            content = @Content(schema = @Schema(implementation = UserResponse.class)))
             }
     )
-    public List<User> listAllUsers() {
+    public List<UserResponse> listAllUsers() {
         return adminService.listUsers();
     }
 
