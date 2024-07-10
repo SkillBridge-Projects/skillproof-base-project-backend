@@ -1,14 +1,13 @@
 package com.skillproof.skillproofapi.services.user;
 
-import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
+import com.skillproof.skillproofapi.constants.UserConstants;
 import com.skillproof.skillproofapi.enumerations.NotificationType;
 import com.skillproof.skillproofapi.enumerations.RoleType;
 import com.skillproof.skillproofapi.enumerations.SkillType;
-import com.skillproof.skillproofapi.exceptions.EmailAlreadyExistsException;
+import com.skillproof.skillproofapi.exceptions.ResourceFoundException;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
 import com.skillproof.skillproofapi.model.entity.*;
-import com.skillproof.skillproofapi.model.request.skillsAndExperience.SkillsAndExperienceResponse;
 import com.skillproof.skillproofapi.model.request.user.CreateUserRequest;
 import com.skillproof.skillproofapi.model.request.user.UserResponse;
 import com.skillproof.skillproofapi.repositories.*;
@@ -265,7 +264,7 @@ public class UserServiceImpl implements UserService {
     public User getUserById(Long id) {
         User user = userRepository.getUserById(id);
         if (user == null){
-            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, id));
+            throw new UserNotFoundException(ObjectConstants.USER, id);
         }
         return user;
     }
@@ -359,8 +358,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserByUsername(String userName) {
         User user = userRepository.getUserByUsername(userName);
         if (user == null){
-            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER,
-                    userName));
+            throw new UserNotFoundException(ObjectConstants.USER, userName);
         }
         return getUserResponse(user);
     }
@@ -377,7 +375,7 @@ public class UserServiceImpl implements UserService {
             user.setPassword(encoder.encode(createUserRequest.getPassword()));
             user = userRepository.createUser(user);
         } else {
-            throw new EmailAlreadyExistsException(createUserRequest.getUserName());
+            throw new ResourceFoundException(ObjectConstants.USER, UserConstants.USER_EMAIL, createUserRequest.getUserName());
         }
         return getUserResponse(user);
     }

@@ -1,5 +1,6 @@
 package com.skillproof.skillproofapi.services.role;
 
+import com.skillproof.skillproofapi.constants.UserConstants;
 import com.skillproof.skillproofapi.exceptions.ResourceNotFoundException;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
 import com.skillproof.skillproofapi.model.entity.Role;
@@ -9,7 +10,6 @@ import com.skillproof.skillproofapi.model.request.role.RoleResponse;
 import com.skillproof.skillproofapi.repositories.role.RoleRepository;
 import com.skillproof.skillproofapi.services.user.UserService;
 import com.skillproof.skillproofapi.utils.ResponseConverter;
-import com.skillproof.skillproofapi.utils.Utils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +32,7 @@ public class RoleServiceImpl implements RoleService {
         if (createRoleRequest.getUserName() != null){
             User user = userService.findUserByUsername(createRoleRequest.getUserName());
             if (ObjectUtils.isEmpty(user)){
-                throw new UserNotFoundException("User with username " + createRoleRequest.getUserName() + " Not found");
+                throw new UserNotFoundException(UserConstants.USER_EMAIL, createRoleRequest.getUserName());
             }
             role.setUser(user);
         }

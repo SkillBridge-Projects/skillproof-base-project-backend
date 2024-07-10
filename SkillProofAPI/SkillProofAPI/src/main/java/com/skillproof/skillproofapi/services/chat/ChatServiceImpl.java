@@ -1,21 +1,17 @@
 package com.skillproof.skillproofapi.services.chat;
 
-import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
 import com.skillproof.skillproofapi.exceptions.ResourceNotFoundException;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
 import com.skillproof.skillproofapi.model.entity.Chat;
 import com.skillproof.skillproofapi.model.entity.Message;
-import com.skillproof.skillproofapi.model.entity.Picture;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.repositories.ChatDao;
 import com.skillproof.skillproofapi.repositories.MessageDao;
 import com.skillproof.skillproofapi.repositories.UserDao;
-import com.skillproof.skillproofapi.utils.PictureSave;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -30,8 +26,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public List<Chat> getAllChats(Long id) {
         User currentUser = userDao.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, id)));
+                .orElseThrow(() -> new UserNotFoundException(ObjectConstants.USER, id));
 //        for (Chat chat : currentUser.getChats()) {
 //            for (User user : chat.getUsers()) {
 //                setUserProfilePicture(user);
@@ -59,23 +54,19 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public Chat getChatByUser(Long userId, Long chatId) {
         userDao.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, userId)));
+                .orElseThrow(() -> new UserNotFoundException(ObjectConstants.USER, userId));
 
         return chatDao.findById(chatId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.CHAT, chatId)));
+                .orElseThrow(() -> new ResourceNotFoundException(ObjectConstants.CHAT, ObjectConstants.ID, chatId));
     }
 
     @Override
     public Message newMessage(Long userId, Long chatId, Message message) {
         User currentUser = userDao.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, userId)));
+                .orElseThrow(() -> new UserNotFoundException(ObjectConstants.USER, userId));
 
         Chat chat = chatDao.findById(chatId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.CHAT, chatId)));
+                .orElseThrow(() -> new ResourceNotFoundException(ObjectConstants.CHAT, ObjectConstants.ID, chatId));
         message.setUserMadeBy(currentUser);
         message.setChat(chat);
         messageDao.save(message);

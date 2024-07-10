@@ -6,6 +6,7 @@ import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.repositories.RoleDao;
 import com.skillproof.skillproofapi.repositories.UserDao;
 import com.skillproof.skillproofapi.repositories.role.RoleRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -34,7 +35,7 @@ public class SkillProofApplication {
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
-			public void addCorsMappings(CorsRegistry registry) {
+			public void addCorsMappings(@NotNull CorsRegistry registry) {
 				registry.addMapping("/*").allowedOrigins("*");
 			}
 		};

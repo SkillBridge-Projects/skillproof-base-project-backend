@@ -1,6 +1,5 @@
 package com.skillproof.skillproofapi.services.skillAndExperience;
 
-import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
 import com.skillproof.skillproofapi.model.entity.SkillsAndExperience;
@@ -39,8 +38,7 @@ public class SkillsAndExperienceServiceImpl implements SkillsAndExperienceServic
     public SkillsAndExperienceResponse createSkillsAndExperience(CreateSkillsAndExperienceRequest createSkillsAndExperienceRequest) {
         User user = userRepository.getUserById(createSkillsAndExperienceRequest.getUserId());
         if (user == null){
-            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER,
-                    createSkillsAndExperienceRequest.getUserId()));
+            throw new UserNotFoundException(ObjectConstants.USER, createSkillsAndExperienceRequest.getUserId());
         }
         SkillsAndExperience skillsAndExperience = createSkillsAndExperienceEntity(createSkillsAndExperienceRequest, user);
         skillsAndExperience = skillsAndExperienceRepository.createSkillsAndExperience(skillsAndExperience);
@@ -51,7 +49,7 @@ public class SkillsAndExperienceServiceImpl implements SkillsAndExperienceServic
     public List<SkillsAndExperienceResponse> getSkillsAndExperiencesByUserId(Long userId) {
         User user = userRepository.getUserById(userId);
         if (user == null){
-            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, userId));
+            throw new UserNotFoundException(ObjectConstants.USER, userId);
         }
         List<SkillsAndExperience> skillsAndExperiences = skillsAndExperienceRepository.getSkillsAndExperiencesByUserId(userId);
         return getResponseList(skillsAndExperiences);

@@ -1,6 +1,5 @@
 package com.skillproof.skillproofapi.services.connection;
 
-import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
 import com.skillproof.skillproofapi.enumerations.NotificationType;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
@@ -44,12 +43,11 @@ public class ConnectionServiceImpl implements ConnectionService {
         LOG.info("Start of createConnection method.");
         User user = userRepository.getUserById(userId);
         if (user == null){
-            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, userId));
+            throw new UserNotFoundException(ObjectConstants.USER, userId);
         }
         User connectingUser = userRepository.getUserById(createConnectionRequest.getConnectionUserId());
         if (connectingUser == null){
-            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER,
-                    createConnectionRequest.getConnectionUserId()));
+            throw new UserNotFoundException(ObjectConstants.USER, createConnectionRequest.getConnectionUserId());
         }
         Connection connection = createConnectionEntity(createConnectionRequest.isAccepted(), connectingUser);
         connection = connectionRepository.createConnection(connection);

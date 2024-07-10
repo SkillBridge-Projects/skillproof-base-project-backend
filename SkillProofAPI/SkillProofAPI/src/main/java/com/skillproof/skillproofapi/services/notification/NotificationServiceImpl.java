@@ -1,30 +1,20 @@
 package com.skillproof.skillproofapi.services.notification;
 
-import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
-import com.skillproof.skillproofapi.model.entity.Connection;
 import com.skillproof.skillproofapi.model.entity.Notification;
-import com.skillproof.skillproofapi.model.entity.SkillsAndExperience;
 import com.skillproof.skillproofapi.model.entity.User;
-import com.skillproof.skillproofapi.model.request.connection.ConnectionResponse;
 import com.skillproof.skillproofapi.model.request.notification.CreateNotificationRequest;
 import com.skillproof.skillproofapi.model.request.notification.NotificationResponse;
-import com.skillproof.skillproofapi.model.request.skillsAndExperience.SkillsAndExperienceResponse;
 import com.skillproof.skillproofapi.repositories.notification.NotificationRepository;
 import com.skillproof.skillproofapi.repositories.user.UserRepository;
-import com.skillproof.skillproofapi.enumerations.NotificationType;
 import com.skillproof.skillproofapi.utils.ResponseConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.skillproof.skillproofapi.enumerations.NotificationType.CONNECTION_REQUEST;
 
 @Service
 @Transactional
@@ -42,7 +32,7 @@ public class NotificationServiceImpl implements NotificationService {
     public List<NotificationResponse> listNotifications(Long userId) {
         User currentUser = userRepository.getUserById(userId);
         if (currentUser == null) {
-            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER, userId));
+            throw new UserNotFoundException(ObjectConstants.USER, userId);
         }
         List<Notification> notifications = notificationRepository.getNotifications(userId);
         return getNotificationResponseList(notifications);
@@ -52,8 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
     public NotificationResponse createNotification(CreateNotificationRequest createNotificationRequest) {
         User user = userRepository.getUserById(createNotificationRequest.getUserId());
         if (user == null) {
-            throw new UserNotFoundException(String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.USER,
-                    createNotificationRequest.getUserId()));
+            throw new UserNotFoundException(ObjectConstants.USER, createNotificationRequest.getUserId());
         }
         Notification notification = notificationRepository.createNotification(createNotificationEntity(createNotificationRequest, user));
         return getNotificationResponse(notification);

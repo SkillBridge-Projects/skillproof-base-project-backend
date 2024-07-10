@@ -4,13 +4,11 @@ import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
 import com.skillproof.skillproofapi.exceptions.ResourceNotFoundException;
 import com.skillproof.skillproofapi.model.entity.Job;
-import com.skillproof.skillproofapi.model.entity.Picture;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.recommendation.RecommendationAlgos;
 import com.skillproof.skillproofapi.repositories.JobsDao;
 import com.skillproof.skillproofapi.repositories.UserDao;
 import com.skillproof.skillproofapi.services.user.UserService;
-import com.skillproof.skillproofapi.utils.PictureSave;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -123,8 +123,7 @@ public class NetworkServiceImpl implements NetworkService {
         connectionDao.save(conn);
 
         Notification not = notificationDao.findByConnectionId(connectionId)
-                .orElseThrow(() -> new UserNotFoundException(
-                        String.format(ErrorMessageConstants.NOT_FOUND, ObjectConstants.NOTIFICATION, connectionId)));
+                .orElseThrow(() -> new UserNotFoundException(ObjectConstants.NOTIFICATION, connectionId));
         not.setIsShown(true);
         notificationDao.save(not);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());

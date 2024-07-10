@@ -1,8 +1,6 @@
 package com.skillproof.skillproofapi.services;
 
-import com.skillproof.skillproofapi.exceptions.EmailNotFoundException;
 import com.skillproof.skillproofapi.repositories.UserDao;
-
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +22,7 @@ public class UserDetailsServiceImp implements UserDetailsService {
     private UserDao applicationUserRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws EmailNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         com.skillproof.skillproofapi.model.entity.User applicationUser = applicationUserRepository.findUserByUserName(username);
         if (applicationUser == null) {
             throw new UsernameNotFoundException(username);

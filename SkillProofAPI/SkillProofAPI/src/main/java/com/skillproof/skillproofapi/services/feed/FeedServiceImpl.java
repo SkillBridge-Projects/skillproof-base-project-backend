@@ -3,7 +3,6 @@ package com.skillproof.skillproofapi.services.feed;
 import com.skillproof.skillproofapi.constants.ErrorMessageConstants;
 import com.skillproof.skillproofapi.constants.ObjectConstants;
 import com.skillproof.skillproofapi.exceptions.PostNotFoundException;
-import com.skillproof.skillproofapi.exceptions.ResourceNotFoundException;
 import com.skillproof.skillproofapi.recommendation.RecommendationAlgos;
 import com.skillproof.skillproofapi.services.user.UserService;
 import com.skillproof.skillproofapi.enumerations.NotificationType;
