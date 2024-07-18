@@ -14,7 +14,7 @@ import java.util.List;
 @ToString
 public class ApiError {
 
-    private HttpStatus httpStatus;
+    private HttpStatus status;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime timeStamp;
@@ -36,14 +36,14 @@ public class ApiError {
 
     public ApiError(HttpStatus httpStatus, String message, List<SubError> subErrors){
         this();
-        this.httpStatus = httpStatus;
+        this.status = httpStatus;
         this.message = message.trim();
         this.subErrors = new ArrayList<>(subErrors);
     }
 
     public ApiError(HttpStatus httpStatus, String message, Throwable ex){
         this();
-        this.httpStatus = httpStatus;
+        this.status = httpStatus;
         this.message = message.trim();
         this.debugMessage = ex.getLocalizedMessage();
     }

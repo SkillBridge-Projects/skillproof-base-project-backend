@@ -1,6 +1,5 @@
 package com.skillproof.skillproofapi.repositories.user;
 
-import com.skillproof.skillproofapi.model.entity.Connection;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.repositories.UserDao;
 import org.slf4j.Logger;
@@ -29,14 +28,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User getUserById(Long id) {
+    public User getUserById(String id) {
         LOG.info("Start of createUser method.");
         return userDao.findById(id).orElse(null);
     }
 
     @Override
     public User getUserByUsername(String userName) {
-        Optional<User> user = userDao.findByUserName(userName);
+        Optional<User> user = userDao.findByEmailAddressIgnoreCase(userName);
         return user.orElse(null);
     }
 
@@ -46,7 +45,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<Connection> listConnectionsForUser(Long userId) {
-        return userDao.findUsersById(userId);
+    public void deleteUserById(String id) {
+        userDao.deleteById(id);
+    }
+
+    @Override
+    public User updateUser(User user) {
+        return userDao.saveAndFlush(user);
     }
 }

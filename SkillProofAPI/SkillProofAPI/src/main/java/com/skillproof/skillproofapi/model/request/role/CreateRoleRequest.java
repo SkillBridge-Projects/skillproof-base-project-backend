@@ -9,5 +9,5 @@ import lombok.Setter;
 public class CreateRoleRequest {
 
     private RoleType roleType;
-    private String userName;
+    private String description;
 }

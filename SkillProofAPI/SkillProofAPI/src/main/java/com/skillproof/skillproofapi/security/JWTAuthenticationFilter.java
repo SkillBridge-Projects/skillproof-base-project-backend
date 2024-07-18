@@ -1,76 +1,99 @@
 package com.skillproof.skillproofapi.security;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.skillproof.skillproofapi.services.user.UserService;
-import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.security.authentication.AuthenticationManager;
+import com.skillproof.skillproofapi.exceptions.InvalidRequestException;
+import com.skillproof.skillproofapi.services.UserDetailsServiceImpl;
+import com.skillproof.skillproofapi.utils.JwtUtil;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.List;
 
-import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
+import static com.skillproof.skillproofapi.security.SecurityConstants.HEADER_STRING;
+import static com.skillproof.skillproofapi.security.SecurityConstants.TOKEN_PREFIX;
 
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final AuthenticationManager authenticationManager;
-    private final UserService userService;
+@Component
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.userService = userService;
-        super.setAuthenticationFailureHandler(new AuthenticationFailureHandlerCustom());
+    private static final List<String> EXCLUDED_PATHS = Arrays.asList("/authenticate", "/signup", "/accessToken");
+
+    private UserDetailsServiceImpl service = null;
+    private final JwtUtil jwtUtil;
+
+    public JWTAuthenticationFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest req,
-                                                HttpServletResponse res) throws AuthenticationException {
-        try {
-            com.skillproof.skillproofapi.model.entity.User creds = new ObjectMapper()
-                    .readValue(req.getInputStream(), com.skillproof.skillproofapi.model.entity.User.class);
+    protected void doFilterInternal(HttpServletRequest request,
+                                    @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain chain) throws IOException, ServletException {
 
-            return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            creds.getUserName(),
-                            creds.getPassword())
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        String path = request.getRequestURI();
+        if (isExcluded(path)) {
+            chain.doFilter(request, response);
+            return;
         }
+
+        if (service == null) {
+            ServletContext servletContext = request.getServletContext();
+            WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            service = webApplicationContext.getBean(UserDetailsServiceImpl.class); //Because service cannot be injected
+        }
+
+        String header = request.getHeader(HEADER_STRING);
+
+        if (header == null || !header.startsWith(TOKEN_PREFIX)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        chain.doFilter(request, response);
     }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest req,
-                                            HttpServletResponse res,
-                                            FilterChain chain,
-                                            Authentication auth) throws IOException, ServletException {
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = null;
+        String authorizationHeader = request.getHeader(HEADER_STRING);
+        String token = null;
+        String userName = null;
 
-
-        String token = JWT.create()
-                .withSubject(((User) auth.getPrincipal()).getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-                .sign(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes()));
-        res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
-        PrintWriter out = res.getWriter();
-        String username = ((User) auth.getPrincipal()).getUsername();
-        com.skillproof.skillproofapi.model.entity.User user = userService.findUserByUsername(username);
-        if (ObjectUtils.isEmpty(user)){
-            throw new UsernameNotFoundException("User with username " + username + "does not exists");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.replace("Bearer ", "");
+            userName = jwtUtil.extractUsername(token);
+        } else {
+            logger.warn("JWT Token does not begin with Bearer String");
         }
-//        user.setPassword(null);
-//        String userJsonString = new ObjectMapper().writeValueAsString(user);
-//        out.print(userJsonString);
-        out.flush();
+
+        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = service.loadUserByUsername(userName);
+            if (jwtUtil.validateToken(token, userDetails)) {
+                usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,
+                        userDetails.getAuthorities());
+                usernamePasswordAuthenticationToken
+                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            } else {
+                throw new InvalidRequestException("Invalid Token");
+            }
+        }
+        return usernamePasswordAuthenticationToken;
+    }
+
+    private boolean isExcluded(String path) {
+        return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
     }
 }

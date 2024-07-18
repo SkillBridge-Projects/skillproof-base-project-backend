@@ -1,10 +1,11 @@
 package com.skillproof.skillproofapi.services;
 
+import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.repositories.UserDao;
+import com.skillproof.skillproofapi.repositories.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,20 +18,21 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 @Transactional
-public class UserDetailsServiceImp implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private UserDao applicationUserRepository;
+    private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
-        com.skillproof.skillproofapi.model.entity.User applicationUser = applicationUserRepository.findUserByUserName(username);
+        User applicationUser = userRepository.getUserByUsername(username);
         if (applicationUser == null) {
             throw new UsernameNotFoundException(username);
         }
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        grantedAuthorities.add(new SimpleGrantedAuthority(applicationUser.getRole().getName().name()));
+        grantedAuthorities.add(new SimpleGrantedAuthority(applicationUser.getRole().name()));
 
-        return new User(applicationUser.getUserName(), applicationUser.getPassword(), grantedAuthorities);
+        return new org.springframework.security.core.userdetails.User(applicationUser.getEmailAddress(),
+                applicationUser.getPassword(), grantedAuthorities);
     }
 }

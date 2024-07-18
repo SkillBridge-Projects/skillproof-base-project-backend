@@ -1,4 +1,4 @@
-package com.skillproof.skillproofapi.repositories.post;
-
-public class PostRepositoryImpl implements PostRepository {
-}
+//package com.skillproof.skillproofapi.repositories.post;
+//
+//public class PostRepositoryImpl implements PostRepository {
+//}
