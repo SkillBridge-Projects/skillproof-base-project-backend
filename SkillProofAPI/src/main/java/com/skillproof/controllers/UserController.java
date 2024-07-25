@@ -47,152 +47,17 @@ public class UserController extends AbstractController {
     public ResponseEntity<?> signup(@RequestBody @Valid CreateUserRequest createUserRequest) {
         UserResponse user = userService.createUser(createUserRequest);
         String token = jwtUtil.createToken(user.getEmailAddress());
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.set(SecurityConstants.HEADER_STRING, token);
-        responseHeaders.set("Content-Type", "application/json");
-        return ResponseEntity.ok().headers(responseHeaders).body(user);
+        return ResponseEntity.ok().headers(getResponseHeaders(token)).body(user);
     }
 
-//    @CrossOrigin(origins = "*")
-//    @GetMapping(value = "/in/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Operation(summary = "Get Profile",
-//            responses = {
-//                    @ApiResponse(description = SwaggerConstants.SUCCESS,
-//                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
-//                            content = @Content(schema = @Schema(implementation = User.class)))
-//            }
-//    )
-//    public User getProfile(@PathVariable Long id) {
-//        return userService.getProfile(id);
-//    }
-//
-//    @CrossOrigin(origins = "*")
-//    @GetMapping(value = "/in/{id}/user-profile/{otherId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Operation(summary = "Get Personal Profile of an User",
-//            responses = {
-//                    @ApiResponse(description = SwaggerConstants.SUCCESS,
-//                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
-//                            content = @Content(schema = @Schema(implementation = User.class)))
-//            }
-//    )
-//    public User getPersonalProfile(@PathVariable Long id, @PathVariable Long otherId) {
-//        return userService.getPersonalProfile(id, otherId);
-//    }
-//
-//    @CrossOrigin(origins = "*")
-//    @PutMapping(value = "/in/{id}/profile/new-info", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Operation(summary = "Update Information of a Profile",
-//            responses = {
-//                    @ApiResponse(description = SwaggerConstants.SUCCESS,
-//                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
-//                            content = @Content(schema = @Schema(implementation = User.class)))
-//            }
-//    )
-//    public ResponseEntity informPersonalProfile(@PathVariable Long id, @RequestBody SkillsAndExperience skill) {
-//        userService.informPersonalProfile(id, skill);
-//        return ResponseEntity.ok("\"All changes made with success!\"");
-//    }
-//
-//    @CrossOrigin(origins = "*")
-//    @PutMapping(value = "/in/{id}/editJob", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Operation(summary = "Update Job of an User",
-//            responses = {
-//                    @ApiResponse(description = SwaggerConstants.SUCCESS,
-//                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
-//                            content = @Content(schema = @Schema(implementation = User.class)))
-//            }
-//    )
-//    public ResponseEntity editUserJob(@PathVariable Long id, @RequestBody User user) {
-//        userService.editUserJob(id, user);
-//        return ResponseEntity.ok("\"All changes made with success!\"");
-//    }
-//
-//    @CrossOrigin(origins = "*")
-//    @GetMapping(value = "/in/{id}/profile/{otherUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Operation(summary = "Get Profile of an User",
-//            responses = {
-//                    @ApiResponse(description = SwaggerConstants.SUCCESS,
-//                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
-//                            content = @Content(schema = @Schema(implementation = User.class)))
-//            }
-//    )
-//    public User showProfile(@PathVariable Long id, @PathVariable Long otherUserId) {
-//        return userService.showProfile(id, otherUserId);
-//    }
-//
-//    @CrossOrigin(origins = "*")
-//    @PutMapping(value = "/in/{id}/settings/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Operation(summary = "Change Password for User",
-//            responses = {
-//                    @ApiResponse(description = SwaggerConstants.SUCCESS,
-//                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
-//                            content = @Content(schema = @Schema(implementation = User.class)))
-//            }
-//    )
-//    public ResponseEntity changePassword(@PathVariable Long id, @RequestBody NewUserInfo pwdDetails) {
-//        //TODO: Need to refactor this code after creating global response object
-//        if (!pwdDetails.getNewPassword().equals(pwdDetails.getPasswordConfirm())) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body("{\"timestamp\": " + "\"" + new Date().toString() + "\","
-//                            + "\"status\": 400, "
-//                            + "\"error\": \"Bad Request\", "
-//                            + "\"message\": \"Passwords do not match!\", "
-//                            + "\"path\": \"/users/" + id.toString() + "/passwordchange\"}"
-//                    );
-//        }
-//        User user = userService.getUserById(id);
-//        if (!encoder.matches(pwdDetails.getCurrentPassword(), user.getPassword())) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body("{\"timestamp\": " + "\"" + new Date().toString() + "\","
-//                            + "\"status\": 400, "
-//                            + "\"error\": \"Bad Request\", "
-//                            + "\"message\": \"Wrong password!\", "
-//                            + "\"path\": \"/users/" + id.toString() + "/passwordchange\"}"
-//                    );
-//        }
-//        user.setPassword(encoder.encode(pwdDetails.getNewPassword()));
-//        userService.saveUser(user);
-//        return ResponseEntity.ok("\"Password Changed!\"");
-//    }
-
-
-//    @CrossOrigin(origins = "*")
-//    @PutMapping(value = "/in/{id}/settings/change-username", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Operation(summary = "Change UserName for User",
-//            responses = {
-//                    @ApiResponse(description = SwaggerConstants.SUCCESS,
-//                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
-//                            content = @Content(schema = @Schema(implementation = User.class)))
-//            }
-//    )
-//    public ResponseEntity changeUserName(@PathVariable Long id, @RequestBody NewUserInfo details) {
-//        //TODO: Need to refactor this code after creating global response object
-//        String token = null;
-//        User existingUser = userService.getUserById(id);
-//
-//        if (!encoder.matches(details.getCurrentPassword(), existingUser.getPassword())) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body("{\"timestamp\": " + "\"" + new Date().toString() + "\","
-//                            + "\"status\": 400, "
-//                            + "\"error\": \"Bad Request\", "
-//                            + "\"message\": \"Wrong password!\", "
-//                            + "\"path\": \"/users/" + id.toString() + "/passwordchange\"}"
-//                    );
-//        }
-//        token = JWT.create()
-//                .withSubject(details.getNewUsername())
-//                .withExpiresAt(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-//                .sign(Algorithm.HMAC512(SecurityConstants.SECRET.getBytes()));
-//        token = SecurityConstants.TOKEN_PREFIX + token;
-//        existingUser.setEmailAddress(details.getNewUsername());
-//        userService.saveUser(existingUser);
-//        HttpHeaders responseHeaders = new HttpHeaders();
-//        responseHeaders.set(SecurityConstants.HEADER_STRING, token);
-//        return ResponseEntity.ok().headers(responseHeaders).body("\"Successful edit!\"");
-//    }
+    private HttpHeaders getResponseHeaders(String token) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set(SecurityConstants.HEADER_STRING, token);
+        responseHeaders.set(SecurityConstants.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        responseHeaders.add(SecurityConstants.EXPOSE_HEADERS, SecurityConstants.AUTH);
+        responseHeaders.add(SecurityConstants.ALLOW_HEADERS, SecurityConstants.ALLOW_HEADERS_VALUE);
+        return responseHeaders;
+    }
 
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "List all Users",
@@ -209,6 +74,7 @@ public class UserController extends AbstractController {
             @RequestParam(required = false) String emailAddress,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String phone,
+            @RequestParam(required = false) String bio,
             @RequestParam(required = false) RoleType roleType,
             @RequestParam(required = false) List<String> skills,
             @Parameter(description = "Creation date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")

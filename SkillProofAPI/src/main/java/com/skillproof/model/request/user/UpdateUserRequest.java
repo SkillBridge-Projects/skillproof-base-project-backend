@@ -33,6 +33,9 @@ public class UpdateUserRequest {
     @Schema(name = "phone", example = "9087654321", format = "phone")
     private String phone;
 
+    @Schema(name = "bio", example = "I am john...", format = "bio")
+    private String bio;
+
     @NotEmptyOnly(label = UserConstants.CITY)
     @Size(max = 250, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
@@ -41,6 +44,5 @@ public class UpdateUserRequest {
 
     @Schema(name = "skills", example = "[\"Java\",\"SQL\"]")
     private List<@NotEmpty(message = Messages.NO_EMPTY_PROPERTY)
-    @Size(max = 250, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY) String> skills;
 }

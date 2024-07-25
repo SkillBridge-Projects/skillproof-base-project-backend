@@ -20,9 +20,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.time.LocalDateTime;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.skillproof.skillproofapi.*"})
-@EntityScan(basePackages = {"com.skillproof.skillproofapi.*"})
-@EnableJpaRepositories(basePackages = {"com.skillproof.skillproofapi.*"})
+@ComponentScan(basePackages = {"com.skillproof.*"})
+@EntityScan(basePackages = {"com.skillproof.*"})
+@EnableJpaRepositories(basePackages = {"com.skillproof.*"})
 public class SkillProofApplication {
 
     public static void main(String[] args) {
