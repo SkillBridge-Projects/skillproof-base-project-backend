@@ -1,6 +1,6 @@
 package com.skillproof.skillproofapi.model.entity;
 
-import com.skillproof.skillproofapi.enumerations.RoleType;
+import com.skillproof.skillproofapi.enums.RoleType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,12 +16,12 @@ public class User {
 
     @Id
     @Size(max = 20)
-    @Column(name = "id")
+    @Column(name = "id", unique = true)
     private String id;
 
     @Basic
     @Size(max = 100)
-    @Column(name = "email_address", nullable = false)
+    @Column(name = "email_address", nullable = false, unique = true)
     private String emailAddress;
 
     @Basic
@@ -64,4 +64,8 @@ public class User {
     @Basic
     @Column(name = "skills")
     private String skills;
+
+    @Basic
+    @Column(name = "bio")
+    private String bio;
 }

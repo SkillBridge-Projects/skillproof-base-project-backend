@@ -1,6 +1,6 @@
 package com.skillproof.skillproofapi;
 
-import com.skillproof.skillproofapi.enumerations.RoleType;
+import com.skillproof.skillproofapi.enums.RoleType;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.repositories.user.UserRepository;
 import org.apache.commons.lang3.ObjectUtils;

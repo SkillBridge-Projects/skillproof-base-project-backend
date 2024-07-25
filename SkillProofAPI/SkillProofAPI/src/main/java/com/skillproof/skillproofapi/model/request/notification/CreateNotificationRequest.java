@@ -1,6 +1,6 @@
 package com.skillproof.skillproofapi.model.request.notification;
 
-import com.skillproof.skillproofapi.enumerations.NotificationType;
+import com.skillproof.skillproofapi.enums.NotificationType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

@@ -1,6 +1,8 @@
 package com.skillproof.skillproofapi.controllers;
 
 import com.skillproof.skillproofapi.constants.SwaggerConstants;
+import com.skillproof.skillproofapi.enums.RoleType;
+import com.skillproof.skillproofapi.enums.sort.UserSortType;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.model.request.user.CreateUserRequest;
 import com.skillproof.skillproofapi.model.request.user.UpdateUserRequest;
@@ -9,6 +11,7 @@ import com.skillproof.skillproofapi.security.SecurityConstants;
 import com.skillproof.skillproofapi.services.user.UserService;
 import com.skillproof.skillproofapi.utils.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,11 +20,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -199,7 +202,27 @@ public class UserController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = UserResponse.class)))
             }
     )
-    public ResponseEntity<List<UserResponse>> listAllUsers() {
+    public ResponseEntity<List<UserResponse>> listAllUsers(
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String emailAddress,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) RoleType roleType,
+            @RequestParam(required = false) List<String> skills,
+            @Parameter(description = "Creation date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")
+            @RequestParam(required = false) LocalDateTime createdDate,
+            @Parameter(description = "Updated date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")
+            @RequestParam(required = false) LocalDateTime updatedDate,
+            @Parameter(description = "Page number, starts at 1")
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @Parameter(description = "Page size, should be at least 1")
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @Parameter(description = "Page size, should be at least 1")
+            @RequestParam(required = false) List<UserSortType> sort) {
+//        List<UserResponse> userResponses = userService.listAllUsers(id, firstName, lastName, emailAddress, city,
+//                phone, roleType, skills, createdDate, updatedDate, page, size, sort);
         List<UserResponse> userResponses = userService.listAllUsers();
         return ok(userResponses);
     }
@@ -241,5 +264,19 @@ public class UserController extends AbstractController {
     public ResponseEntity<?> deleteUserById(@PathVariable String id) {
         userService.deleteUserById(id);
         return ok();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value = "/users/roles/{role}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get users by role",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
+                            content = @Content(schema = @Schema(implementation = UserResponse.class)))
+            }
+    )
+    public ResponseEntity<List<UserResponse>> listUsersByRole(@PathVariable RoleType role) {
+        List<UserResponse> roleUsers = userService.listUsersByRole(role);
+        return ok(roleUsers);
     }
 }

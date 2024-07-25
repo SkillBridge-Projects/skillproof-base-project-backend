@@ -1,8 +1,7 @@
 
 package com.skillproof.skillproofapi.model.request.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.skillproof.skillproofapi.enumerations.RoleType;
+import com.skillproof.skillproofapi.enums.RoleType;
 import com.skillproof.skillproofapi.validators.Messages;
 import com.skillproof.skillproofapi.validators.RegEx;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -44,6 +43,10 @@ public class CreateUserRequest {
     @Size(max = 20, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Schema(name = "phone", example = "9087654321", format = "phone")
     private String phone;
+
+    @Size(max = 20, message = Messages.SIZE_VALIDATION_PROPERTY)
+    @Schema(name = "phone", example = "9087654321", format = "phone")
+    private String bio;
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Size(max = 250, message = Messages.SIZE_VALIDATION_PROPERTY)

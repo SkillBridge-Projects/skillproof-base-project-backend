@@ -2,14 +2,13 @@ package com.skillproof.skillproofapi.services.user;
 
 import com.skillproof.skillproofapi.constants.ObjectConstants;
 import com.skillproof.skillproofapi.constants.UserConstants;
-import com.skillproof.skillproofapi.enumerations.RoleType;
+import com.skillproof.skillproofapi.enums.RoleType;
 import com.skillproof.skillproofapi.exceptions.ResourceFoundException;
 import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.model.request.user.CreateUserRequest;
 import com.skillproof.skillproofapi.model.request.user.UpdateUserRequest;
 import com.skillproof.skillproofapi.model.request.user.UserResponse;
-import com.skillproof.skillproofapi.repositories.UserDao;
 import com.skillproof.skillproofapi.repositories.user.UserRepository;
 import com.skillproof.skillproofapi.utils.ResponseConverter;
 import lombok.AllArgsConstructor;
@@ -260,7 +259,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserById(String id) {
         User user = userRepository.getUserById(id);
         if (user == null) {
-            throw new UserNotFoundException(ObjectConstants.USER, id);
+            throw new UserNotFoundException(ObjectConstants.ID, id);
         }
         return getUserResponse(user);
     }
@@ -344,7 +343,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserByEmailAddress(String emailAddress) {
         User user = userRepository.getUserByUsername(emailAddress);
         if (ObjectUtils.isEmpty(user)) {
-            throw new UserNotFoundException(ObjectConstants.USER, emailAddress);
+            throw new UserNotFoundException(UserConstants.USER_EMAIL, emailAddress);
         }
         return getUserResponse(user);
     }
@@ -377,14 +376,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> listAllUsers() {
         List<User> users = userRepository.listAllUsers();
-        return getResponseList(users);
+        return getResponseList(users, false);
     }
 
     @Override
     public UserResponse updateUser(String id, UpdateUserRequest updateUserRequest) {
         User user = userRepository.getUserById(id);
         if (ObjectUtils.isEmpty(user)) {
-            throw new UserNotFoundException(ObjectConstants.USER, id);
+            throw new UserNotFoundException(ObjectConstants.ID, id);
         }
         prepareUserEntity(user, updateUserRequest);
         User updatedUser = userRepository.updateUser(user);
@@ -414,14 +413,31 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(String id) {
         User user = userRepository.getUserById(id);
         if (ObjectUtils.isEmpty(user)) {
-            throw new UserNotFoundException(ObjectConstants.USER, id);
+            throw new UserNotFoundException(ObjectConstants.ID, id);
         }
         userRepository.deleteUserById(id);
     }
 
-    private List<UserResponse> getResponseList(List<User> users) {
+    @Override
+    public List<UserResponse> listUsersByRole(RoleType role) {
+        List<User> users = userRepository.listUsersByRole(role);
+        return getResponseList(users, true);
+    }
+
+    private List<UserResponse> getResponseList(List<User> users, boolean includeAdmins) {
         return users.stream()
-                .filter(entity -> entity.getRole() != RoleType.ADMIN)
+                .filter(entity -> {
+                    if (includeAdmins){
+                        return true;
+                    }
+                    return entity.getRole() != RoleType.ADMIN;
+                })
+                .map(this::getUserResponse)
+                .collect(Collectors.toList());
+    }
+
+    private List<UserResponse> getResponseListWithAdmin(List<User> users) {
+        return users.stream()
                 .map(this::getUserResponse)
                 .collect(Collectors.toList());
     }

@@ -1,5 +1,6 @@
 package com.skillproof.skillproofapi.repositories.user;
 
+import com.skillproof.skillproofapi.enums.RoleType;
 import com.skillproof.skillproofapi.model.entity.User;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface UserRepository {
     void deleteUserById(String id);
 
     User updateUser(User user);
+
+    List<User> listUsersByRole(RoleType roleType);
 }

@@ -47,14 +47,14 @@ public class AuthenticationController extends AbstractController {
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
                             responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
-                            content = @Content(schema = @Schema(implementation = String.class)))
+                            content = @Content(schema = @Schema(implementation = JwtResponse.class)))
             }
     )
-    public ResponseEntity<String> getAccessToken(@PathVariable String emailAddress) {
+    public ResponseEntity<JwtResponse> getAccessToken(@PathVariable String emailAddress) {
         LOG.info("Start of getAccessToken method.");
         String token = jwtUtil.createToken(emailAddress);
         LOG.info("End of getAccessToken method.");
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        return ok(new JwtResponse(token));
     }
 
     @PostMapping("/authenticate")
@@ -65,7 +65,7 @@ public class AuthenticationController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = JwtResponse.class)))
             }
     )
-    public ResponseEntity<?> authenticateUser(@RequestBody UserCredentials authenticationRequest) throws Exception {
+    public ResponseEntity<JwtResponse> authenticateUser(@RequestBody UserCredentials authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUserName(), authenticationRequest.getPassword());
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUserName());

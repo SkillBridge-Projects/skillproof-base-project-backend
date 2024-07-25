@@ -1,5 +1,6 @@
 package com.skillproof.skillproofapi.repositories.user;
 
+import com.skillproof.skillproofapi.enums.RoleType;
 import com.skillproof.skillproofapi.model.entity.User;
 import com.skillproof.skillproofapi.repositories.UserDao;
 import org.slf4j.Logger;
@@ -52,5 +53,10 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User updateUser(User user) {
         return userDao.saveAndFlush(user);
+    }
+
+    @Override
+    public List<User> listUsersByRole(RoleType roleType) {
+        return userDao.findAllByRole(roleType);
     }
 }

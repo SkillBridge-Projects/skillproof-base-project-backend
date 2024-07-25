@@ -1,4 +1,4 @@
-package com.skillproof.skillproofapi.enumerations;
+package com.skillproof.skillproofapi.enums;
 
 public enum RoleType {
     ADMIN,

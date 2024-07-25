@@ -1,6 +1,6 @@
 package com.skillproof.skillproofapi.model.request.role;
 
-import com.skillproof.skillproofapi.enumerations.RoleType;
+import com.skillproof.skillproofapi.enums.RoleType;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,8 +1,10 @@
 package com.skillproof.skillproofapi.repositories;
 
+import com.skillproof.skillproofapi.enums.RoleType;
 import com.skillproof.skillproofapi.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserDao extends JpaRepository<User, String> {
@@ -12,4 +14,5 @@ public interface UserDao extends JpaRepository<User, String> {
 
     Optional<User> findByEmailAddressIgnoreCase(String userName);
 
+    List<User> findAllByRole(RoleType roleType);
 }

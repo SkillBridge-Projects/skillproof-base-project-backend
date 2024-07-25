@@ -1,14 +1,11 @@
 package com.skillproof.skillproofapi.services.user;
 
-import com.skillproof.skillproofapi.model.entity.*;
+import com.skillproof.skillproofapi.enums.RoleType;
 import com.skillproof.skillproofapi.model.request.user.CreateUserRequest;
 import com.skillproof.skillproofapi.model.request.user.UpdateUserRequest;
 import com.skillproof.skillproofapi.model.request.user.UserResponse;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 public interface UserService {
 
@@ -59,4 +56,6 @@ public interface UserService {
     UserResponse updateUser(String id, UpdateUserRequest updateUserRequest);
 
     void deleteUserById(String id);
+
+    List<UserResponse> listUsersByRole(RoleType role);
 }
