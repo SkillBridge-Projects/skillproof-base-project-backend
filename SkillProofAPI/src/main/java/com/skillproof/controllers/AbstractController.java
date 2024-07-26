@@ -16,6 +16,10 @@ public abstract class AbstractController {
     ResponseEntity noContent(){
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    ResponseEntity forbidden(){
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
     private ResponseEntity<String> resp(HttpStatus httpStatus){
         return new ResponseEntity<>(httpStatus);
     }

@@ -10,6 +10,7 @@ import lombok.ToString;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -20,24 +21,27 @@ public class CreateExperienceRequest {
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Size(max = 100, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "companyName", example = "skillbridge", format = "companyname")
+    @Schema(name = "companyName", example = "SkillBridge")
     private String companyName;
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Size(max = 100, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "designation", example = "junior developer", format = "designation")
+    @Schema(name = "designation", example = "junior developer")
     private String designation;
 
     @Size(max = 250, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "description", example = "Worked as junior developer and user management application",
-            format = "description")
+    @Schema(name = "description", example = "Worked as junior developer in SkillBridge")
     private String description;
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
-    @Schema(name = "experience", example = "2.0", format = "experience")
-    private float experience;
+    @Schema(name = "startDate", example = "2023-03-01", type = "String", format = "YYYY-MM-DD")
+    private LocalDate startDate;
+
+    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
+    @Schema(name = "endDate", example = "2024-03-01", type = "String", format = "YYYY-MM-DD")
+    private LocalDate endDate;
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     private String userId;

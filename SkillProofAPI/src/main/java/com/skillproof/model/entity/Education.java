@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "experience")
-public class Experience {
+@Table(name = "education")
+public class Education {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,21 +21,27 @@ public class Experience {
     private Long id;
 
     @Basic
-    @Size(max = 100)
+    @Size(max = 250)
     @NotNull
-    @Column(name = "company_name", nullable = false)
-    private String companyName;
-
-    @Basic
-    @Size(max = 100)
-    @NotNull
-    @Column(name = "designation", nullable = false)
-    private String designation;
+    @Column(name = "university", nullable = false)
+    private String university;
 
     @Basic
     @Size(max = 250)
-    @Column(name = "description")
-    private String description;
+    @NotNull
+    @Column(name = "college_or_school", nullable = false)
+    private String collegeOrSchool;
+
+    @Basic
+    @Size(max = 100)
+    @NotNull
+    @Column(name = "degree", nullable = false)
+    private String degree;
+
+    @Basic
+    @NotNull
+    @Column(name = "grade", nullable = false)
+    private float grade;
 
     @Basic
     @NotNull
@@ -46,6 +52,11 @@ public class Experience {
     @NotNull
     @Column(name = "end_date")
     private LocalDate endDate;
+
+    @Basic
+    @Size(max = 250)
+    @Column(name = "description")
+    private String description;
 
     @Basic
     @NotNull

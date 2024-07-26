@@ -9,5 +9,5 @@ public class SecurityConstants {
     public static final String EXPOSE_HEADERS = "Access-Control-Expose-Headers";
     public static final String ALLOW_HEADERS = "Access-Control-Allow-Headers";
     public static final String ALLOW_HEADERS_VALUE = "Authorization, X-PINGOTHER, Origin, X-Requested-With, Content-Type, Accept, X-Custom-header";
-    public static final String CONTENT_TYPE = "Authorization";
+    public static final String CONTENT_TYPE = "Content-Type";
 }

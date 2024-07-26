@@ -1,6 +1,8 @@
 package com.skillproof.controllers;
 
 import com.skillproof.constants.SwaggerConstants;
+import com.skillproof.model.request.experience.ExperienceResponse;
+import com.skillproof.model.request.experience.UpdateExperienceRequest;
 import com.skillproof.model.request.experience.CreateExperienceRequest;
 import com.skillproof.model.request.experience.ExperienceResponse;
 import com.skillproof.services.experience.ExperienceService;
@@ -64,5 +66,59 @@ public class ExperienceController extends AbstractController {
         }
         LOG.info("End of getExperiencesByUserId method.");
         return ok(experienceResponse);
+    }
+
+    @GetMapping(value = "/experiences/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get Experience by id",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
+                            content = @Content(schema = @Schema(implementation = ExperienceResponse.class)))
+            }
+    )
+    public ResponseEntity<?> getExperienceById(@PathVariable Long id){
+        LOG.debug("Start of getExperienceById method.");
+        ExperienceResponse ExperienceResponse = experienceService.getExperienceById(id);
+        LOG.debug("End of getExperienceById method.");
+        return ok(ExperienceResponse);
+    }
+
+    @GetMapping(value = "/experiences", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "List All Experiences of an user",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
+                            content = @Content(schema = @Schema(implementation = ExperienceResponse.class)))
+            }
+    )
+    public ResponseEntity<List<ExperienceResponse>> listAllExperienceDetails(){
+        List<ExperienceResponse> experienceResponses = experienceService.listAllExperienceDetails();
+        return ok(experienceResponses);
+    }
+
+    @PatchMapping(value = "/experiences/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Update experience of an user",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
+                            content = @Content(schema = @Schema(implementation = ExperienceResponse.class)))
+            }
+    )
+    public ResponseEntity<ExperienceResponse> updateUser(@PathVariable Long id,
+                                                        @RequestBody @Valid UpdateExperienceRequest updateExperienceRequest) {
+        ExperienceResponse ExperienceResponse = experienceService.updateExperience(id, updateExperienceRequest);
+        return ok(ExperienceResponse);
+    }
+
+    @DeleteMapping(value = "/experiences/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Delete experience of an user by id",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_DELETE)
+            }
+    )
+    public ResponseEntity<?> deleteExperienceById(@PathVariable Long id) {
+        experienceService.deleteExperienceById(id);
+        return ok();
     }
 }

@@ -4,6 +4,7 @@ import com.skillproof.constants.SwaggerConstants;
 import com.skillproof.enums.RoleType;
 import com.skillproof.enums.sort.UserSortType;
 import com.skillproof.model.entity.User;
+import com.skillproof.model.request.profile.UserProfile;
 import com.skillproof.model.request.user.CreateUserRequest;
 import com.skillproof.model.request.user.UpdateUserRequest;
 import com.skillproof.model.request.user.UserResponse;
@@ -21,6 +22,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -144,5 +147,24 @@ public class UserController extends AbstractController {
     public ResponseEntity<List<UserResponse>> listUsersByRole(@PathVariable RoleType role) {
         List<UserResponse> roleUsers = userService.listUsersByRole(role);
         return ok(roleUsers);
+    }
+
+    @GetMapping(value = "/users/{id}/profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get user profile by userId",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
+                            content = @Content(schema = @Schema(implementation = UserProfile.class)))
+            }
+    )
+    public ResponseEntity<?> getUserProfileByUserId(@PathVariable String id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        UserResponse user = userService.getUserById(id);
+        if (!user.getEmailAddress().equals(currentUsername)) {
+            return forbidden();
+        }
+        UserProfile userProfile = userService.getUserProfileByUserId(id);
+        return ok(userProfile);
     }
 }

@@ -1,4 +1,4 @@
-package com.skillproof.model.request.experience;
+package com.skillproof.model.request.education;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class ExperienceResponse extends CreateExperienceRequest {
+public class EducationResponse extends CreateEducationRequest {
 
     @Schema(name = "userEmail", example = "john.doe@email.com", accessMode = Schema.AccessMode.READ_ONLY)
     private String userEmail;

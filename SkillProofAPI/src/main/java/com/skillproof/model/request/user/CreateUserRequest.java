@@ -28,29 +28,29 @@ public class CreateUserRequest {
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Size(max = 100, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "firstName", example = "john", format = "firstname")
+    @Schema(name = "firstName", example = "john")
     private String firstName;
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Size(max = 100, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "lastName", example = "john", format = "lastname")
+    @Schema(name = "lastName", example = "john")
     private String lastName;
 
     @Schema(name = "password", format = "password")
     private String password;
 
     @Size(max = 20, message = Messages.SIZE_VALIDATION_PROPERTY)
-    @Schema(name = "phone", example = "9087654321", format = "phone")
+    @Schema(name = "phone", example = "9087654321")
     private String phone;
 
-    @Schema(name = "bio", example = "I am john...", format = "bio")
+    @Schema(name = "bio", example = "I am john...")
     private String bio;
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Size(max = 250, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "city", example = "bangalore", format = "city")
+    @Schema(name = "city", example = "bangalore")
     private String city;
 
     @NotNull(message = Messages.NO_EMPTY_PROPERTY)

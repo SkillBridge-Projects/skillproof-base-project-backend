@@ -25,12 +25,31 @@ CREATE TABLE IF NOT EXISTS experience (
   company_name VARCHAR(100) NOT NULL,
   designation VARCHAR(100) NOT NULL,
   description VARCHAR(250),
-  user_experience FLOAT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
   user_id VARCHAR(20) NOT NULL,
   created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_date TIMESTAMP NULL,
   PRIMARY KEY (id),
   CONSTRAINT `FK_EXPERIENCE_USER`
+    FOREIGN KEY (user_id)
+    REFERENCES user (id)
+);
+
+CREATE TABLE IF NOT EXISTS education (
+  id BIGINT AUTO_INCREMENT,
+  university VARCHAR(250) NOT NULL,
+  college_or_school VARCHAR(250) NOT NULL,
+  degree VARCHAR(100) NOT NULL,
+  grade FLOAT NOT NULL,
+  description VARCHAR(250),
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  user_id VARCHAR(20) NOT NULL,
+  created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_date TIMESTAMP NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT `FK_EDUCATION_USER`
     FOREIGN KEY (user_id)
     REFERENCES user (id)
 );

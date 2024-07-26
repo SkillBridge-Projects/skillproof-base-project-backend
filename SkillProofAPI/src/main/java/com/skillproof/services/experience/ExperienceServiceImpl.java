@@ -1,14 +1,18 @@
 package com.skillproof.services.experience;
 
 import com.skillproof.constants.ObjectConstants;
+import com.skillproof.exceptions.ExperienceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
 import com.skillproof.model.entity.Experience;
 import com.skillproof.model.entity.User;
 import com.skillproof.model.request.experience.CreateExperienceRequest;
 import com.skillproof.model.request.experience.ExperienceResponse;
-import com.skillproof.repositories.user.UserRepository;
+import com.skillproof.model.request.experience.UpdateExperienceRequest;
 import com.skillproof.repositories.experience.ExperienceRepository;
+import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.utils.ResponseConverter;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -60,6 +64,49 @@ public class ExperienceServiceImpl implements ExperienceService {
         return getResponseList(experiences);
     }
 
+    @Override
+    public ExperienceResponse getExperienceById(Long id) {
+        LOG.debug("Start of getExperienceById method - ExperienceServiceImpl");
+        Experience experience = experienceRepository.getExperienceById(id);
+        if (experience == null){
+            LOG.error("Experience with {} not found", id);
+            throw new ExperienceNotFoundException(ObjectConstants.ID, id);
+        }
+        return getResponse(experience);
+    }
+
+    @Override
+    public List<ExperienceResponse> listAllExperienceDetails() {
+        LOG.debug("Start of listAllExperienceDetails method - ExperienceServiceImpl");
+        List<Experience> experienceResponses = experienceRepository.listAllExperienceDetails();
+        return getResponseList(experienceResponses);
+    }
+
+    @Override
+    public ExperienceResponse updateExperience(Long id, UpdateExperienceRequest updateExperienceRequest) {
+        LOG.debug("Start of updateExperience method - ExperienceServiceImpl");
+        Experience experience = experienceRepository.getExperienceById(id);
+        if (ObjectUtils.isEmpty(experience)) {
+            LOG.error("Experience with {} not found", id);
+            throw new ExperienceNotFoundException(ObjectConstants.ID, id);
+        }
+        prepareExperienceEntity(experience, updateExperienceRequest);
+        Experience updatedExperience = experienceRepository.updateExperience(experience);
+        LOG.debug("End of updateExperience method - ExperienceServiceImpl");
+        return getResponse(updatedExperience);
+    }
+
+    @Override
+    public void deleteExperienceById(Long id) {
+        LOG.debug("Start of deleteExperienceById method - ExperienceServiceImpl");
+        Experience experience = experienceRepository.getExperienceById(id);
+        if (ObjectUtils.isEmpty(experience)) {
+            LOG.error("Experience with {} not found", id);
+            throw new ExperienceNotFoundException(ObjectConstants.ID, id);
+        }
+        experienceRepository.deleteExperienceById(id);
+    }
+
     private Experience createExperienceEntity(CreateExperienceRequest createExperienceRequest,
                                               User user) {
         LOG.debug("Start of createExperienceEntity method - ExperienceServiceImpl");
@@ -67,12 +114,34 @@ public class ExperienceServiceImpl implements ExperienceService {
         experience.setCompanyName(createExperienceRequest.getCompanyName());
         experience.setDescription(createExperienceRequest.getDescription());
         experience.setDesignation(createExperienceRequest.getDesignation());
-        experience.setExperience(createExperienceRequest.getExperience());
+        experience.setStartDate(createExperienceRequest.getStartDate());
+        experience.setEndDate(createExperienceRequest.getEndDate());
         experience.setCreatedDate(LocalDateTime.now());
         experience.setUpdatedDate(LocalDateTime.now());
         experience.setUser(user);
         LOG.debug("End of createExperienceEntity method - ExperienceServiceImpl");
         return experience;
+    }
+
+    private void prepareExperienceEntity(Experience experience, UpdateExperienceRequest updateExperienceRequest) {
+        LOG.debug("Start of prepareEductionEntity method - experienceServiceImpl");
+        if (StringUtils.isNotEmpty(updateExperienceRequest.getCompanyName())){
+            experience.setCompanyName(updateExperienceRequest.getCompanyName());
+        }
+        if (StringUtils.isNotEmpty(updateExperienceRequest.getDesignation())){
+            experience.setDesignation(updateExperienceRequest.getDesignation());
+        }
+        if (StringUtils.isNotEmpty(updateExperienceRequest.getDescription())){
+            experience.setDescription(updateExperienceRequest.getDescription());
+        }
+        if (updateExperienceRequest.getStartDate() != null){
+            experience.setStartDate(updateExperienceRequest.getStartDate());
+        }
+        if (updateExperienceRequest.getEndDate() != null){
+            experience.setEndDate(updateExperienceRequest.getEndDate());
+        }
+        experience.setUpdatedDate(LocalDateTime.now());
+        LOG.debug("End of prepareEductionEntity method - experienceServiceImpl");
     }
 
     private ExperienceResponse getResponse(Experience experience){

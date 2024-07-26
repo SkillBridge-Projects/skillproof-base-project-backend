@@ -32,4 +32,28 @@ public class ExperienceRepositoryImpl implements ExperienceRepository {
         LOG.debug("Start of createSkillsAndExperience method.");
         return experienceDao.saveAndFlush(Experience);
     }
+
+    @Override
+    public List<Experience> listAllExperienceDetails() {
+        LOG.debug("Start of listAllExperienceDetails method.");
+        return experienceDao.findAll();
+    }
+
+    @Override
+    public Experience getExperienceById(Long id) {
+        LOG.debug("Start of getExperienceById method.");
+        return experienceDao.findById(id).orElse(null);
+    }
+
+    @Override
+    public Experience updateExperience(Experience experience) {
+        LOG.debug("Start of updateExperience method.");
+        return experienceDao.saveAndFlush(experience);
+    }
+
+    @Override
+    public void deleteExperienceById(Long id) {
+        LOG.debug("Start of deleteExperienceById method.");
+        experienceDao.deleteById(id);
+    }
 }

@@ -1,5 +1,6 @@
-package com.skillproof.model.request.experience;
+package com.skillproof.model.request.education;
 
+import com.skillproof.constants.EducationConstants;
 import com.skillproof.constants.ExperienceConstants;
 import com.skillproof.validators.Messages;
 import com.skillproof.validators.NotEmptyOnly;
@@ -17,31 +18,38 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
-public class UpdateExperienceRequest {
+public class UpdateEducationRequest {
 
+    @NotEmptyOnly(label = EducationConstants.UNIVERSITY)
+    @Size(max = 250, message = Messages.SIZE_VALIDATION_PROPERTY)
+    @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
+    @Schema(name = "university", example = "Cambridge")
+    private String university;
 
-    @NotEmptyOnly(label = ExperienceConstants.COMPANY_NAME)
+    @NotEmptyOnly(label = EducationConstants.UNIVERSITY)
+    @Size(max = 250, message = Messages.SIZE_VALIDATION_PROPERTY)
+    @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
+    @Schema(name = "collegeOrSchool", example = "Cambridge")
+    private String collegeOrSchool;
+
+    @NotEmptyOnly(label = EducationConstants.UNIVERSITY)
     @Size(max = 100, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "companyName", example = "skillbridge")
-    private String companyName;
-
-    @NotEmptyOnly(label = ExperienceConstants.DESIGNATION)
-    @Size(max = 100, message = Messages.SIZE_VALIDATION_PROPERTY)
-    @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "designation", example = "junior developer")
-    private String designation;
+    @Schema(name = "degree", example = "Bachelor of Technology")
+    private String degree;
 
     @Size(max = 250, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
-    @Schema(name = "description", example = "Worked as junior developer and user management application")
+    @Schema(name = "description", example = "Completed B.Tech in the stream of Computer Science")
     private String description;
 
-    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
+    @NotEmptyOnly(label = EducationConstants.GRADE)
+    @Schema(name = "grade", example = "10.0")
+    private Float grade;
+
     @Schema(name = "startDate", example = "2023-03-01", type = "String", format = "YYYY-MM-DD")
     private LocalDate startDate;
 
-    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Schema(name = "endDate", example = "2024-03-01", type = "String", format = "YYYY-MM-DD")
     private LocalDate endDate;
 }

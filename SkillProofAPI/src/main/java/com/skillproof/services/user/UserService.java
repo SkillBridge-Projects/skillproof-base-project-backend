@@ -1,6 +1,7 @@
 package com.skillproof.services.user;
 
 import com.skillproof.enums.RoleType;
+import com.skillproof.model.request.profile.UserProfile;
 import com.skillproof.model.request.user.CreateUserRequest;
 import com.skillproof.model.request.user.UpdateUserRequest;
 import com.skillproof.model.request.user.UserResponse;
@@ -58,4 +59,6 @@ public interface UserService {
     void deleteUserById(String id);
 
     List<UserResponse> listUsersByRole(RoleType role);
+
+    UserProfile getUserProfileByUserId(String id);
 }
