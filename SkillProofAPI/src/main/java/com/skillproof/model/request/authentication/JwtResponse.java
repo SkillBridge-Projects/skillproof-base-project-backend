@@ -12,7 +12,12 @@ public class JwtResponse {
             accessMode = Schema.AccessMode.READ_ONLY)
     private final String token;
 
-    public JwtResponse(String token) {
+    @Schema(name = "userId", example = "SBsfji238sy7fs",
+            accessMode = Schema.AccessMode.READ_ONLY)
+    private final String userId;
+
+    public JwtResponse(String token, String userId) {
         this.token = token;
+        this.userId = userId;
     }
 }

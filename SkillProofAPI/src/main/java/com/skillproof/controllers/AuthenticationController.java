@@ -3,6 +3,7 @@ package com.skillproof.controllers;
 import com.skillproof.constants.SwaggerConstants;
 import com.skillproof.model.request.authentication.JwtResponse;
 import com.skillproof.model.request.authentication.UserCredentials;
+import com.skillproof.model.request.user.UserResponse;
 import com.skillproof.utils.JwtUtil;
 import com.skillproof.services.UserDetailsServiceImpl;
 import com.skillproof.services.user.UserService;
@@ -51,9 +52,10 @@ public class AuthenticationController extends AbstractController {
     )
     public ResponseEntity<JwtResponse> getAccessToken(@PathVariable String emailAddress) {
         LOG.info("Start of getAccessToken method.");
-        String token = jwtUtil.createToken(emailAddress);
+        UserResponse user = userService.getUserByEmailAddress(emailAddress);
+        String token = jwtUtil.createToken(user);
         LOG.info("End of getAccessToken method.");
-        return ok(new JwtResponse(token));
+        return ok(new JwtResponse(token, user.getId()));
     }
 
     @PostMapping("/authenticate")
@@ -67,9 +69,9 @@ public class AuthenticationController extends AbstractController {
     public ResponseEntity<JwtResponse> authenticateUser(@RequestBody UserCredentials authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUserName(), authenticationRequest.getPassword());
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUserName());
-        final String token = jwtUtil.createToken(userDetails.getUsername());
-        return ok(new JwtResponse(token));
+        final UserResponse userDetails = userService.getUserByEmailAddress(authenticationRequest.getUserName());
+        final String token = jwtUtil.createToken(userDetails);
+        return ok(new JwtResponse(token, userDetails.getId()));
     }
 
     private void authenticate(String username, String password) throws Exception {

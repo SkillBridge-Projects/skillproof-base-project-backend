@@ -49,7 +49,7 @@ public class UserController extends AbstractController {
     )
     public ResponseEntity<?> signup(@RequestBody @Valid CreateUserRequest createUserRequest) {
         UserResponse user = userService.createUser(createUserRequest);
-        String token = jwtUtil.createToken(user.getEmailAddress());
+        String token = jwtUtil.createToken(user);
         return ResponseEntity.ok().headers(getResponseHeaders(token)).body(user);
     }
 

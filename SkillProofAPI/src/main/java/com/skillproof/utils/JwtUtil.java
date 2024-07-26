@@ -44,9 +44,8 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String createToken(String userName){
-        UserResponse user = userService.getUserByEmailAddress(userName);
-        return generateToken(userName, user.getRole().name());
+    public String createToken(UserResponse user){
+        return generateToken(user.getEmailAddress(), user.getRole().name());
     }
 
     public String generateToken(String userName, String role) {
