@@ -167,6 +167,17 @@ public class UserServiceImpl implements UserService {
         return getUserProfile(user, experiences, educationDetails);
     }
 
+    @Override
+    public String getPresignedUrlForProfile(String id) {
+        LOG.debug("Start of getPresignedUrlForProfile method - UserServiceImpl");
+        String preSignedUrl = null;
+        UserResponse user = getUserById(id);
+        if (StringUtils.isNotEmpty(user.getProfilePicture())) {
+            preSignedUrl = awss3Service.generatePresignedUrl(awss3Service.getFileName(user.getProfilePicture()));
+        }
+        return preSignedUrl;
+    }
+
     private UserProfile getUserProfile(UserResponse user, List<ExperienceResponse> experiences,
                                        List<EducationResponse> educationDetails) {
         LOG.debug("Start of getUserProfile method - UserServiceImpl");
