@@ -68,4 +68,8 @@ public class User {
     @Basic
     @Column(name = "bio")
     private String bio;
+
+    @Basic
+    @Column(name = "profile_picture_url")
+    private String profilePicture;
 }

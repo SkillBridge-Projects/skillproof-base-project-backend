@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS user (
   password VARCHAR(100) NOT NULL,
   skills TEXT NULL,
   bio TEXT NULL,
+  profile_picture_url TEXT NULL,
   created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_date TIMESTAMP NULL,
   PRIMARY KEY (id),

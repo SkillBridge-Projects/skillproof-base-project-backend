@@ -23,4 +23,7 @@ public class UserResponse extends CreateUserRequest {
     @Schema(name = "updatedDate", example = "2024-03-01T12:00:00.000",
             type = "String", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime updatedDate;
+
+    @Schema(name = "profilePicture", example = "http://someimage.png", accessMode = Schema.AccessMode.READ_ONLY)
+    private String profilePicture;
 }

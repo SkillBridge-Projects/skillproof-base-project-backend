@@ -3,6 +3,7 @@ package com.skillproof.services.user;
 import com.skillproof.constants.ObjectConstants;
 import com.skillproof.constants.UserConstants;
 import com.skillproof.enums.RoleType;
+import com.skillproof.exceptions.ResourceFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
 import com.skillproof.model.entity.User;
 import com.skillproof.model.request.education.EducationResponse;
@@ -12,21 +13,19 @@ import com.skillproof.model.request.user.CreateUserRequest;
 import com.skillproof.model.request.user.UpdateUserRequest;
 import com.skillproof.model.request.user.UserResponse;
 import com.skillproof.repositories.user.UserRepository;
-import com.skillproof.exceptions.ResourceFoundException;
+import com.skillproof.services.AWSS3Service;
 import com.skillproof.services.education.EducationService;
-import com.skillproof.services.education.EducationServiceImpl;
 import com.skillproof.services.experience.ExperienceService;
 import com.skillproof.utils.ResponseConverter;
-import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -44,14 +43,16 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
     private final ExperienceService experienceService;
     private final EducationService educationService;
+    private final AWSS3Service awss3Service;
 
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder,
-                           ExperienceService experienceService, EducationService educationService) {
+                           ExperienceService experienceService, EducationService educationService,
+                           AWSS3Service awss3Service) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.experienceService = experienceService;
         this.educationService = educationService;
-
+        this.awss3Service = awss3Service;
     }
 
     public UserResponse getUserById(String id) {
@@ -112,6 +113,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserProfile updateProfilePicture(String id, MultipartFile profilePicture) throws Exception {
+        LOG.debug("Start of updateProfilePicture method - UserServiceImpl");
+        User user = userRepository.getUserById(id);
+        if (ObjectUtils.isEmpty(user)) {
+            LOG.error("User with id {} not found.", id);
+            throw new UserNotFoundException(ObjectConstants.ID, id);
+        }
+
+        String oldProfilePictureUrl = user.getProfilePicture();
+
+        // Delete the old profile picture from S3
+        if (oldProfilePictureUrl != null && !oldProfilePictureUrl.isEmpty()) {
+            LOG.debug("Deleting old profile picture");
+            awss3Service.deleteFile(oldProfilePictureUrl);
+        }
+
+        String profilePictureUrl = null;
+        if (ObjectUtils.isNotEmpty(profilePicture)) {
+            LOG.debug("Uploading new profile picture");
+            profilePictureUrl = awss3Service.uploadFile(profilePicture);
+        }
+        user.setProfilePicture(profilePictureUrl);
+        userRepository.updateUser(user);
+        return getUserProfileByUserId(id);
+    }
+
+    @Override
     public void deleteUserById(String id) {
         LOG.debug("Start of deleteUserById method - UserServiceImpl");
         User user = userRepository.getUserById(id);
@@ -150,7 +178,7 @@ public class UserServiceImpl implements UserService {
         return userProfile;
     }
 
-    private User createUserEntity(CreateUserRequest createUserRequest){
+    private User createUserEntity(CreateUserRequest createUserRequest) {
         LOG.debug("Start of createUserEntity method - UserServiceImpl");
         User user = new User();
         user.setId(getRandomUUID());

@@ -25,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -108,6 +109,20 @@ public class UserController extends AbstractController {
                                                    @RequestBody @Valid UpdateUserRequest updateUserRequest) {
         UserResponse userResponse = userService.updateUser(id, updateUserRequest);
         return ok(userResponse);
+    }
+
+    @PatchMapping(value = "/users/{id}/profile-picture", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "Update profile picture of an User",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
+                            content = @Content(schema = @Schema(implementation = UserProfile.class)))
+            }
+    )
+    public ResponseEntity<UserProfile> updateProfilePicture(@PathVariable String id,
+                                                            @RequestParam(required = false) MultipartFile profilePicture) throws Exception {
+        UserProfile userProfile = userService.updateProfilePicture(id, profilePicture);
+        return ok(userProfile);
     }
 
     @GetMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -5,6 +5,7 @@ import com.skillproof.model.request.profile.UserProfile;
 import com.skillproof.model.request.user.CreateUserRequest;
 import com.skillproof.model.request.user.UpdateUserRequest;
 import com.skillproof.model.request.user.UserResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -55,6 +56,8 @@ public interface UserService {
     List<UserResponse> listAllUsers();
 
     UserResponse updateUser(String id, UpdateUserRequest updateUserRequest);
+
+    UserProfile updateProfilePicture(String id, MultipartFile profilePicture) throws Exception;
 
     void deleteUserById(String id);
 
