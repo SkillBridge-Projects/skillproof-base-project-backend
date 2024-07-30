@@ -64,6 +64,4 @@ public interface UserService {
     List<UserResponse> listUsersByRole(RoleType role);
 
     UserProfile getUserProfileByUserId(String id);
-
-    String getPresignedUrlForProfile(String id);
 }

@@ -30,7 +30,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -135,6 +137,7 @@ public class UserServiceImpl implements UserService {
             profilePictureUrl = awss3Service.uploadFile(profilePicture);
         }
         user.setProfilePicture(profilePictureUrl);
+        user.setUpdatedDate(LocalDateTime.now());
         userRepository.updateUser(user);
         return getUserProfileByUserId(id);
     }
@@ -167,13 +170,11 @@ public class UserServiceImpl implements UserService {
         return getUserProfile(user, experiences, educationDetails);
     }
 
-    @Override
-    public String getPresignedUrlForProfile(String id) {
+    private String getPresignedUrlForProfile(String profilePictureUrl) {
         LOG.debug("Start of getPresignedUrlForProfile method - UserServiceImpl");
         String preSignedUrl = null;
-        UserResponse user = getUserById(id);
-        if (StringUtils.isNotEmpty(user.getProfilePicture())) {
-            preSignedUrl = awss3Service.generatePresignedUrl(awss3Service.getFileName(user.getProfilePicture()));
+        if (StringUtils.isNotEmpty(profilePictureUrl)) {
+            preSignedUrl = awss3Service.generatePresignedUrl(awss3Service.getFileName(profilePictureUrl));
         }
         return preSignedUrl;
     }
@@ -232,7 +233,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of prepareUserEntity method - UserServiceImpl");
-    }
+}
 
     private String getRandomUUID() {
         return UserConstants.COMMON_USERID_PREFIX + RandomStringUtils.randomAlphanumeric(18);
@@ -256,6 +257,7 @@ public class UserServiceImpl implements UserService {
             response.setSkills(Arrays.asList(user.getSkills().split(",")));
         }
         response.setPassword(null);
+        response.setProfilePicture(getPresignedUrlForProfile(response.getProfilePicture()));
         return response;
     }
 }

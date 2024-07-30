@@ -182,17 +182,4 @@ public class UserController extends AbstractController {
         UserProfile userProfile = userService.getUserProfileByUserId(id);
         return ok(userProfile);
     }
-
-    @GetMapping(value = "/users/{id}/profile-picture-url", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Get pre-signed profile picture url by userId",
-            responses = {
-                    @ApiResponse(description = SwaggerConstants.SUCCESS,
-                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_GET,
-                            content = @Content(schema = @Schema(implementation = UserProfile.class)))
-            }
-    )
-    public ResponseEntity<String> getPresignedUrlForProfile(@PathVariable String id) {
-        String preSignedUrl = userService.getPresignedUrlForProfile(id);
-        return ok(preSignedUrl);
-    }
 }
