@@ -3,6 +3,7 @@ package com.skillproof.model.request.profile;
 
 import com.skillproof.model.request.education.EducationResponse;
 import com.skillproof.model.request.experience.ExperienceResponse;
+import com.skillproof.model.request.skill.SkillResponse;
 import com.skillproof.model.request.user.UserResponse;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,4 +21,6 @@ public class UserProfile {
     private List<EducationResponse> educationDetails;
 
     private List<ExperienceResponse> experiences;
+
+    private List<SkillResponse> skills;
 }

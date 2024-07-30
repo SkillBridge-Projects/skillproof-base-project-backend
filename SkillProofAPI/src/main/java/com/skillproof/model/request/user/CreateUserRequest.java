@@ -56,10 +56,4 @@ public class CreateUserRequest {
     @NotNull(message = Messages.NO_EMPTY_PROPERTY)
     @Schema(name = "role", example = "EMPLOYEE")
     private RoleType role;
-
-    @Valid
-    @NotNull(message = Messages.NO_EMPTY_PROPERTY)
-    @Schema(name = "skills", example = "[\"Java\",\"SQL\"]")
-    private List<@NotBlank(message = Messages.NO_EMPTY_PROPERTY)
-    @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY) String> skills;
 }

@@ -27,9 +27,9 @@ public class EducationController extends AbstractController {
 
     private static final Logger LOG = LoggerFactory.getLogger(EducationController.class);
 
-    private EducationService educationService;
+    private final EducationService educationService;
 
-    public EducationController(EducationService educationService){
+    public EducationController(EducationService educationService) {
         this.educationService = educationService;
     }
 
@@ -38,10 +38,10 @@ public class EducationController extends AbstractController {
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
                             responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
-                            content = @Content(schema = @Schema(implementation = CreateEducationRequest.class)))
+                            content = @Content(schema = @Schema(implementation = EducationResponse.class)))
             }
     )
-    public ResponseEntity<EducationResponse> createEducation(@RequestBody @Valid CreateEducationRequest createEducationRequest){
+    public ResponseEntity<EducationResponse> createEducation(@RequestBody @Valid CreateEducationRequest createEducationRequest) {
         LOG.debug("Start of createEducation method.");
         EducationResponse educationResponse = educationService.createEducation(createEducationRequest);
         LOG.debug("End of createEducation method.");
@@ -56,10 +56,10 @@ public class EducationController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = EducationResponse.class)))
             }
     )
-    public ResponseEntity<?> getEducationByUserId(@PathVariable String userId){
+    public ResponseEntity<?> getEducationByUserId(@PathVariable String userId) {
         LOG.debug("Start of getEducationByUserId method.");
         List<EducationResponse> educationResponse = educationService.getEducationByUserId(userId);
-        if (CollectionUtils.isEmpty(educationResponse)){
+        if (CollectionUtils.isEmpty(educationResponse)) {
             LOG.info("End of getEducationByUserId method.");
             return noContent();
         }
@@ -75,7 +75,7 @@ public class EducationController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = EducationResponse.class)))
             }
     )
-    public ResponseEntity<?> getEducationById(@PathVariable Long id){
+    public ResponseEntity<?> getEducationById(@PathVariable Long id) {
         LOG.debug("Start of getEducationById method.");
         EducationResponse educationResponse = educationService.getEducationById(id);
         LOG.debug("End of getEducationById method.");
@@ -90,7 +90,7 @@ public class EducationController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = EducationResponse.class)))
             }
     )
-    public ResponseEntity<List<EducationResponse>> listAllEducationDetails(){
+    public ResponseEntity<List<EducationResponse>> listAllEducationDetails() {
         List<EducationResponse> educationResponses = educationService.listAllEducationDetails();
         return ok(educationResponses);
     }
@@ -103,8 +103,8 @@ public class EducationController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = EducationResponse.class)))
             }
     )
-    public ResponseEntity<EducationResponse> updateUser(@PathVariable Long id,
-                                                   @RequestBody @Valid UpdateEducationRequest updateEducationRequest) {
+    public ResponseEntity<EducationResponse> updateEducation(@PathVariable Long id,
+                                                             @RequestBody @Valid UpdateEducationRequest updateEducationRequest) {
         EducationResponse educationResponse = educationService.updateEducation(id, updateEducationRequest);
         return ok(educationResponse);
     }

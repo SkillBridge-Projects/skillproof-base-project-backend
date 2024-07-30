@@ -4,7 +4,6 @@ import com.skillproof.constants.SwaggerConstants;
 import com.skillproof.model.request.experience.ExperienceResponse;
 import com.skillproof.model.request.experience.UpdateExperienceRequest;
 import com.skillproof.model.request.experience.CreateExperienceRequest;
-import com.skillproof.model.request.experience.ExperienceResponse;
 import com.skillproof.services.experience.ExperienceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,10 +38,10 @@ public class ExperienceController extends AbstractController {
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
                             responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
-                            content = @Content(schema = @Schema(implementation = CreateExperienceRequest.class)))
+                            content = @Content(schema = @Schema(implementation = ExperienceResponse.class)))
             }
     )
-    public ResponseEntity<ExperienceResponse> createExperience(@RequestBody @Valid CreateExperienceRequest createExperienceRequest){
+    public ResponseEntity<ExperienceResponse> createExperience(@RequestBody @Valid CreateExperienceRequest createExperienceRequest) {
         LOG.info("Start of createExperience method.");
         ExperienceResponse experienceResponse = experienceService.createExperience(createExperienceRequest);
         LOG.info("End of createExperience method.");
@@ -57,10 +56,10 @@ public class ExperienceController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = ExperienceResponse.class)))
             }
     )
-    public ResponseEntity<?> getExperienceByUserId(@PathVariable String userId){
+    public ResponseEntity<?> getExperienceByUserId(@PathVariable String userId) {
         LOG.info("Start of getExperiencesByUserId method.");
         List<ExperienceResponse> experienceResponse = experienceService.getExperienceByUserId(userId);
-        if (CollectionUtils.isEmpty(experienceResponse)){
+        if (CollectionUtils.isEmpty(experienceResponse)) {
             LOG.info("End of getExperiencesByUserId method.");
             return noContent();
         }
@@ -76,7 +75,7 @@ public class ExperienceController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = ExperienceResponse.class)))
             }
     )
-    public ResponseEntity<?> getExperienceById(@PathVariable Long id){
+    public ResponseEntity<?> getExperienceById(@PathVariable Long id) {
         LOG.debug("Start of getExperienceById method.");
         ExperienceResponse ExperienceResponse = experienceService.getExperienceById(id);
         LOG.debug("End of getExperienceById method.");
@@ -91,8 +90,8 @@ public class ExperienceController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = ExperienceResponse.class)))
             }
     )
-    public ResponseEntity<List<ExperienceResponse>> listAllExperienceDetails(){
-        List<ExperienceResponse> experienceResponses = experienceService.listAllExperienceDetails();
+    public ResponseEntity<List<ExperienceResponse>> listAllExperiences() {
+        List<ExperienceResponse> experienceResponses = experienceService.listAllExperiences();
         return ok(experienceResponses);
     }
 
@@ -104,8 +103,8 @@ public class ExperienceController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = ExperienceResponse.class)))
             }
     )
-    public ResponseEntity<ExperienceResponse> updateUser(@PathVariable Long id,
-                                                        @RequestBody @Valid UpdateExperienceRequest updateExperienceRequest) {
+    public ResponseEntity<ExperienceResponse> updateExperience(@PathVariable Long id,
+                                                               @RequestBody @Valid UpdateExperienceRequest updateExperienceRequest) {
         ExperienceResponse ExperienceResponse = experienceService.updateExperience(id, updateExperienceRequest);
         return ok(ExperienceResponse);
     }

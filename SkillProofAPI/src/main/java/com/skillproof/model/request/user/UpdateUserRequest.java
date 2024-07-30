@@ -43,8 +43,4 @@ public class UpdateUserRequest {
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
     @Schema(name = "city", example = "bangalore", format = "city")
     private String city;
-
-    @Schema(name = "skills", example = "[\"Java\",\"SQL\"]")
-    private List<@NotEmpty(message = Messages.NO_EMPTY_PROPERTY)
-    @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY) String> skills;
 }

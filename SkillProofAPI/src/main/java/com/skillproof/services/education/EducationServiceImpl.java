@@ -99,7 +99,7 @@ public class EducationServiceImpl implements EducationService {
     public EducationResponse getEducationById(Long id) {
         LOG.debug("Start of getEducationById method - EducationServiceImpl");
         Education education = educationRepository.getEducationById(id);
-        if (education == null){
+        if (education == null) {
             LOG.error("Education with {} not found", id);
             throw new EducationNotFoundException(ObjectConstants.ID, id);
         }
@@ -126,13 +126,13 @@ public class EducationServiceImpl implements EducationService {
 
     private void prepareEducationEntity(Education education, UpdateEducationRequest updateEducationRequest) {
         LOG.debug("Start of prepareEductionEntity method - EducationServiceImpl");
-        if (StringUtils.isNotEmpty(updateEducationRequest.getUniversity())){
+        if (StringUtils.isNotEmpty(updateEducationRequest.getUniversity())) {
             education.setUniversity(updateEducationRequest.getUniversity());
         }
-        if (StringUtils.isNotEmpty(updateEducationRequest.getCollegeOrSchool())){
+        if (StringUtils.isNotEmpty(updateEducationRequest.getCollegeOrSchool())) {
             education.setCollegeOrSchool(updateEducationRequest.getCollegeOrSchool());
         }
-        if (StringUtils.isNotEmpty(updateEducationRequest.getDegree())){
+        if (StringUtils.isNotEmpty(updateEducationRequest.getDegree())) {
             education.setDegree(updateEducationRequest.getDegree());
         }
         if (updateEducationRequest.getGrade() != null) {
@@ -141,10 +141,10 @@ public class EducationServiceImpl implements EducationService {
         if (StringUtils.isNotEmpty(updateEducationRequest.getDescription())) {
             education.setDescription(updateEducationRequest.getDescription());
         }
-        if (updateEducationRequest.getStartDate() != null){
+        if (updateEducationRequest.getStartDate() != null) {
             education.setStartDate(updateEducationRequest.getStartDate());
         }
-        if (updateEducationRequest.getEndDate() != null){
+        if (updateEducationRequest.getEndDate() != null) {
             education.setEndDate(updateEducationRequest.getEndDate());
         }
         education.setUpdatedDate(LocalDateTime.now());
@@ -161,13 +161,7 @@ public class EducationServiceImpl implements EducationService {
 
     private List<EducationResponse> getResponseList(List<Education> educationList) {
         return educationList.stream()
-                .map(entity -> {
-                    EducationResponse educationResponse = ResponseConverter
-                            .copyProperties(entity, EducationResponse.class);
-                    educationResponse.setUserId(entity.getUser().getId());
-                    educationResponse.setUserEmail(entity.getUser().getEmailAddress());
-                    return educationResponse;
-                })
+                .map(this::getResponse)
                 .collect(Collectors.toList());
     }
 }

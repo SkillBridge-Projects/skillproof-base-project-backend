@@ -5,6 +5,7 @@ public class ObjectConstants {
     public static final String USER = "User";
     public static final String EDUCATION = "Education";
     public static final String EXPERIENCE = "Experience";
+    public static final String SKILL = "Skill";
     public static final String CHAT = "Chat";
     public static final String FEED = "Feed";
     public static final String PICTURE = "Picture";

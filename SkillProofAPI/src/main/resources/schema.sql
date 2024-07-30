@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS user (
   email_address VARCHAR(100) NOT NULL,
   role VARCHAR(20) NOT NULL,
   password VARCHAR(100) NOT NULL,
-  skills TEXT NULL,
   bio TEXT NULL,
   profile_picture_url TEXT NULL,
   created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -51,6 +50,19 @@ CREATE TABLE IF NOT EXISTS education (
   updated_date TIMESTAMP NULL,
   PRIMARY KEY (id),
   CONSTRAINT `FK_EDUCATION_USER`
+    FOREIGN KEY (user_id)
+    REFERENCES user (id)
+);
+
+CREATE TABLE IF NOT EXISTS skills (
+  id BIGINT AUTO_INCREMENT,
+  technology VARCHAR(250) NOT NULL,
+  tools TEXT NOT NULL,
+  user_id VARCHAR(20) NOT NULL,
+  created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_date TIMESTAMP NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT `FK_SKILL_USER`
     FOREIGN KEY (user_id)
     REFERENCES user (id)
 );

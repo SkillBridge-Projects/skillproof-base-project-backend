@@ -41,7 +41,7 @@ public class ExperienceServiceImpl implements ExperienceService {
     public ExperienceResponse createExperience(CreateExperienceRequest createExperienceRequest) {
         LOG.debug("Start of createExperience method - ExperienceServiceImpl");
         User user = userRepository.getUserById(createExperienceRequest.getUserId());
-        if (user == null){
+        if (user == null) {
             LOG.error("User with id {} not found.", createExperienceRequest.getUserId());
             throw new UserNotFoundException(ObjectConstants.USER, createExperienceRequest.getUserId());
         }
@@ -55,7 +55,7 @@ public class ExperienceServiceImpl implements ExperienceService {
     public List<ExperienceResponse> getExperienceByUserId(String userId) {
         LOG.debug("Start of getExperienceByUserId method - ExperienceServiceImpl");
         User user = userRepository.getUserById(userId);
-        if (user == null){
+        if (user == null) {
             LOG.error("User with id {} not found.", userId);
             throw new UserNotFoundException(ObjectConstants.USER, userId);
         }
@@ -68,7 +68,7 @@ public class ExperienceServiceImpl implements ExperienceService {
     public ExperienceResponse getExperienceById(Long id) {
         LOG.debug("Start of getExperienceById method - ExperienceServiceImpl");
         Experience experience = experienceRepository.getExperienceById(id);
-        if (experience == null){
+        if (experience == null) {
             LOG.error("Experience with {} not found", id);
             throw new ExperienceNotFoundException(ObjectConstants.ID, id);
         }
@@ -76,7 +76,7 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 
     @Override
-    public List<ExperienceResponse> listAllExperienceDetails() {
+    public List<ExperienceResponse> listAllExperiences() {
         LOG.debug("Start of listAllExperienceDetails method - ExperienceServiceImpl");
         List<Experience> experienceResponses = experienceRepository.listAllExperienceDetails();
         return getResponseList(experienceResponses);
@@ -125,42 +125,36 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     private void prepareExperienceEntity(Experience experience, UpdateExperienceRequest updateExperienceRequest) {
         LOG.debug("Start of prepareEductionEntity method - experienceServiceImpl");
-        if (StringUtils.isNotEmpty(updateExperienceRequest.getCompanyName())){
+        if (StringUtils.isNotEmpty(updateExperienceRequest.getCompanyName())) {
             experience.setCompanyName(updateExperienceRequest.getCompanyName());
         }
-        if (StringUtils.isNotEmpty(updateExperienceRequest.getDesignation())){
+        if (StringUtils.isNotEmpty(updateExperienceRequest.getDesignation())) {
             experience.setDesignation(updateExperienceRequest.getDesignation());
         }
-        if (StringUtils.isNotEmpty(updateExperienceRequest.getDescription())){
+        if (StringUtils.isNotEmpty(updateExperienceRequest.getDescription())) {
             experience.setDescription(updateExperienceRequest.getDescription());
         }
-        if (updateExperienceRequest.getStartDate() != null){
+        if (updateExperienceRequest.getStartDate() != null) {
             experience.setStartDate(updateExperienceRequest.getStartDate());
         }
-        if (updateExperienceRequest.getEndDate() != null){
+        if (updateExperienceRequest.getEndDate() != null) {
             experience.setEndDate(updateExperienceRequest.getEndDate());
         }
         experience.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of prepareEductionEntity method - experienceServiceImpl");
     }
 
-    private ExperienceResponse getResponse(Experience experience){
-        ExperienceResponse experienceResponse =  ResponseConverter
+    private ExperienceResponse getResponse(Experience experience) {
+        ExperienceResponse experienceResponse = ResponseConverter
                 .copyProperties(experience, ExperienceResponse.class);
         experienceResponse.setUserId(experience.getUser().getId());
         experienceResponse.setUserEmail(experience.getUser().getEmailAddress());
         return experienceResponse;
     }
 
-    private List<ExperienceResponse> getResponseList(List<Experience> experiences){
+    private List<ExperienceResponse> getResponseList(List<Experience> experiences) {
         return experiences.stream()
-                .map(entity -> {
-                    ExperienceResponse experienceResponse = ResponseConverter
-                            .copyProperties(entity, ExperienceResponse.class);
-                    experienceResponse.setUserId(entity.getUser().getId());
-                    experienceResponse.setUserEmail(entity.getUser().getEmailAddress());
-                    return experienceResponse;
-                })
+                .map(this::getResponse)
                 .collect(Collectors.toList());
     }
 }

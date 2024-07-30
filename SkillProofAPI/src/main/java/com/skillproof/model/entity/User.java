@@ -62,10 +62,6 @@ public class User {
     private RoleType role;
 
     @Basic
-    @Column(name = "skills")
-    private String skills;
-
-    @Basic
     @Column(name = "bio")
     private String bio;
 

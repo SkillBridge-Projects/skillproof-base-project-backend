@@ -13,7 +13,7 @@ public interface ExperienceService {
 
     ExperienceResponse getExperienceById(Long id);
 
-    List<ExperienceResponse> listAllExperienceDetails();
+    List<ExperienceResponse> listAllExperiences();
 
     ExperienceResponse updateExperience(Long id, UpdateExperienceRequest updateExperienceRequest);
 

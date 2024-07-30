@@ -9,6 +9,7 @@ import com.skillproof.model.entity.User;
 import com.skillproof.model.request.education.EducationResponse;
 import com.skillproof.model.request.experience.ExperienceResponse;
 import com.skillproof.model.request.profile.UserProfile;
+import com.skillproof.model.request.skill.SkillResponse;
 import com.skillproof.model.request.user.CreateUserRequest;
 import com.skillproof.model.request.user.UpdateUserRequest;
 import com.skillproof.model.request.user.UserResponse;
@@ -16,8 +17,8 @@ import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.services.AWSS3Service;
 import com.skillproof.services.education.EducationService;
 import com.skillproof.services.experience.ExperienceService;
+import com.skillproof.services.skill.SkillService;
 import com.skillproof.utils.ResponseConverter;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,10 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,16 +43,18 @@ public class UserServiceImpl implements UserService {
     private final BCryptPasswordEncoder encoder;
     private final ExperienceService experienceService;
     private final EducationService educationService;
+    private final SkillService skillService;
     private final AWSS3Service awss3Service;
 
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder,
                            ExperienceService experienceService, EducationService educationService,
-                           AWSS3Service awss3Service) {
+                           AWSS3Service awss3Service, SkillService skillService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.experienceService = experienceService;
         this.educationService = educationService;
         this.awss3Service = awss3Service;
+        this.skillService = skillService;
     }
 
     public UserResponse getUserById(String id) {
@@ -167,7 +167,8 @@ public class UserServiceImpl implements UserService {
         UserResponse user = getUserById(id);
         List<ExperienceResponse> experiences = experienceService.getExperienceByUserId(id);
         List<EducationResponse> educationDetails = educationService.getEducationByUserId(id);
-        return getUserProfile(user, experiences, educationDetails);
+        List<SkillResponse> skills = skillService.getSkillsByUserId(id);
+        return getUserProfile(user, experiences, educationDetails, skills);
     }
 
     private String getPresignedUrlForProfile(String profilePictureUrl) {
@@ -180,12 +181,13 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserProfile getUserProfile(UserResponse user, List<ExperienceResponse> experiences,
-                                       List<EducationResponse> educationDetails) {
+                                       List<EducationResponse> educationDetails, List<SkillResponse> skills) {
         LOG.debug("Start of getUserProfile method - UserServiceImpl");
         UserProfile userProfile = new UserProfile();
         userProfile.setUser(user);
         userProfile.setExperiences(experiences);
         userProfile.setEducationDetails(educationDetails);
+        userProfile.setSkills(skills);
         LOG.debug("End of getUserProfile method - UserServiceImpl");
         return userProfile;
     }
@@ -202,9 +204,6 @@ public class UserServiceImpl implements UserService {
         user.setCity(createUserRequest.getCity());
         user.setPassword(encoder.encode(createUserRequest.getPassword()));
         user.setRole(createUserRequest.getRole());
-        if (CollectionUtils.isNotEmpty(createUserRequest.getSkills())) {
-            user.setSkills(StringUtils.join(createUserRequest.getSkills(), ","));
-        }
         user.setCreatedDate(LocalDateTime.now());
         user.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of createUserEntity method - UserServiceImpl");
@@ -228,12 +227,9 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotEmpty(updateUserRequest.getBio())) {
             user.setBio(updateUserRequest.getBio());
         }
-        if (CollectionUtils.isNotEmpty(updateUserRequest.getSkills())) {
-            user.setSkills(StringUtils.join(updateUserRequest.getSkills(), ","));
-        }
         user.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of prepareUserEntity method - UserServiceImpl");
-}
+    }
 
     private String getRandomUUID() {
         return UserConstants.COMMON_USERID_PREFIX + RandomStringUtils.randomAlphanumeric(18);
@@ -253,9 +249,6 @@ public class UserServiceImpl implements UserService {
 
     private UserResponse getUserResponse(User user) {
         UserResponse response = ResponseConverter.copyProperties(user, UserResponse.class);
-        if (StringUtils.isNotEmpty(user.getSkills())) {
-            response.setSkills(Arrays.asList(user.getSkills().split(",")));
-        }
         response.setPassword(null);
         response.setProfilePicture(getPresignedUrlForProfile(response.getProfilePicture()));
         return response;
