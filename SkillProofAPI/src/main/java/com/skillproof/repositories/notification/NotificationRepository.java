@@ -1,11 +1,17 @@
-//package com.skillproof.skillproofapi.repositories.notification;
-//
-//import com.skillproof.skillproofapi.model.entity.Notification;
-//
-//import java.util.List;
-//
-//public interface NotificationRepository {
-//    Notification createNotification(Notification notificationEntity);
-//
-//    List<Notification> getNotifications(Long userId);
-//}
+package com.skillproof.repositories.notification;
+
+import com.skillproof.model.entity.Notification;
+
+import java.util.List;
+
+public interface NotificationRepository {
+    Notification createNotification(Notification notification);
+
+    List<Notification> getAllNotifications();
+
+    List<Notification> listNotificationsForUser(String userId);
+
+    Notification getNotificationById(Long id);
+
+    Notification updateConnection(Notification notification);
+}

@@ -51,10 +51,10 @@ public class AuthenticationController extends AbstractController {
             }
     )
     public ResponseEntity<JwtResponse> getAccessToken(@PathVariable String emailAddress) {
-        LOG.info("Start of getAccessToken method.");
+        LOG.debug("Start of getAccessToken method.");
         UserResponse user = userService.getUserByEmailAddress(emailAddress);
         String token = jwtUtil.createToken(user);
-        LOG.info("End of getAccessToken method.");
+        LOG.debug("End of getAccessToken method.");
         return ok(new JwtResponse(token, user.getId()));
     }
 

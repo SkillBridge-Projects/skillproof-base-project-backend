@@ -60,7 +60,7 @@ public class EducationController extends AbstractController {
         LOG.debug("Start of getEducationByUserId method.");
         List<EducationResponse> educationResponse = educationService.getEducationByUserId(userId);
         if (CollectionUtils.isEmpty(educationResponse)) {
-            LOG.info("End of getEducationByUserId method.");
+            LOG.debug("End of getEducationByUserId method.");
             return noContent();
         }
         LOG.debug("End of getEducationByUserId method.");

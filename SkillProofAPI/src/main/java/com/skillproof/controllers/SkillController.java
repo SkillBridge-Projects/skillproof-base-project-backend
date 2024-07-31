@@ -60,7 +60,7 @@ public class SkillController extends AbstractController {
         LOG.debug("Start of getSkillByUserId method.");
         List<SkillResponse> skillResponse = skillService.getSkillsByUserId(userId);
         if (CollectionUtils.isEmpty(skillResponse)) {
-            LOG.info("End of getSkillByUserId method.");
+            LOG.debug("End of getSkillByUserId method.");
             return noContent();
         }
         LOG.debug("End of getSkillByUserId method.");

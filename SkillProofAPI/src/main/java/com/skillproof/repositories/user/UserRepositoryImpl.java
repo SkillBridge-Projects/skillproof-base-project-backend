@@ -24,13 +24,13 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User createUser(User user) {
-        LOG.info("Start of createUser method.");
+        LOG.debug("Start of createUser method.");
         return userDao.saveAndFlush(user);
     }
 
     @Override
     public User getUserById(String id) {
-        LOG.info("Start of createUser method.");
+        LOG.debug("Start of createUser method.");
         return userDao.findById(id).orElse(null);
     }
 

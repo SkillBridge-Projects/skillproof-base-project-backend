@@ -1,6 +1,5 @@
 package com.skillproof.model.request.notification;
 
-import com.skillproof.enums.NotificationType;
 import com.skillproof.validators.Messages;
 import com.skillproof.validators.RegEx;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,11 +14,8 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 @ToString
-public class CreateNotificationRequest {
+public class UpdateNotificationRequest {
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     private boolean isRead;
-
-    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
-    private String userId;
 }

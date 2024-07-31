@@ -64,5 +64,33 @@ CREATE TABLE IF NOT EXISTS skills (
   PRIMARY KEY (id),
   CONSTRAINT `FK_SKILL_USER`
     FOREIGN KEY (user_id)
-    REFERENCES user (id)
+      REFERENCES user (id)
+);
+
+CREATE TABLE IF NOT EXISTS connection (
+    id BIGINT AUTO_INCREMENT,
+    user_following VARCHAR(20) NOT NULL,
+    user_followed_by VARCHAR(20) NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT `FK_CONNECTION_FOLLOW_USER`
+        FOREIGN KEY (user_following)
+            REFERENCES user(id),
+    CONSTRAINT `FK_CONNECTION_FOLLOW_BY_USER`
+        FOREIGN KEY (user_followed_by)
+            REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS notification (
+    id BIGINT AUTO_INCREMENT,
+    user_id VARCHAR(20) NOT NULL,
+    is_read BIT(1) DEFAULT 1,
+    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT `FK_NOTIFICATION_USER`
+        FOREIGN KEY (user_id)
+            REFERENCES user(id)
 );

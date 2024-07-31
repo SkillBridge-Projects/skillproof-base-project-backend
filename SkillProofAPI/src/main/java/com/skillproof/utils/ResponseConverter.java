@@ -24,24 +24,24 @@ public final class ResponseConverter {
     }
 
     public static  <S, T> T copyProperties(S sourceObject, Class<T> targetClass){
-        LOG.info("Start of copyProperties method.");
+        LOG.debug("Start of copyProperties method.");
         T targetObject = null;
         if (ObjectUtils.isNotEmpty(sourceObject)){
             targetObject = MODEL_MAPPER.map(sourceObject, targetClass);
         }
-        LOG.info("End of copyProperties method.");
+        LOG.debug("End of copyProperties method.");
         return targetObject;
     }
 
     public static <S, T> List<T> copyListProperties(List<S> sourceObject, Class<T> targetClass){
-        LOG.info("Start of copyListProperties method.");
+        LOG.debug("Start of copyListProperties method.");
         List<T> responseList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(sourceObject)){
             responseList = sourceObject.stream()
                     .map(entity -> MODEL_MAPPER.map(entity, targetClass))
                     .collect(Collectors.toList());
         }
-        LOG.info("End of copyListProperties method.");
+        LOG.debug("End of copyListProperties method.");
         return responseList;
     }
 }

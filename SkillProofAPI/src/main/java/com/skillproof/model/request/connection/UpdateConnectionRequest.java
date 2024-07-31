@@ -1,26 +1,18 @@
 package com.skillproof.model.request.connection;
 
 import com.skillproof.enums.ConnectionStatus;
-import com.skillproof.validators.Messages;
+import com.skillproof.validators.NotEmptyOnly;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.NotBlank;
-
 @Getter
 @Setter
 @ToString
-public class CreateConnectionRequest {
+public class UpdateConnectionRequest {
 
-    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
-    private String following;
-
-    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
-    private String follower;
-
-    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
+    @NotEmptyOnly(label = "ConnectionStatus")
     @Schema(name = "connectionStatus", example = "PENDING")
     private ConnectionStatus connectionStatus;
 }

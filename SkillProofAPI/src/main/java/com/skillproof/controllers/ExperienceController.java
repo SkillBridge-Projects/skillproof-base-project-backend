@@ -42,9 +42,9 @@ public class ExperienceController extends AbstractController {
             }
     )
     public ResponseEntity<ExperienceResponse> createExperience(@RequestBody @Valid CreateExperienceRequest createExperienceRequest) {
-        LOG.info("Start of createExperience method.");
+        LOG.debug("Start of createExperience method.");
         ExperienceResponse experienceResponse = experienceService.createExperience(createExperienceRequest);
-        LOG.info("End of createExperience method.");
+        LOG.debug("End of createExperience method.");
         return created(experienceResponse);
     }
 
@@ -57,13 +57,13 @@ public class ExperienceController extends AbstractController {
             }
     )
     public ResponseEntity<?> getExperienceByUserId(@PathVariable String userId) {
-        LOG.info("Start of getExperiencesByUserId method.");
+        LOG.debug("Start of getExperiencesByUserId method.");
         List<ExperienceResponse> experienceResponse = experienceService.getExperienceByUserId(userId);
         if (CollectionUtils.isEmpty(experienceResponse)) {
-            LOG.info("End of getExperiencesByUserId method.");
+            LOG.debug("End of getExperiencesByUserId method.");
             return noContent();
         }
-        LOG.info("End of getExperiencesByUserId method.");
+        LOG.debug("End of getExperiencesByUserId method.");
         return ok(experienceResponse);
     }
 
