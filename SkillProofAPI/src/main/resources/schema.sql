@@ -87,6 +87,8 @@ CREATE TABLE IF NOT EXISTS notification (
     id BIGINT AUTO_INCREMENT,
     user_id VARCHAR(20) NOT NULL,
     is_read BIT(1) DEFAULT 1,
+    message TEXT NOT NULL,
+    notification_type VARCHAR(50) NOT NULL,
     created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_date TIMESTAMP NULL,
     PRIMARY KEY (id),

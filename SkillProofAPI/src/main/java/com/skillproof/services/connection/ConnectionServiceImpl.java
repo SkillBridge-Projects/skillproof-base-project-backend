@@ -1,7 +1,9 @@
 package com.skillproof.services.connection;
 
+import com.skillproof.constants.MessageConstants;
 import com.skillproof.constants.ObjectConstants;
 import com.skillproof.enums.ConnectionStatus;
+import com.skillproof.enums.NotificationType;
 import com.skillproof.exceptions.ResourceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
 import com.skillproof.model.entity.Connection;
@@ -16,12 +18,14 @@ import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.services.notification.NotificationService;
 import com.skillproof.services.user.UserService;
 import com.skillproof.utils.ResponseConverter;
+import com.skillproof.utils.Utils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,13 +65,27 @@ public class ConnectionServiceImpl implements ConnectionService {
                 userFollowing, follower);
         connection = connectionRepository.createConnection(connection);
         if (ObjectUtils.isNotEmpty(connection)) {
-            CreateNotificationRequest notificationRequest = new CreateNotificationRequest();
-            notificationRequest.setRead(false);
-            notificationRequest.setUserId(follower.getId());
-            notificationService.createNotification(notificationRequest);
+            String userName = getUserName(userFollowing);
+            createNotificationWithMessage(follower.getId(), userName, createConnectionRequest.getConnectionStatus());
         }
         LOG.debug("End of createConnection method.");
         return getConnectionResponse(connection);
+    }
+
+    private String getUserName(User user){
+        return user.getFirstName() + " " + user.getLastName();
+    }
+
+    private void createNotificationWithMessage(String userId, String userName, ConnectionStatus connectionStatus){
+        String msg = connectionStatus == ConnectionStatus.PENDING ? MessageConstants.REQUEST_SENT : MessageConstants.REQUEST_ACCEPTED;
+        String notificationMessage = Utils.getNotificationMessage(msg, userName);
+
+        CreateNotificationRequest notificationRequest = new CreateNotificationRequest();
+        notificationRequest.setRead(false);
+        notificationRequest.setUserId(userId);
+        notificationRequest.setNotificationType(NotificationType.CONNECTION_REQUEST);
+        notificationRequest.setMessage(notificationMessage);
+        notificationService.createNotification(notificationRequest);
     }
 
     @Override

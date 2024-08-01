@@ -1,5 +1,7 @@
 package com.skillproof.model.entity;
 
+import com.skillproof.enums.NotificationType;
+import com.skillproof.enums.RoleType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +23,15 @@ public class Notification {
 
     @Column(name = "is_read")
     private boolean isRead;
+
+    @NotNull
+    @Column(name = "notification_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private NotificationType notificationType;
+
+    @NotNull
+    @Column(name = "message", nullable = false)
+    private String message;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

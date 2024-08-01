@@ -103,6 +103,8 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setRead(createNotificationRequest.isRead());
+        notification.setNotificationType(createNotificationRequest.getNotificationType());
+        notification.setMessage(createNotificationRequest.getMessage());
         LOG.debug("End of createNotificationEntity method.");
         return notification;
     }

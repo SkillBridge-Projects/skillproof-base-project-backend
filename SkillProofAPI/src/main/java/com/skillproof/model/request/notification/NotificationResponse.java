@@ -22,5 +22,4 @@ public class NotificationResponse extends CreateNotificationRequest {
     @Schema(name = "updatedDate", example = "2024-03-01T12:00:00.000",
             type = "String", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime updatedDate;
-
 }

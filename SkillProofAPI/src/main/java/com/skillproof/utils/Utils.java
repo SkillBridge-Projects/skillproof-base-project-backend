@@ -1,5 +1,7 @@
 package com.skillproof.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
 
 public class Utils {
@@ -34,5 +36,9 @@ public class Utils {
         }
 
         return mem[i][j];
+    }
+
+    public static String getNotificationMessage(String message, Object... args){
+        return String.format(message, args);
     }
 }

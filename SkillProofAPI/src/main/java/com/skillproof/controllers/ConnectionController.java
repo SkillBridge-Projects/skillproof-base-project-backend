@@ -71,7 +71,7 @@ public class ConnectionController extends AbstractController {
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
                             responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
-                            content = @Content(schema = @Schema(implementation = ConnectionResponse.class)))
+                            content = @Content(schema = @Schema(implementation = UserResponse.class)))
             }
     )
     public ResponseEntity<List<UserResponse>> listConnectionsForUser(@PathVariable String userId) {

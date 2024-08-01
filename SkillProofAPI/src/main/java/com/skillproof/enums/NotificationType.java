@@ -2,6 +2,7 @@ package com.skillproof.enums;
 
 public enum NotificationType {
     COMMENT,
-    INTEREST,
+    LIKE,
+    CONVERSATION,
     CONNECTION_REQUEST
 }
