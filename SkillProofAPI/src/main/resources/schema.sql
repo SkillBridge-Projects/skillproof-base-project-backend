@@ -85,14 +85,17 @@ CREATE TABLE IF NOT EXISTS connection (
 
 CREATE TABLE IF NOT EXISTS notification (
     id BIGINT AUTO_INCREMENT,
-    user_id VARCHAR(20) NOT NULL,
+    follower_user_id VARCHAR(20) NOT NULL,
     is_read BIT(1) DEFAULT 1,
     message TEXT NOT NULL,
+    profile_picture_url TEXT NULL,
+    following_user_id varchar(20) NOT NULL,
+    following_user_name varchar(200) NOT NULL,
     notification_type VARCHAR(50) NOT NULL,
     created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_date TIMESTAMP NULL,
     PRIMARY KEY (id),
     CONSTRAINT `FK_NOTIFICATION_USER`
-        FOREIGN KEY (user_id)
+        FOREIGN KEY (follower_user_id)
             REFERENCES user(id)
 );
