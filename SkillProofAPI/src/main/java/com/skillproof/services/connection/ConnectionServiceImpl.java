@@ -214,6 +214,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         Connection connection = new Connection();
         connection.setFollowing(userFollowing);
         connection.setFollower(userFollowedBy);
+        connectionStatus = connectionStatus == null ? ConnectionStatus.PENDING : connectionStatus;
         connection.setConnectionStatus(connectionStatus);
         return connection;
     }
