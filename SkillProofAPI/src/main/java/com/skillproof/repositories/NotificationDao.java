@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface NotificationDao extends JpaRepository<Notification, Long> {
 
-    List<Notification> findByFollowerIdId(String followerId);
+    List<Notification> findByFollowerId(String followerId);
 }

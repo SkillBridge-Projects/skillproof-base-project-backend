@@ -110,7 +110,7 @@ public class NotificationServiceImpl implements NotificationService {
     private NotificationResponse getNotificationResponse(Notification notification) {
         NotificationResponse notificationResponse = ResponseConverter
                 .copyProperties(notification, NotificationResponse.class);
-        notificationResponse.setFollowerId(notification.getFollowerId().getId());
+        notificationResponse.setFollowerId(notification.getFollower().getId());
         notificationResponse.setProfilePicture(awss3Service.getPresignedUrlForProfile(notification.getProfilePicture()));
         return notificationResponse;
     }
@@ -118,7 +118,7 @@ public class NotificationServiceImpl implements NotificationService {
     private Notification createNotificationEntity(CreateNotificationRequest createNotificationRequest, User user) {
         LOG.debug("Start of createNotificationEntity method.");
         Notification notification = new Notification();
-        notification.setFollowerId(user);
+        notification.setFollower(user);
         notification.setRead(createNotificationRequest.isRead());
         notification.setNotificationType(createNotificationRequest.getNotificationType());
         notification.setMessage(createNotificationRequest.getMessage());

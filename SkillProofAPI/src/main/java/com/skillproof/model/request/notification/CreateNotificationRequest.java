@@ -35,11 +35,9 @@ public class CreateNotificationRequest {
     @Schema(hidden = true)
     private String profilePicture;
 
-    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Schema(hidden = true)
     private String followingId;
 
-    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Schema(hidden = true)
     private String followingUserName;
 }

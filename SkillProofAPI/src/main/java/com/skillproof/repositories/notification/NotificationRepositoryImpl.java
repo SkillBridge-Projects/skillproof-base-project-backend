@@ -32,7 +32,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 
     @Override
     public List<Notification> listNotificationsForUser(String userId) {
-        return notificationDao.findByFollowerIdId(userId);
+        return notificationDao.findByFollowerId(userId);
     }
 
     @Override

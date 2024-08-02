@@ -76,7 +76,7 @@ public class ConnectionServiceImpl implements ConnectionService {
         return user.getFirstName() + " " + user.getLastName();
     }
 
-    private void createNotificationWithMessage(String followerId, String profile, String userName, String followingId,
+    private void createNotificationWithMessage(String followerId, String profile, String followingId, String userName,
                                                ConnectionStatus connectionStatus) {
         String msg = connectionStatus == ConnectionStatus.PENDING
                 ? MessageConstants.REQUEST_SENT

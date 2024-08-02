@@ -39,7 +39,7 @@ public class Notification {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "follower_user_id", referencedColumnName = "id", nullable = false)
-    private User followerId;
+    private User follower;
 
     @NotNull
     @Column(name = "following_user_id", nullable = false)
