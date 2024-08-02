@@ -1,7 +1,5 @@
 package com.skillproof.utils;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Arrays;
 
 public class Utils {

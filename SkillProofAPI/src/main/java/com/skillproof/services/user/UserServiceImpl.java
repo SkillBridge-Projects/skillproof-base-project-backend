@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
         String oldProfilePictureUrl = user.getProfilePicture();
 
         // Delete the old profile picture from S3
-        if (oldProfilePictureUrl != null && !oldProfilePictureUrl.isEmpty()) {
+        if (StringUtils.isNotEmpty(oldProfilePictureUrl)) {
             LOG.debug("Deleting old profile picture");
             awss3Service.deleteFile(oldProfilePictureUrl);
         }
@@ -169,15 +169,6 @@ public class UserServiceImpl implements UserService {
         List<EducationResponse> educationDetails = educationService.getEducationByUserId(id);
         List<SkillResponse> skills = skillService.getSkillsByUserId(id);
         return getUserProfile(user, experiences, educationDetails, skills);
-    }
-
-    private String getPresignedUrlForProfile(String profilePictureUrl) {
-        LOG.debug("Start of getPresignedUrlForProfile method - UserServiceImpl");
-        String preSignedUrl = null;
-        if (StringUtils.isNotEmpty(profilePictureUrl)) {
-            preSignedUrl = awss3Service.generatePresignedUrl(awss3Service.getFileName(profilePictureUrl));
-        }
-        return preSignedUrl;
     }
 
     private UserProfile getUserProfile(UserResponse user, List<ExperienceResponse> experiences,
@@ -250,7 +241,7 @@ public class UserServiceImpl implements UserService {
     private UserResponse getUserResponse(User user) {
         UserResponse response = ResponseConverter.copyProperties(user, UserResponse.class);
         response.setPassword(null);
-        response.setProfilePicture(getPresignedUrlForProfile(response.getProfilePicture()));
+        response.setProfilePicture(awss3Service.getPresignedUrlForProfile(response.getProfilePicture()));
         return response;
     }
 }

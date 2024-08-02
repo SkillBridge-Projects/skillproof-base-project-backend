@@ -15,7 +15,9 @@ public interface NotificationService {
 
     List<NotificationResponse> listNotificationsForUser(String userId);
 
-    NotificationResponse updateConnection(Long id, UpdateNotificationRequest updateNotificationRequest);
+    NotificationResponse updateNotification(Long id, UpdateNotificationRequest updateNotificationRequest);
 
     NotificationResponse getNotificationById(Long id);
+
+    void deleteNotificationById(Long id);
 }

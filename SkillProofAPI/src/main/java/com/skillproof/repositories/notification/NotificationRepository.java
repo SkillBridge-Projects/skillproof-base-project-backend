@@ -14,4 +14,6 @@ public interface NotificationRepository {
     Notification getNotificationById(Long id);
 
     Notification updateConnection(Notification notification);
+
+    void deleteNotification(Long id);
 }

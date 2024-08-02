@@ -23,4 +23,6 @@ public interface ConnectionService {
     List<UserResponse> getFollowersList(String userId);
 
     List<UserResponse> listConnectionsForUser(String userId);
+
+    ConnectionResponse updateConnectionForUser(String followingUserId, String followerId);
 }

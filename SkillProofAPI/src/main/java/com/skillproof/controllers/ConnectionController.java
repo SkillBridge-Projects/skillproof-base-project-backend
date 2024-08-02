@@ -65,6 +65,23 @@ public class ConnectionController extends AbstractController {
         return ok(connectionResponse);
     }
 
+    @PatchMapping(value = "/connections/{followingUserId}/follower/{followerId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update connection of followingUser for follower",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
+                            content = @Content(schema = @Schema(implementation = ConnectionResponse.class)))
+            }
+    )
+    public ResponseEntity<ConnectionResponse> updateConnectionForUser(@PathVariable String followingUserId,
+                                                                   @PathVariable String followerId) {
+        LOG.debug("Start of getConnectionForUser method.");
+        ConnectionResponse connectionResponse = connectionService.updateConnectionForUser(followingUserId, followerId);
+        LOG.debug("End of getConnectionForUser method.");
+        return ok(connectionResponse);
+    }
+
     @GetMapping(value = "/users/{userId}/connections",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "List Connections for user",

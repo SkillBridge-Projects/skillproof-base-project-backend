@@ -10,15 +10,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Table(name = "comments")
-public class Comment {
+public class Like {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
-    @Column(name = "content", nullable = false)
-    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "post_id", nullable = false)

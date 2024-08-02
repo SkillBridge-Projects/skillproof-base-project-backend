@@ -1,7 +1,6 @@
 package com.skillproof.model.request.notification;
 
 import com.skillproof.enums.NotificationType;
-import com.skillproof.enums.RoleType;
 import com.skillproof.validators.Messages;
 import com.skillproof.validators.RegEx;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -12,7 +11,6 @@ import lombok.ToString;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -23,7 +21,7 @@ public class CreateNotificationRequest {
     private boolean isRead;
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
-    private String userId;
+    private String followerId;
 
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
     @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
@@ -33,4 +31,15 @@ public class CreateNotificationRequest {
     @NotNull(message = Messages.NO_EMPTY_PROPERTY)
     @Schema(name = "notificationType", example = "POST")
     private NotificationType notificationType;
+
+    @Schema(hidden = true)
+    private String profilePicture;
+
+    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
+    @Schema(hidden = true)
+    private String followingId;
+
+    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
+    @Schema(hidden = true)
+    private String followingUserName;
 }

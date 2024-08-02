@@ -10,6 +10,7 @@ import com.skillproof.model.request.notification.NotificationResponse;
 import com.skillproof.model.request.notification.UpdateNotificationRequest;
 import com.skillproof.repositories.notification.NotificationRepository;
 import com.skillproof.repositories.user.UserRepository;
+import com.skillproof.services.AWSS3Service;
 import com.skillproof.utils.ResponseConverter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -28,10 +29,13 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final AWSS3Service awss3Service;
 
-    public NotificationServiceImpl(UserRepository userRepository, NotificationRepository notificationRepository) {
+    public NotificationServiceImpl(UserRepository userRepository, NotificationRepository notificationRepository,
+                                   AWSS3Service awss3Service) {
         this.userRepository = userRepository;
         this.notificationRepository = notificationRepository;
+        this.awss3Service = awss3Service;
     }
 
     @Override
@@ -43,10 +47,10 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public NotificationResponse createNotification(CreateNotificationRequest createNotificationRequest) {
         LOG.debug("Start of createNotification method.");
-        User user = userRepository.getUserById(createNotificationRequest.getUserId());
+        User user = userRepository.getUserById(createNotificationRequest.getFollowerId());
         if (ObjectUtils.isEmpty(user)) {
-            LOG.error("User with id {} not found.", createNotificationRequest.getUserId());
-            throw new UserNotFoundException(ObjectConstants.USER, createNotificationRequest.getUserId());
+            LOG.error("User with id {} not found.", createNotificationRequest.getFollowerId());
+            throw new UserNotFoundException(ObjectConstants.USER, createNotificationRequest.getFollowerId());
         }
         Notification notification = notificationRepository.createNotification(createNotificationEntity(createNotificationRequest, user));
         LOG.debug("End of createNotification method.");
@@ -67,8 +71,8 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public NotificationResponse updateConnection(Long id, UpdateNotificationRequest updateNotificationRequest) {
-        LOG.debug("Start of updateConnection method.");
+    public NotificationResponse updateNotification(Long id, UpdateNotificationRequest updateNotificationRequest) {
+        LOG.debug("Start of updateNotification method.");
         Notification notification = notificationRepository.getNotificationById(id);
         if (ObjectUtils.isEmpty(notification)) {
             LOG.error("Notification with id {} not found.", id);
@@ -76,7 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
         notification.setRead(updateNotificationRequest.isRead());
         notification = notificationRepository.updateConnection(notification);
-        LOG.debug("End of updateConnection method.");
+        LOG.debug("End of updateNotification method.");
         return getNotificationResponse(notification);
     }
 
@@ -91,20 +95,36 @@ public class NotificationServiceImpl implements NotificationService {
         return getNotificationResponse(notification);
     }
 
+    @Override
+    public void deleteNotificationById(Long id) {
+        LOG.debug("Start of deleteNotificationById method.");
+        Notification notification = notificationRepository.getNotificationById(id);
+        if (ObjectUtils.isEmpty(notification)) {
+            LOG.error("Notification with id {} not found.", id);
+            throw new ResourceNotFoundException(ObjectConstants.NOTIFICATION, ObjectConstants.ID, id);
+        }
+        notificationRepository.deleteNotification(id);
+        LOG.debug("End of deleteNotificationById method.");
+    }
+
     private NotificationResponse getNotificationResponse(Notification notification) {
         NotificationResponse notificationResponse = ResponseConverter
                 .copyProperties(notification, NotificationResponse.class);
-        notificationResponse.setUserId(notification.getUser().getId());
+        notificationResponse.setFollowerId(notification.getFollowerId().getId());
+        notificationResponse.setProfilePicture(awss3Service.getPresignedUrlForProfile(notification.getProfilePicture()));
         return notificationResponse;
     }
 
     private Notification createNotificationEntity(CreateNotificationRequest createNotificationRequest, User user) {
         LOG.debug("Start of createNotificationEntity method.");
         Notification notification = new Notification();
-        notification.setUser(user);
+        notification.setFollowerId(user);
         notification.setRead(createNotificationRequest.isRead());
         notification.setNotificationType(createNotificationRequest.getNotificationType());
         notification.setMessage(createNotificationRequest.getMessage());
+        notification.setProfilePicture(createNotificationRequest.getProfilePicture());
+        notification.setFollowingId(createNotificationRequest.getFollowingId());
+        notification.setFollowingUserName(createNotificationRequest.getFollowingUserName());
         LOG.debug("End of createNotificationEntity method.");
         return notification;
     }

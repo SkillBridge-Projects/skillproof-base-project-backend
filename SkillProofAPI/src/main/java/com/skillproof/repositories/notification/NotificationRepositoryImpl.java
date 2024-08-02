@@ -32,7 +32,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 
     @Override
     public List<Notification> listNotificationsForUser(String userId) {
-        return notificationDao.findByUserId(userId);
+        return notificationDao.findByFollowerId(userId);
     }
 
     @Override
@@ -43,5 +43,10 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     @Override
     public Notification updateConnection(Notification notification) {
         return notificationDao.saveAndFlush(notification);
+    }
+
+    @Override
+    public void deleteNotification(Long id) {
+        notificationDao.deleteById(id);
     }
 }

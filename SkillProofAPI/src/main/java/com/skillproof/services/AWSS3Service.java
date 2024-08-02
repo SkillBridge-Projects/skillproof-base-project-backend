@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +68,15 @@ public class AWSS3Service {
 
         URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
+    }
+
+    public String getPresignedUrlForProfile(String profilePictureUrl) {
+        LOG.debug("Start of getPresignedUrlForProfile method - UserServiceImpl");
+        String preSignedUrl = null;
+        if (StringUtils.isNotEmpty(profilePictureUrl)) {
+            preSignedUrl = generatePresignedUrl(getFileName(profilePictureUrl));
+        }
+        return preSignedUrl;
     }
 }
 

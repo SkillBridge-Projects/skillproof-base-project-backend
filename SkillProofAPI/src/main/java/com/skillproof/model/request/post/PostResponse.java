@@ -1,9 +1,15 @@
 package com.skillproof.model.request.post;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@ToString
 public class PostResponse extends CreatePostRequest {
 
     @Schema(name = "userEmail", example = "john.doe@email.com", accessMode = Schema.AccessMode.READ_ONLY)
@@ -27,6 +33,4 @@ public class PostResponse extends CreatePostRequest {
     @Schema(name = "updatedDate", example = "2024-03-01T12:00:00.000",
             type = "String", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime updatedDate;
-
-
 }

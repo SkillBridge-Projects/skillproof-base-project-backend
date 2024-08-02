@@ -41,7 +41,7 @@ public class NotificationController extends AbstractController {
             }
     )
     public ResponseEntity<NotificationResponse> createNotification(
-            @RequestBody @Valid CreateNotificationRequest createNotificationRequest){
+            @RequestBody @Valid CreateNotificationRequest createNotificationRequest) {
         LOG.debug("Start of createNotification method.");
         NotificationResponse notificationResponse = notificationService.createNotification(createNotificationRequest);
         LOG.debug("End of createNotification method.");
@@ -56,9 +56,10 @@ public class NotificationController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = NotificationResponse.class)))
             }
     )
-    public List<NotificationResponse> listAllNotifications() {
+    public ResponseEntity<List<NotificationResponse>> listAllNotifications() {
         LOG.debug("Start of listAllNotifications method.");
-        return notificationService.listAllNotifications();
+        List<NotificationResponse> notifications = notificationService.listAllNotifications();
+        return ok(notifications);
     }
 
     @GetMapping(value = "/users/{userId}/notifications", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,8 +85,8 @@ public class NotificationController extends AbstractController {
             }
     )
     public ResponseEntity<NotificationResponse> updateNotification(@PathVariable Long id,
-                                                               @RequestBody @Valid UpdateNotificationRequest updateNotificationRequest) {
-        NotificationResponse notificationResponse = notificationService.updateConnection(id, updateNotificationRequest);
+                                                                   @RequestBody @Valid UpdateNotificationRequest updateNotificationRequest) {
+        NotificationResponse notificationResponse = notificationService.updateNotification(id, updateNotificationRequest);
         return ok(notificationResponse);
     }
 
@@ -102,5 +103,17 @@ public class NotificationController extends AbstractController {
         NotificationResponse notification = notificationService.getNotificationById(id);
         LOG.debug("End of getNotificationById method.");
         return ok(notification);
+    }
+
+    @DeleteMapping(value = "/notifications/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Delete notification of an user by id",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_DELETE)
+            }
+    )
+    public ResponseEntity<?> deleteNotificationById(@PathVariable Long id) {
+        notificationService.deleteNotificationById(id);
+        return ok();
     }
 }

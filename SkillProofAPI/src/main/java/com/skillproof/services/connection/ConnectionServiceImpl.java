@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,25 +65,32 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection = connectionRepository.createConnection(connection);
         if (ObjectUtils.isNotEmpty(connection)) {
             String userName = getUserName(userFollowing);
-            createNotificationWithMessage(follower.getId(), userName, createConnectionRequest.getConnectionStatus());
+            createNotificationWithMessage(follower.getId(), userFollowing.getProfilePicture(), userFollowing.getId(),
+                    userName, connection.getConnectionStatus());
         }
         LOG.debug("End of createConnection method.");
         return getConnectionResponse(connection);
     }
 
-    private String getUserName(User user){
+    private String getUserName(User user) {
         return user.getFirstName() + " " + user.getLastName();
     }
 
-    private void createNotificationWithMessage(String userId, String userName, ConnectionStatus connectionStatus){
-        String msg = connectionStatus == ConnectionStatus.PENDING ? MessageConstants.REQUEST_SENT : MessageConstants.REQUEST_ACCEPTED;
+    private void createNotificationWithMessage(String followerId, String profile, String userName, String followingId,
+                                               ConnectionStatus connectionStatus) {
+        String msg = connectionStatus == ConnectionStatus.PENDING
+                ? MessageConstants.REQUEST_SENT
+                : MessageConstants.REQUEST_ACCEPTED;
         String notificationMessage = Utils.getNotificationMessage(msg, userName);
 
         CreateNotificationRequest notificationRequest = new CreateNotificationRequest();
         notificationRequest.setRead(false);
-        notificationRequest.setUserId(userId);
+        notificationRequest.setFollowerId(followerId);
         notificationRequest.setNotificationType(NotificationType.CONNECTION_REQUEST);
         notificationRequest.setMessage(notificationMessage);
+        notificationRequest.setProfilePicture(profile);
+        notificationRequest.setFollowingId(followingId);
+        notificationRequest.setFollowingUserName(userName);
         notificationService.createNotification(notificationRequest);
     }
 
@@ -193,6 +199,18 @@ public class ConnectionServiceImpl implements ConnectionService {
         return connectionRepository.listConnectionsForUser(userId).stream()
                 .map(connection -> userService.getUserById(connection.getFollower().getId()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ConnectionResponse updateConnectionForUser(String followingUserId, String followerId) {
+        ConnectionResponse response = getConnectionForUser(followingUserId, followerId);
+        if (ObjectUtils.isEmpty(response)) {
+            LOG.error("No Connection request exists between users {} and {}", followingUserId, followerId);
+            throw new ResourceNotFoundException("No Connection request exists between users " + followingUserId + " and " + followerId);
+        }
+        UpdateConnectionRequest request = new UpdateConnectionRequest();
+        request.setConnectionStatus(ConnectionStatus.ACCEPTED);
+        return updateConnection(response.getId(), request);
     }
 
     private ConnectionResponse getConnectionResponse(Connection connection) {

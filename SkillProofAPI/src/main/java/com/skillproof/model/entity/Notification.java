@@ -1,7 +1,6 @@
 package com.skillproof.model.entity;
 
 import com.skillproof.enums.NotificationType;
-import com.skillproof.enums.RoleType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,10 +32,22 @@ public class Notification {
     @Column(name = "message", nullable = false)
     private String message;
 
+    @Basic
+    @Column(name = "profile_picture_url")
+    private String profilePicture;
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
+    @JoinColumn(name = "follower_user_id", referencedColumnName = "id", nullable = false)
+    private User followerId;
+
+    @NotNull
+    @Column(name = "following_user_id", nullable = false)
+    private String followingId;
+
+    @NotNull
+    @Column(name = "following_user_name", nullable = false)
+    private String followingUserName;
 
     @Column(name = "created_date")
     private LocalDateTime createdDate;
