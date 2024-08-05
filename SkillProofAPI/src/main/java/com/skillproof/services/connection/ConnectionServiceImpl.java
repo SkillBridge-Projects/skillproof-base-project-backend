@@ -224,6 +224,27 @@ public class ConnectionServiceImpl implements ConnectionService {
         return updateConnection(response.getId(), request);
     }
 
+    @Override
+    public void deleteConnectionForUser(String followingUserId, String followerId) {
+        LOG.debug("Start of deleteConnectionForUser method.");
+        User followingUser = userRepository.getUserById(followingUserId);
+        if (ObjectUtils.isEmpty(followingUser)) {
+            LOG.error("User with id {} not found.", followingUserId);
+            throw new UserNotFoundException(ObjectConstants.USER, followingUserId);
+        }
+
+        User follower = userRepository.getUserById(followerId);
+        if (ObjectUtils.isEmpty(follower)) {
+            LOG.error("User with id {} not found.", followerId);
+            throw new UserNotFoundException(ObjectConstants.USER, followerId);
+        }
+
+        List<Connection> connections = connectionRepository.findByFollowingIdOrFollowerIdAndConnectionStatus(
+                followingUserId, followerId, ConnectionStatus.ACCEPTED);
+        connections.forEach(con -> connectionRepository.deleteConnection(con.getId()));
+        LOG.debug("End of deleteConnectionForUser method.");
+    }
+
     private ConnectionResponse getConnectionResponse(Connection connection) {
         ConnectionResponse connectionResponse = ResponseConverter
                 .copyProperties(connection, ConnectionResponse.class);

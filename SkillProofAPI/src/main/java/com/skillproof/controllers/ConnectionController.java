@@ -124,6 +124,23 @@ public class ConnectionController extends AbstractController {
         return ok();
     }
 
+    @DeleteMapping(value = "/connections/{followingUserId}/follower/{followerId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Delete connection of followingUser",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
+                            content = @Content(schema = @Schema(implementation = ConnectionResponse.class)))
+            }
+    )
+    public ResponseEntity<?> deleteConnectionForUser(@PathVariable String followingUserId,
+                                                                      @PathVariable String followerId) {
+        LOG.debug("Start of deleteConnectionForUser method.");
+        connectionService.deleteConnectionForUser(followingUserId, followerId);
+        LOG.debug("End of deleteConnectionForUser method.");
+        return ok();
+    }
+
     @GetMapping(value = "/connections/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get Connection by id",
             responses = {

@@ -25,4 +25,6 @@ public interface ConnectionService {
     List<UserResponse> listConnectionsForUser(String userId);
 
     ConnectionResponse updateConnectionForUser(String followingUserId, String followerId);
+
+    void deleteConnectionForUser(String followingUserId, String followerId);
 }
