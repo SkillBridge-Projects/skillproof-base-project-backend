@@ -143,7 +143,14 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Override
     public void deleteConnectionById(Long id) {
         LOG.debug("Start of deleteConnectionById method.");
-        connectionRepository.deleteConnection(id);
+        Connection connection = connectionRepository.getConnectionById(id);
+        if (ObjectUtils.isEmpty(connection)) {
+            LOG.error("Connection with id {} not found.", id);
+            throw new ResourceNotFoundException(ObjectConstants.CONNECTION, ObjectConstants.ID, id);
+        }
+        List<Connection> connections = connectionRepository.findByFollowingIdOrFollowerIdAndConnectionStatus(
+                connection.getFollowing().getId(), connection.getFollower().getId(), connection.getConnectionStatus());
+        connections.forEach(con -> connectionRepository.deleteConnection(con.getId()));
         LOG.debug("End of deleteConnectionById method.");
     }
 

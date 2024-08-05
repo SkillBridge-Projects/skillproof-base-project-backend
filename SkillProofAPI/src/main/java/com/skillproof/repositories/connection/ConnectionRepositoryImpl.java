@@ -65,4 +65,10 @@ public class ConnectionRepositoryImpl implements ConnectionRepository {
     public List<Connection> listConnectionsForUser(String userId) {
         return connectionDao.findByFollowingId(userId);
     }
+
+    @Override
+    public List<Connection> findByFollowingIdOrFollowerIdAndConnectionStatus(String followingId, String followerId,
+                                                                             ConnectionStatus connectionStatus){
+        return connectionDao.findByFollowingIdOrFollowerIdAndConnectionStatus(followingId, followerId, connectionStatus);
+    }
 }

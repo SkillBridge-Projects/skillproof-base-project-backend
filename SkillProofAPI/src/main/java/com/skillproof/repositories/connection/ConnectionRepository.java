@@ -24,4 +24,7 @@ public interface ConnectionRepository {
                                                       ConnectionStatus status);
 
     List<Connection> listConnectionsForUser(String userId);
+
+    List<Connection> findByFollowingIdOrFollowerIdAndConnectionStatus(String followingId, String followerId,
+                                                                      ConnectionStatus connectionStatus);
 }
