@@ -58,7 +58,7 @@ public class ConnectionController extends AbstractController {
             }
     )
     public ResponseEntity<ConnectionResponse> getConnectionForUser(@PathVariable String followingUserId,
-                                                                     @PathVariable String followerId) {
+                                                                   @PathVariable String followerId) {
         LOG.debug("Start of getConnectionForUser method.");
         ConnectionResponse connectionResponse = connectionService.getConnectionForUser(followingUserId, followerId);
         LOG.debug("End of getConnectionForUser method.");
@@ -75,7 +75,7 @@ public class ConnectionController extends AbstractController {
             }
     )
     public ResponseEntity<ConnectionResponse> updateConnectionForUser(@PathVariable String followingUserId,
-                                                                   @PathVariable String followerId) {
+                                                                      @PathVariable String followerId) {
         LOG.debug("Start of getConnectionForUser method.");
         ConnectionResponse connectionResponse = connectionService.updateConnectionForUser(followingUserId, followerId);
         LOG.debug("End of getConnectionForUser method.");

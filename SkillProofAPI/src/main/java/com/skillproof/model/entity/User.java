@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -68,4 +69,7 @@ public class User {
     @Basic
     @Column(name = "profile_picture_url")
     private String profilePicture;
+
+    @ManyToMany(mappedBy = "participants")
+    private List<Conversation> conversations;
 }

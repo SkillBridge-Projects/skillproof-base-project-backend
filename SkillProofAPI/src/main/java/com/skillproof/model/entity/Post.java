@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,8 +30,9 @@ public class Post {
     @Column(name = "video_url")
     private String videoUrl; // URL for video
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     @Basic

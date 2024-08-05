@@ -5,31 +5,35 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "likes")
-public class Like {
+@Table(name = "conversation")
+public class Conversation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "post_id", nullable = false)
-    private Post post; // The post to which the comment belongs
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user; // The user who created the comment
+    @ManyToMany
+    @JoinTable(
+            name = "conversation_users",
+            joinColumns = @JoinColumn(name = "conversation_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> participants;
 
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+
+    public Conversation() {
+    }
 
     @PrePersist
     protected void onCreate() {
@@ -42,3 +46,4 @@ public class Like {
         updatedDate = LocalDateTime.now();
     }
 }
+

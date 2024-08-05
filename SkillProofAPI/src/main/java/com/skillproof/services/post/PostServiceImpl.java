@@ -9,6 +9,7 @@ import com.skillproof.model.request.post.PostResponse;
 import com.skillproof.repositories.post.PostRepository;
 import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.services.AWSS3Service;
+import com.skillproof.services.notification.NotificationService;
 import com.skillproof.utils.ResponseConverter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,12 +31,15 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final AWSS3Service awss3Service;
+    private final NotificationService notificationService;
 
 
-    public PostServiceImpl(UserRepository userRepository, PostRepository postRepository, AWSS3Service awss3Service) {
+    public PostServiceImpl(UserRepository userRepository, PostRepository postRepository,
+                           AWSS3Service awss3Service, NotificationService notificationService) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.awss3Service = awss3Service;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -61,6 +65,9 @@ public class PostServiceImpl implements PostService {
 
         Post post = createPostEntity(content, imageUrl, videoUrl, user);
         post = postRepository.createPost(post);
+
+        //TODO: Need to send notification i think
+
         LOG.debug("End of createPost method.");
         return getPostResponse(post);
     }
@@ -123,6 +130,8 @@ public class PostServiceImpl implements PostService {
 
         preparePostEntity(content, newImageUrl, newVideoUrl, post);
         post = postRepository.updatePost(post);
+
+
         LOG.debug("End of updatePost method");
         return getPostResponse(post);
     }

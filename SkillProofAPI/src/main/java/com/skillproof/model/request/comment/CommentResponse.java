@@ -1,15 +1,16 @@
-package com.skillproof.model.request.message;
+package com.skillproof.model.request.comment;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @ToString
-public class MessageResponse extends CreateMessageRequest {
+public class CommentResponse extends CreateCommentRequest {
 
     @Schema(name = "id", example = "123", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
@@ -22,4 +23,3 @@ public class MessageResponse extends CreateMessageRequest {
             type = "String", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime updatedDate;
 }
-

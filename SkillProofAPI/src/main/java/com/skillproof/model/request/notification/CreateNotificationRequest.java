@@ -28,7 +28,7 @@ public class CreateNotificationRequest {
     @Schema(name = "message", example = "John.Doe has sent you a connection request.")
     private String message;
 
-    @NotNull(message = Messages.NO_EMPTY_PROPERTY)
+    @NotNull(message = Messages.REQUIRED_PROPERTY)
     @Schema(name = "notificationType", example = "POST")
     private NotificationType notificationType;
 

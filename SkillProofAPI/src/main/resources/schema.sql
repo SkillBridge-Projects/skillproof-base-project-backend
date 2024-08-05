@@ -92,10 +92,90 @@ CREATE TABLE IF NOT EXISTS notification (
     following_user_id varchar(20) NOT NULL,
     following_user_name varchar(200) NOT NULL,
     notification_type VARCHAR(50) NOT NULL,
-    created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_date TIMESTAMP NULL,
     PRIMARY KEY (id),
     CONSTRAINT `FK_NOTIFICATION_USER`
         FOREIGN KEY (follower_user_id)
+            REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS post (
+    id BIGINT AUTO_INCREMENT,
+    user_id VARCHAR(20) NOT NULL,
+    image_url TEXT NULL,
+    video_url TEXT NULL,
+    content varchar(1000) NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT `FK_POST_USER`
+        FOREIGN KEY (user_id)
+            REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS likes (
+    id BIGINT AUTO_INCREMENT,
+    user_id VARCHAR(20) NOT NULL,
+    post_id BIGINT NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT `FK_LIKE_USER`
+        FOREIGN KEY (user_id)
+            REFERENCES user(id),
+    CONSTRAINT `FK_LIKE_POST`
+        FOREIGN KEY (post_id)
+            REFERENCES post(id)
+);
+
+CREATE TABLE IF NOT EXISTS comment (
+    id BIGINT AUTO_INCREMENT,
+    user_id VARCHAR(20) NOT NULL,
+    post_id BIGINT NOT NULL,
+    content varchar(1000) NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT `FK_COMMENT_USER`
+        FOREIGN KEY (user_id)
+            REFERENCES user(id),
+    CONSTRAINT `FK_COMMENT_POST`
+        FOREIGN KEY (post_id)
+            REFERENCES post(id)
+);
+
+CREATE TABLE IF NOT EXISTS conversation (
+    id BIGINT AUTO_INCREMENT,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS message (
+    id BIGINT AUTO_INCREMENT,
+    conversation_id BIGINT NOT NULL,
+    sender_id VARCHAR(20) NOT NULL,
+    content VARCHAR(1000) NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT `FK_MESSAGE_CONVERSATION`
+        FOREIGN KEY (conversation_id)
+            REFERENCES conversation(id),
+    CONSTRAINT `FK_MESSAGE_USER`
+        FOREIGN KEY (sender_id)
+            REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS conversation_users (
+    conversation_id BIGINT NOT NULL,
+    user_id VARCHAR(20) NOT NULL,
+    PRIMARY KEY (conversation_id, user_id),
+    CONSTRAINT `FK_CONVERSATION_USERS_CONVERSATION`
+        FOREIGN KEY (conversation_id)
+            REFERENCES conversation(id),
+    CONSTRAINT `FK_CONVERSATION_USERS_USER`
+        FOREIGN KEY (user_id)
             REFERENCES user(id)
 );

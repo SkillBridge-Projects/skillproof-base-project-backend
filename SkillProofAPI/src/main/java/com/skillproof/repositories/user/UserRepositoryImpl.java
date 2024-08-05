@@ -59,4 +59,9 @@ public class UserRepositoryImpl implements UserRepository {
     public List<User> listUsersByRole(RoleType roleType) {
         return userDao.findAllByRole(roleType);
     }
+
+    @Override
+    public List<User> findParticipants(List<String> participantIds) {
+        return userDao.findAllById(participantIds);
+    }
 }

@@ -1,7 +1,10 @@
-//package com.skillproof.skillproofapi.repositories;
-//
-//import com.skillproof.skillproofapi.model.entity.Comment;
-//import org.springframework.data.jpa.repository.JpaRepository;
-//
-//public interface CommentDao extends JpaRepository<Comment, Long> {
-//}
+package com.skillproof.repositories;
+
+import com.skillproof.model.entity.Comment;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface CommentDao extends JpaRepository<Comment, Long> {
+    List<Comment> findCommentByPostId(Long postId);
+}

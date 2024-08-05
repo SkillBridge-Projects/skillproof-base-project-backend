@@ -1,8 +1,6 @@
 package com.skillproof.controllers;
 
 import com.skillproof.constants.SwaggerConstants;
-import com.skillproof.model.request.notification.NotificationResponse;
-import com.skillproof.model.request.notification.UpdateNotificationRequest;
 import com.skillproof.model.request.post.PostResponse;
 import com.skillproof.services.AWSS3Service;
 import com.skillproof.services.post.PostService;
@@ -18,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
 import java.util.List;
 
 

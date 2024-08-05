@@ -20,4 +20,6 @@ public interface UserRepository {
     User updateUser(User user);
 
     List<User> listUsersByRole(RoleType roleType);
+
+    List<User> findParticipants(List<String> participantIds);
 }
