@@ -13,10 +13,12 @@ public interface ConnectionDao extends JpaRepository<Connection, Long> {
     List<Connection> findByFollowingIdOrFollowerIdAndConnectionStatus(String following, String followerId,
                                                                       ConnectionStatus connectionStatus);
 
-    List<Connection> findByFollowingIdAndConnectionStatus(String followingId, ConnectionStatus connectionStatus);
+    List<Connection> findByFollowingId(String followingId);
 
     List<Connection> findByFollowerIdAndConnectionStatus(String followerId, ConnectionStatus connectionStatus);
 
     boolean existsByFollowingIdAndFollowerIdAndConnectionStatus(String followingId, String followerId,
                                                                 ConnectionStatus connectionStatus);
+
+    List<Connection> findByFollowingIdAndConnectionStatus(String followingId, ConnectionStatus connectionStatus);
 }

@@ -63,6 +63,6 @@ public class ConnectionRepositoryImpl implements ConnectionRepository {
 
     @Override
     public List<Connection> listConnectionsForUser(String userId) {
-        return connectionDao.findByFollowingIdAndConnectionStatus(userId, ConnectionStatus.ACCEPTED);
+        return connectionDao.findByFollowingId(userId);
     }
 }
