@@ -4,5 +4,6 @@ public enum NotificationType {
     COMMENT,
     LIKE,
     CONVERSATION,
-    CONNECTION_REQUEST
+    CONNECTION_REQUEST,
+    CONNECTION_ACCEPTED
 }

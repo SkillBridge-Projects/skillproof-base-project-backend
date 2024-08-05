@@ -81,12 +81,16 @@ public class ConnectionServiceImpl implements ConnectionService {
         String msg = connectionStatus == ConnectionStatus.PENDING
                 ? MessageConstants.REQUEST_SENT
                 : MessageConstants.REQUEST_ACCEPTED;
+
+        NotificationType type = connectionStatus == ConnectionStatus.PENDING
+                ? NotificationType.CONNECTION_REQUEST
+                : NotificationType.CONNECTION_ACCEPTED;
         String notificationMessage = Utils.getNotificationMessage(msg, userName);
 
         CreateNotificationRequest notificationRequest = new CreateNotificationRequest();
         notificationRequest.setRead(false);
         notificationRequest.setFollowerId(followerId);
-        notificationRequest.setNotificationType(NotificationType.CONNECTION_REQUEST);
+        notificationRequest.setNotificationType(type);
         notificationRequest.setMessage(notificationMessage);
         notificationRequest.setProfilePicture(profile);
         notificationRequest.setFollowingId(followingId);
