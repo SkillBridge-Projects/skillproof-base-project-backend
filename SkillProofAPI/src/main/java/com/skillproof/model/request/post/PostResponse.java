@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,13 +16,13 @@ public class PostResponse extends CreatePostRequest {
     @Schema(name = "userEmail", example = "john.doe@email.com", accessMode = Schema.AccessMode.READ_ONLY)
     private String userEmail;
 
-    @Schema(name = "imageUrl", example = "https://skillproofmedia.s3.ap-south-1.amazonaws.com/172210xxxxxx_Capture.PNG",
+    @Schema(name = "imageUrl", example = "[\"https://skillproofmedia.s3.ap-south-1.amazonaws.com/172210xxxxxx_Capture.PNG\"]",
             accessMode = Schema.AccessMode.READ_ONLY)
-    private String imageUrl;
+    private List<String> imageUrls;
 
-    @Schema(name = "videoUrl", example = "https://skillproofmedia.s3.ap-south-1.amazonaws.com/172210xxxxxx_Video.MP4",
+    @Schema(name = "videoUrl", example = "[\"https://skillproofmedia.s3.ap-south-1.amazonaws.com/172210xxxxxx_Video.MP4\"]",
             accessMode = Schema.AccessMode.READ_ONLY)
-    private String videoUrl;
+    private List<String> videoUrls;
 
     @Schema(name = "id", example = "123", accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;

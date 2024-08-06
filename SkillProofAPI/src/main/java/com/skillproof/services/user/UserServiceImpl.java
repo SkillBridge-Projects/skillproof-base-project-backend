@@ -16,8 +16,10 @@ import com.skillproof.model.request.user.UserResponse;
 import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.services.AWSS3Service;
 import com.skillproof.services.education.EducationService;
+import com.skillproof.services.email.EmailService;
 import com.skillproof.services.experience.ExperienceService;
 import com.skillproof.services.skill.SkillService;
+import com.skillproof.services.sms.SmsService;
 import com.skillproof.utils.ResponseConverter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -45,16 +47,21 @@ public class UserServiceImpl implements UserService {
     private final EducationService educationService;
     private final SkillService skillService;
     private final AWSS3Service awss3Service;
+    private final EmailService emailService;
+    private final SmsService smsService;
 
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder,
                            ExperienceService experienceService, EducationService educationService,
-                           AWSS3Service awss3Service, SkillService skillService) {
+                           AWSS3Service awss3Service, SkillService skillService, EmailService emailService,
+                           SmsService smsService) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.experienceService = experienceService;
         this.educationService = educationService;
         this.awss3Service = awss3Service;
         this.skillService = skillService;
+        this.emailService = emailService;
+        this.smsService = smsService;
     }
 
     public UserResponse getUserById(String id) {
@@ -89,8 +96,30 @@ public class UserServiceImpl implements UserService {
         }
         User user = createUserEntity(createUserRequest);
         user = userRepository.createUser(user);
+        if (ObjectUtils.isNotEmpty(user)) {
+            emailService.sendUserCreationEmail(user.getEmailAddress(), user.getEmailAddress());
+        }
         LOG.debug("End of getUserById method - UserServiceImpl");
         return getUserResponse(user);
+    }
+
+    @Override
+    public void inviteUsers(List<String> emailAddresses) {
+        for (String email : emailAddresses) {
+            boolean isExists = userRepository.isEmailExists(email);
+            if (!isExists) {
+                emailService.sendInvitationEmail(email, email);
+            } else {
+                LOG.error("User with email {} already exists !!", email);
+            }
+        }
+    }
+
+    @Override
+    public void inviteUsersViaSms(List<String> phoneNumbers) {
+        for (String phoneNumber : phoneNumbers) {
+            smsService.sendInvitationSms(phoneNumber);
+        }
     }
 
     @Override
@@ -241,7 +270,7 @@ public class UserServiceImpl implements UserService {
     private UserResponse getUserResponse(User user) {
         UserResponse response = ResponseConverter.copyProperties(user, UserResponse.class);
         response.setPassword(null);
-        response.setProfilePicture(awss3Service.getPresignedUrlForProfile(response.getProfilePicture()));
+        response.setProfilePicture(awss3Service.getPresignedUrl(response.getProfilePicture()));
         return response;
     }
 }

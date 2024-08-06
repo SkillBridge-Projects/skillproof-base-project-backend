@@ -129,12 +129,11 @@ public class ConnectionController extends AbstractController {
     @Operation(summary = "Delete connection of followingUser",
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
-                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
-                            content = @Content(schema = @Schema(implementation = ConnectionResponse.class)))
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE)
             }
     )
     public ResponseEntity<?> deleteConnectionForUser(@PathVariable String followingUserId,
-                                                                      @PathVariable String followerId) {
+                                                     @PathVariable String followerId) {
         LOG.debug("Start of deleteConnectionForUser method.");
         connectionService.deleteConnectionForUser(followingUserId, followerId);
         LOG.debug("End of deleteConnectionForUser method.");

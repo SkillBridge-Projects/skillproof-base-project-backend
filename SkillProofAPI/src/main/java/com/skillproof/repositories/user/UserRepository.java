@@ -22,4 +22,6 @@ public interface UserRepository {
     List<User> listUsersByRole(RoleType roleType);
 
     List<User> findParticipants(List<String> participantIds);
+
+    boolean isEmailExists(String email);
 }

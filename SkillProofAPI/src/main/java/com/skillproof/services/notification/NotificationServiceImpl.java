@@ -111,7 +111,7 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationResponse notificationResponse = ResponseConverter
                 .copyProperties(notification, NotificationResponse.class);
         notificationResponse.setFollowerId(notification.getFollower().getId());
-        notificationResponse.setProfilePicture(awss3Service.getPresignedUrlForProfile(notification.getProfilePicture()));
+        notificationResponse.setProfilePicture(awss3Service.getPresignedUrl(notification.getProfilePicture()));
         return notificationResponse;
     }
 

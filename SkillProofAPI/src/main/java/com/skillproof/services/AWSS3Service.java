@@ -70,7 +70,7 @@ public class AWSS3Service {
         return url.toString();
     }
 
-    public String getPresignedUrlForProfile(String profilePictureUrl) {
+    public String getPresignedUrl(String profilePictureUrl) {
         LOG.debug("Start of getPresignedUrlForProfile method - UserServiceImpl");
         String preSignedUrl = null;
         if (StringUtils.isNotEmpty(profilePictureUrl)) {

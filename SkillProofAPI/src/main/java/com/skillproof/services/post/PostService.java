@@ -9,11 +9,12 @@ import java.util.List;
 
 public interface PostService {
 
-    PostResponse createPost(String content, String userId, MultipartFile image, MultipartFile video) throws Exception;
+    PostResponse createPost(String content, String userId, List<MultipartFile> image,
+                            List<MultipartFile> video) throws Exception;
 
     PostResponse getPostById(Long id);
 
-    PostResponse updatePost(Long id, String content, MultipartFile image, MultipartFile video) throws Exception;
+    PostResponse updatePost(Long id, String content, List<MultipartFile> images, List<MultipartFile> videos) throws Exception;
 
     List<PostResponse> listAllPosts();
 

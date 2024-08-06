@@ -83,7 +83,17 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.4</version> <!-- Latest version -->
         </dependency>
-<!--        <dependency>-->
+        <!-- Spring Boot Starter Mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>8.26.0</version>
+        </dependency>
+        <!--        <dependency>-->
 <!--            <groupId>mysql</groupId>-->
 <!--            <artifactId>mysql-connector-java</artifactId>-->
 <!--            <scope>runtime</scope>-->

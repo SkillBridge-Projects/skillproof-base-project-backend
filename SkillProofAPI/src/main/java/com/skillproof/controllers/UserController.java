@@ -63,6 +63,32 @@ public class UserController extends AbstractController {
         return responseHeaders;
     }
 
+    @PostMapping(value = "/users/invite-email", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Invite Users By Email",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
+                            content = @Content(schema = @Schema(implementation = User.class)))
+            }
+    )
+    public ResponseEntity<?> inviteUsers(@RequestBody @Valid List<String> emailAddresses) {
+        userService.inviteUsers(emailAddresses);
+        return ok();
+    }
+
+    @PostMapping(value = "/users/invite-sms", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Invite Users By SMS",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
+                            content = @Content(schema = @Schema(implementation = User.class)))
+            }
+    )
+    public ResponseEntity<?> inviteUsersBySms(@RequestBody @Valid List<String> phoneNumbers) {
+        userService.inviteUsersViaSms(phoneNumbers);
+        return ok();
+    }
+
     @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "List all Users",
             responses = {

@@ -44,9 +44,9 @@ public class PostController extends AbstractController {
     )
     public PostResponse createPost(@RequestParam String content,
                                    @RequestParam String userId,
-                                   @RequestParam(required = false) MultipartFile image,
-                                   @RequestParam(required = false) MultipartFile video) throws Exception {
-        return postService.createPost(content, userId, image, video);
+                                   @RequestParam(required = false) List<MultipartFile> images,
+                                   @RequestParam(required = false) List<MultipartFile> videos) throws Exception {
+        return postService.createPost(content, userId, images, videos);
     }
 
     @GetMapping(value = "/posts", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -73,9 +73,9 @@ public class PostController extends AbstractController {
     )
     public ResponseEntity<PostResponse> updatePost(@PathVariable Long id,
                                                    @RequestParam String content,
-                                                   @RequestParam(required = false) MultipartFile image,
-                                                   @RequestParam(required = false) MultipartFile video) throws Exception {
-        PostResponse postResponse = postService.updatePost(id, content, image, video);
+                                                   @RequestParam(required = false) List<MultipartFile> images,
+                                                   @RequestParam(required = false) List<MultipartFile> videos) throws Exception {
+        PostResponse postResponse = postService.updatePost(id, content, images, videos);
         return ok(postResponse);
     }
 

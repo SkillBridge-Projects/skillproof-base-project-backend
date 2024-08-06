@@ -1,6 +1,7 @@
 package com.skillproof.services.post;
 
 import com.skillproof.constants.ObjectConstants;
+import com.skillproof.exceptions.InvalidRequestException;
 import com.skillproof.exceptions.ResourceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
 import com.skillproof.model.entity.Post;
@@ -11,6 +12,7 @@ import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.services.AWSS3Service;
 import com.skillproof.services.notification.NotificationService;
 import com.skillproof.utils.ResponseConverter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +46,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse createPost(String content, String userId, MultipartFile image, MultipartFile video) throws Exception {
+    public PostResponse createPost(String content, String userId, List<MultipartFile> images, List<MultipartFile> videos) throws Exception {
         LOG.debug("Start of createPost method.");
         User user = userRepository.getUserById(userId);
         if (ObjectUtils.isEmpty(user)) {
@@ -51,33 +54,46 @@ public class PostServiceImpl implements PostService {
             throw new UserNotFoundException(ObjectConstants.USER, userId);
         }
 
-        String imageUrl = null;
-        if (ObjectUtils.isNotEmpty(image)) {
+        List<String> imageUrls = null;
+        if (CollectionUtils.isNotEmpty(images)) {
             LOG.debug("Uploading image - Post");
-            imageUrl = awss3Service.uploadFile(image);
+            imageUrls = uploadFiles(images);
         }
 
-        String videoUrl = null;
-        if (ObjectUtils.isNotEmpty(video)) {
+        List<String> videoUrls = null;
+        if (CollectionUtils.isNotEmpty(videos)) {
             LOG.debug("Uploading video - Post");
-            videoUrl = awss3Service.uploadFile(video);
+            videoUrls = uploadFiles(videos);
         }
 
-        Post post = createPostEntity(content, imageUrl, videoUrl, user);
+        Post post = createPostEntity(content, imageUrls, videoUrls, user);
         post = postRepository.createPost(post);
 
-        //TODO: Need to send notification i think
+        //TODO: Need to send notification i think when we tag other users
 
         LOG.debug("End of createPost method.");
         return getPostResponse(post);
     }
 
-    private Post createPostEntity(String content, String imageUrl, String videoUrl, User user) {
+    private List<String> uploadFiles(List<MultipartFile> files) {
+        return files.stream().map(file -> {
+            try {
+                return awss3Service.uploadFile(file);
+            } catch (Exception e) {
+                LOG.error("Failed to Update file, Message : {}", e.getMessage());
+                throw new InvalidRequestException(e.getMessage());
+            }
+        }).collect(Collectors.toList());
+    }
+
+    private Post createPostEntity(String content, List<String> imageUrls, List<String> videoUrls, User user) {
         LOG.debug("Start of createPost method.");
         Post post = new Post();
         post.setContent(content);
-        post.setImageUrl(imageUrl);
-        post.setVideoUrl(videoUrl);
+        String allImageUrls = StringUtils.join(imageUrls, ",");
+        post.setImageUrl(allImageUrls);
+        String allVideoUrls = StringUtils.join(videoUrls, ",");
+        post.setVideoUrl(allVideoUrls);
         post.setUser(user);
         return post;
     }
@@ -94,7 +110,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse updatePost(Long id, String content, MultipartFile image, MultipartFile video) throws Exception {
+    public PostResponse updatePost(Long id, String content, List<MultipartFile> images, List<MultipartFile> videos) throws Exception {
         LOG.debug("Start of updatePost method.");
         Post post = postRepository.getPostById(id);
         if (ObjectUtils.isEmpty(post)) {
@@ -102,33 +118,33 @@ public class PostServiceImpl implements PostService {
             throw new ResourceNotFoundException(ObjectConstants.POST, ObjectConstants.ID, id);
         }
 
-        String oldPostedImageUrl = post.getImageUrl();
+        List<String> oldPostedImageUrls = Arrays.asList(post.getImageUrl().split(","));
         // Delete the old posted image from S3
-        if (StringUtils.isNotEmpty(oldPostedImageUrl)) {
+        if (CollectionUtils.isNotEmpty(oldPostedImageUrls)) {
             LOG.debug("Deleting old posted image");
-            awss3Service.deleteFile(oldPostedImageUrl);
+            deleteFiles(oldPostedImageUrls);
         }
 
-        String oldPostedVideoUrl = post.getVideoUrl();
+        List<String> oldPostedVideoUrls = Arrays.asList(post.getVideoUrl().split(","));
         // Delete the old posted video from S3
-        if (StringUtils.isNotEmpty(oldPostedVideoUrl)) {
+        if (CollectionUtils.isNotEmpty(oldPostedVideoUrls)) {
             LOG.debug("Deleting old posted video");
-            awss3Service.deleteFile(oldPostedVideoUrl);
+            deleteFiles(oldPostedVideoUrls);
         }
 
-        String newImageUrl = null;
-        if (ObjectUtils.isNotEmpty(image)) {
+        List<String> newImageUrls = null;
+        if (CollectionUtils.isNotEmpty(images)) {
             LOG.debug("Uploading image - Post");
-            newImageUrl = awss3Service.uploadFile(image);
+            newImageUrls = uploadFiles(images);
         }
 
-        String newVideoUrl = null;
-        if (ObjectUtils.isNotEmpty(video)) {
+        List<String> newVideoUrls = null;
+        if (ObjectUtils.isNotEmpty(videos)) {
             LOG.debug("Uploading video - Post");
-            newVideoUrl = awss3Service.uploadFile(video);
+            newVideoUrls = uploadFiles(videos);
         }
 
-        preparePostEntity(content, newImageUrl, newVideoUrl, post);
+        preparePostEntity(content, newImageUrls, newVideoUrls, post);
         post = postRepository.updatePost(post);
 
 
@@ -136,16 +152,20 @@ public class PostServiceImpl implements PostService {
         return getPostResponse(post);
     }
 
-    private void preparePostEntity(String content, String newImageUrl, String newVideoUrl, Post post) {
+    private void deleteFiles(List<String> files) {
+        files.forEach(awss3Service::deleteFile);
+    }
+
+    private void preparePostEntity(String content, List<String> newImageUrls, List<String> newVideoUrls, Post post) {
         LOG.debug("Start of preparePostEntity method");
-        if (StringUtils.isNotEmpty(content)){
+        if (StringUtils.isNotEmpty(content)) {
             post.setContent(content);
         }
-        if (StringUtils.isNotEmpty(newImageUrl)){
-            post.setImageUrl(newImageUrl);
+        if (CollectionUtils.isNotEmpty(newImageUrls)) {
+            post.setImageUrl(StringUtils.join(",", newImageUrls));
         }
-        if (StringUtils.isNotEmpty(newVideoUrl)){
-            post.setVideoUrl(newVideoUrl);
+        if (CollectionUtils.isNotEmpty(newVideoUrls)) {
+            post.setVideoUrl(StringUtils.join(",", newVideoUrls));
         }
         LOG.debug("End of preparePostEntity method");
     }
@@ -170,11 +190,17 @@ public class PostServiceImpl implements PostService {
 
     private PostResponse getPostResponse(Post post) {
         PostResponse postResponse = ResponseConverter.copyProperties(post, PostResponse.class);
-        postResponse.setImageUrl(awss3Service.getPresignedUrlForProfile(post.getImageUrl()));
-        postResponse.setVideoUrl(awss3Service.getPresignedUrlForProfile(post.getVideoUrl()));
+        postResponse.setImageUrls(getPreSignedUrls(post.getImageUrl()));
+        postResponse.setVideoUrls(getPreSignedUrls(post.getVideoUrl()));
         postResponse.setUserId(post.getUser().getId());
         postResponse.setUserEmail(post.getUser().getEmailAddress());
         return postResponse;
+    }
+
+    private List<String> getPreSignedUrls(String baseUrl) {
+        return Arrays.stream(baseUrl.split(","))
+                .map(awss3Service::getPresignedUrl)
+                .collect(Collectors.toList());
     }
 
     private List<PostResponse> getPostResponseList(List<Post> posts) {

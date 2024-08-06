@@ -64,4 +64,9 @@ public class UserRepositoryImpl implements UserRepository {
     public List<User> findParticipants(List<String> participantIds) {
         return userDao.findAllById(participantIds);
     }
+
+    @Override
+    public boolean isEmailExists(String email) {
+        return userDao.existsByEmailAddressIgnoreCase(email);
+    }
 }

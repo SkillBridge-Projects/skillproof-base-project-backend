@@ -53,6 +53,10 @@ public interface UserService {
 
     UserResponse createUser(CreateUserRequest createUserRequest);
 
+    void inviteUsers(List<String> emailAddresses);
+
+    void inviteUsersViaSms(List<String> phoneNumbers);
+
     List<UserResponse> listAllUsers();
 
     UserResponse updateUser(String id, UpdateUserRequest updateUserRequest);
