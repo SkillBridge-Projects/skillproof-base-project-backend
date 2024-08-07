@@ -198,9 +198,12 @@ public class PostServiceImpl implements PostService {
     }
 
     private List<String> getPreSignedUrls(String baseUrl) {
-        return Arrays.stream(baseUrl.split(","))
-                .map(awss3Service::getPresignedUrl)
-                .collect(Collectors.toList());
+        if (baseUrl != null) {
+            return Arrays.stream(baseUrl.split(","))
+                    .map(awss3Service::getPresignedUrl)
+                    .collect(Collectors.toList());
+        }
+        return null;
     }
 
     private List<PostResponse> getPostResponseList(List<Post> posts) {
