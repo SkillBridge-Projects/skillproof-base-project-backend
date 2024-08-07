@@ -21,6 +21,7 @@ import com.skillproof.services.experience.ExperienceService;
 import com.skillproof.services.skill.SkillService;
 import com.skillproof.services.sms.SmsService;
 import com.skillproof.utils.ResponseConverter;
+import com.skillproof.utils.Utils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -219,6 +220,7 @@ public class UserServiceImpl implements UserService {
         user.setEmailAddress(createUserRequest.getEmailAddress());
         user.setFirstName(createUserRequest.getFirstName());
         user.setLastName(createUserRequest.getLastName());
+        user.setUserName(Utils.getUserName(createUserRequest.getFirstName(), createUserRequest.getLastName()));
         user.setPhone(createUserRequest.getPhone());
         user.setBio(createUserRequest.getBio());
         user.setCity(createUserRequest.getCity());

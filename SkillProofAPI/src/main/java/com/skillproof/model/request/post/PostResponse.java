@@ -16,6 +16,12 @@ public class PostResponse extends CreatePostRequest {
     @Schema(name = "userEmail", example = "john.doe@email.com", accessMode = Schema.AccessMode.READ_ONLY)
     private String userEmail;
 
+    @Schema(name = "userName", example = "john doe", accessMode = Schema.AccessMode.READ_ONLY)
+    private String userName;
+
+    @Schema(name = "profilePicture", example = "http://someimage.png", accessMode = Schema.AccessMode.READ_ONLY)
+    private String profilePicture;
+
     @Schema(name = "imageUrl", example = "[\"https://skillproofmedia.s3.ap-south-1.amazonaws.com/172210xxxxxx_Capture.PNG\"]",
             accessMode = Schema.AccessMode.READ_ONLY)
     private List<String> imageUrls;

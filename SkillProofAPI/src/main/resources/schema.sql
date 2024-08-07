@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS user (
   id VARCHAR(20) NOT NULL,
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
+  username VARCHAR(201) NOT NULL,
   city VARCHAR(250) NOT NULL,
   phone VARCHAR(20) NULL,
   email_address VARCHAR(100) NOT NULL,

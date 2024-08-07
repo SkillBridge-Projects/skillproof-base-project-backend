@@ -1,6 +1,7 @@
 package com.skillproof.services.post;
 
 import com.skillproof.model.request.post.CreatePostRequest;
+import com.skillproof.model.request.post.Feed;
 import com.skillproof.model.request.post.PostResponse;
 import com.skillproof.model.request.post.UpdatePostRequest;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,5 +20,7 @@ public interface PostService {
     List<PostResponse> listAllPosts();
 
     void deletePostById(Long id);
+
+    Feed listAllFeed(List<String> userIds);
 }
 

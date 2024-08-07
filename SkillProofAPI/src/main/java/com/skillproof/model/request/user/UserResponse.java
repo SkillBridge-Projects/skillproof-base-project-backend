@@ -16,6 +16,9 @@ public class UserResponse extends CreateUserRequest {
     @Schema(name = "id", example = "ad23ua63gaf7a", accessMode = Schema.AccessMode.READ_ONLY)
     private String id;
 
+    @Schema(name = "userName", example = "john doe", accessMode = Schema.AccessMode.READ_ONLY)
+    private String userName;
+
     @Schema(name = "createdDate", example = "2024-03-01T12:00:00.000",
             type = "String", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime createdDate;

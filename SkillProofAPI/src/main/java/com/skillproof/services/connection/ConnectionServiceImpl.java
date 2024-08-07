@@ -64,16 +64,11 @@ public class ConnectionServiceImpl implements ConnectionService {
                 userFollowing, follower);
         connection = connectionRepository.createConnection(connection);
         if (ObjectUtils.isNotEmpty(connection)) {
-            String userName = getUserName(userFollowing);
             createNotificationWithMessage(follower.getId(), userFollowing.getProfilePicture(), userFollowing.getId(),
-                    userName, connection.getConnectionStatus());
+                    userFollowing.getUserName(), connection.getConnectionStatus());
         }
         LOG.debug("End of createConnection method.");
         return getConnectionResponse(connection);
-    }
-
-    private String getUserName(User user) {
-        return user.getFirstName() + " " + user.getLastName();
     }
 
     private void createNotificationWithMessage(String followerId, String profile, String followingId, String userName,

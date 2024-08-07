@@ -1,22 +1,18 @@
 package com.skillproof.services.comment;
 
 import com.skillproof.constants.ObjectConstants;
-import com.skillproof.exceptions.ExperienceNotFoundException;
 import com.skillproof.exceptions.ResourceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
 import com.skillproof.model.entity.Comment;
-import com.skillproof.model.entity.Experience;
 import com.skillproof.model.entity.Post;
 import com.skillproof.model.entity.User;
 import com.skillproof.model.request.comment.CreateCommentRequest;
 import com.skillproof.model.request.comment.CommentResponse;
 import com.skillproof.model.request.comment.UpdateCommentRequest;
-import com.skillproof.model.request.experience.ExperienceResponse;
-import com.skillproof.model.request.experience.UpdateExperienceRequest;
 import com.skillproof.repositories.comment.CommentRepository;
 import com.skillproof.repositories.post.PostRepository;
 import com.skillproof.repositories.user.UserRepository;
-import com.skillproof.services.comment.CommentService;
+import com.skillproof.services.AWSS3Service;
 import com.skillproof.utils.ResponseConverter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,12 +33,14 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final AWSS3Service awss3Service;
 
     public CommentServiceImpl(CommentRepository commentRepository, UserRepository userRepository,
-                              PostRepository postRepository) {
+                              PostRepository postRepository, AWSS3Service awss3Service) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
+        this.awss3Service = awss3Service;
     }
 
 
@@ -139,6 +137,8 @@ public class CommentServiceImpl implements CommentService {
                 .copyProperties(comment, CommentResponse.class);
         commentResponse.setUserId(comment.getUser().getId());
         commentResponse.setPostId(comment.getPost().getId());
+        commentResponse.setUserName(comment.getUser().getUserName());
+        commentResponse.setProfilePicture(awss3Service.getPresignedUrl(comment.getUser().getProfilePicture()));
         return commentResponse;
     }
 

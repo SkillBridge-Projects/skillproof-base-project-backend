@@ -40,4 +40,9 @@ public class PostRepositoryImpl implements PostRepository {
     public void deletePost(Long id) {
         postDao.deleteById(id);
     }
+
+    @Override
+    public List<Post> findByUserId(String userId) {
+        return postDao.findByUserId(userId);
+    }
 }

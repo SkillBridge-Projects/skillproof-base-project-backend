@@ -36,7 +36,11 @@ public class Utils {
         return mem[i][j];
     }
 
-    public static String getNotificationMessage(String message, Object... args){
+    public static String getNotificationMessage(String message, Object... args) {
         return String.format(message, args);
+    }
+
+    public static String getUserName(String firstName, String lastName) {
+        return firstName + " " + lastName;
     }
 }

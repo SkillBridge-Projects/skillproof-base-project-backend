@@ -1,6 +1,8 @@
 package com.skillproof.controllers;
 
 import com.skillproof.constants.SwaggerConstants;
+import com.skillproof.model.request.post.Feed;
+import com.skillproof.model.request.post.PostDTO;
 import com.skillproof.model.request.post.PostResponse;
 import com.skillproof.services.AWSS3Service;
 import com.skillproof.services.post.PostService;
@@ -61,6 +63,20 @@ public class PostController extends AbstractController {
         LOG.debug("Start of listAllPosts method.");
         List<PostResponse> posts = postService.listAllPosts();
         return ok(posts);
+    }
+
+    @GetMapping(value = "/news-feed", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "List All Feed",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
+                            content = @Content(schema = @Schema(implementation = PostDTO.class)))
+            }
+    )
+    public ResponseEntity<Feed> listAllFeed(@RequestParam List<String> userIds) {
+        LOG.debug("Start of listAllFeed method.");
+        Feed feed = postService.listAllFeed(userIds);
+        return ok(feed);
     }
 
     @PatchMapping(value = "/posts/{id}", produces = {MediaType.MULTIPART_FORM_DATA_VALUE})

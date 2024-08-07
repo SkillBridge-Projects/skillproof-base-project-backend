@@ -40,6 +40,11 @@ public class User {
     private String lastName;
 
     @Basic
+    @Size(max = 201)
+    @Column(name = "username", nullable = false)
+    private String userName;
+
+    @Basic
     @Size(max = 250)
     @Column(name = "city", nullable = false)
     private String city;

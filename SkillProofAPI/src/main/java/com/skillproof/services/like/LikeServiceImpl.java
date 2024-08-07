@@ -116,6 +116,7 @@ public class LikeServiceImpl implements LikeService {
                 .copyProperties(like, LikeResponse.class);
         likeResponse.setUserId(like.getUser().getId());
         likeResponse.setPostId(like.getPost().getId());
+        likeResponse.setUserName(like.getUser().getUserName());
         return likeResponse;
     }
 

@@ -1,7 +1,6 @@
 package com.skillproof.repositories.post;
 
 import com.skillproof.model.entity.Post;
-import com.skillproof.model.request.post.PostResponse;
 
 import java.util.List;
 
@@ -15,4 +14,6 @@ public interface PostRepository {
     List<Post> listAllPosts();
 
     void deletePost(Long id);
+
+    List<Post> findByUserId(String userId);
 }

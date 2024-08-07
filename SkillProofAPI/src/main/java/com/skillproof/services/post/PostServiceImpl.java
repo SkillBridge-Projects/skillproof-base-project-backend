@@ -6,10 +6,16 @@ import com.skillproof.exceptions.ResourceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
 import com.skillproof.model.entity.Post;
 import com.skillproof.model.entity.User;
+import com.skillproof.model.request.comment.CommentResponse;
+import com.skillproof.model.request.like.LikeResponse;
+import com.skillproof.model.request.post.Feed;
+import com.skillproof.model.request.post.PostDTO;
 import com.skillproof.model.request.post.PostResponse;
 import com.skillproof.repositories.post.PostRepository;
 import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.services.AWSS3Service;
+import com.skillproof.services.comment.CommentService;
+import com.skillproof.services.like.LikeService;
 import com.skillproof.services.notification.NotificationService;
 import com.skillproof.utils.ResponseConverter;
 import org.apache.commons.collections4.CollectionUtils;
@@ -21,7 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,14 +43,18 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final AWSS3Service awss3Service;
     private final NotificationService notificationService;
+    private final LikeService likeService;
+    private final CommentService commentService;
 
 
     public PostServiceImpl(UserRepository userRepository, PostRepository postRepository,
-                           AWSS3Service awss3Service, NotificationService notificationService) {
+                           AWSS3Service awss3Service, NotificationService notificationService, LikeService likeService, CommentService commentService) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.awss3Service = awss3Service;
         this.notificationService = notificationService;
+        this.likeService = likeService;
+        this.commentService = commentService;
     }
 
     @Override
@@ -188,12 +200,40 @@ public class PostServiceImpl implements PostService {
         postRepository.deletePost(id);
     }
 
+    @Override
+    public Feed listAllFeed(List<String> userIds) {
+        Feed feed = new Feed();
+        for (String userId : userIds) {
+            List<Post> posts = postRepository.findByUserId(userId);
+            if (CollectionUtils.isNotEmpty(posts)) {
+                List<PostDTO> postsForFeed = posts.stream().map(this::convertToDTO).collect(Collectors.toList());
+                postsForFeed = postsForFeed.stream()
+                        .sorted(Comparator.comparing(dto -> dto.getPost().getUpdatedDate(), Comparator.reverseOrder()))
+                        .collect(Collectors.toList());
+                feed.setPosts(postsForFeed);
+            }
+        }
+        return feed;
+    }
+
+    private PostDTO convertToDTO(Post post) {
+        PostDTO dto = new PostDTO();
+        List<LikeResponse> likes = likeService.listLikesByPostId(post.getId());
+        List<CommentResponse> comments = commentService.listCommentsByPostId(post.getId());
+        dto.setPost(getPostResponse(post));
+        dto.setLikes(likes);
+        dto.setComments(comments);
+        return dto;
+    }
+
     private PostResponse getPostResponse(Post post) {
         PostResponse postResponse = ResponseConverter.copyProperties(post, PostResponse.class);
         postResponse.setImageUrls(getPreSignedUrls(post.getImageUrl()));
         postResponse.setVideoUrls(getPreSignedUrls(post.getVideoUrl()));
         postResponse.setUserId(post.getUser().getId());
         postResponse.setUserEmail(post.getUser().getEmailAddress());
+        postResponse.setUserName(post.getUser().getUserName());
+        postResponse.setProfilePicture(awss3Service.getPresignedUrl(post.getUser().getProfilePicture()));
         return postResponse;
     }
 
@@ -203,7 +243,7 @@ public class PostServiceImpl implements PostService {
                     .map(awss3Service::getPresignedUrl)
                     .collect(Collectors.toList());
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private List<PostResponse> getPostResponseList(List<Post> posts) {
