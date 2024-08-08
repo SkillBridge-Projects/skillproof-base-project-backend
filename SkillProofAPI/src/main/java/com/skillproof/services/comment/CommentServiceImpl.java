@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,7 +61,7 @@ public class CommentServiceImpl implements CommentService {
             throw new ResourceNotFoundException(ObjectConstants.POST, ObjectConstants.ID, createCommentRequest.getPostId());
         }
 
-        Comment comment = createCommentEntity(post, user);
+        Comment comment = createCommentEntity(createCommentRequest.getContent(), post, user);
         comment = commentRepository.createComment(comment);
         LOG.debug("End of createComment method - CommentServiceImpl");
         return getResponse(comment);
@@ -123,9 +125,10 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteComment(id);
     }
 
-    private Comment createCommentEntity(Post post, User user) {
+    private Comment createCommentEntity(String content, Post post, User user) {
         LOG.debug("Start of createCommentEntity method - CommentServiceImpl");
         Comment comment = new Comment();
+        comment.setContent(content);
         comment.setPost(post);
         comment.setUser(user);
         LOG.debug("End of createCommentEntity method - CommentServiceImpl");
