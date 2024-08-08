@@ -6,8 +6,8 @@ import com.skillproof.exceptions.UserNotFoundException;
 import com.skillproof.model.entity.Comment;
 import com.skillproof.model.entity.Post;
 import com.skillproof.model.entity.User;
-import com.skillproof.model.request.comment.CreateCommentRequest;
 import com.skillproof.model.request.comment.CommentResponse;
+import com.skillproof.model.request.comment.CreateCommentRequest;
 import com.skillproof.model.request.comment.UpdateCommentRequest;
 import com.skillproof.repositories.comment.CommentRepository;
 import com.skillproof.repositories.post.PostRepository;
@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 

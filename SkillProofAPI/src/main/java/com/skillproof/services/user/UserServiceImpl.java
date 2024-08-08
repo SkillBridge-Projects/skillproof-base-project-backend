@@ -13,6 +13,7 @@ import com.skillproof.model.request.skill.SkillResponse;
 import com.skillproof.model.request.user.CreateUserRequest;
 import com.skillproof.model.request.user.UpdateUserRequest;
 import com.skillproof.model.request.user.UserResponse;
+import com.skillproof.repositories.connection.ConnectionRepository;
 import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.services.AWSS3Service;
 import com.skillproof.services.education.EducationService;
@@ -50,11 +51,12 @@ public class UserServiceImpl implements UserService {
     private final AWSS3Service awss3Service;
     private final EmailService emailService;
     private final SmsService smsService;
+    private final ConnectionRepository connectionRepository;
 
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder encoder,
                            ExperienceService experienceService, EducationService educationService,
                            AWSS3Service awss3Service, SkillService skillService, EmailService emailService,
-                           SmsService smsService) {
+                           SmsService smsService, ConnectionRepository connectionRepository) {
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.experienceService = experienceService;
@@ -63,6 +65,7 @@ public class UserServiceImpl implements UserService {
         this.skillService = skillService;
         this.emailService = emailService;
         this.smsService = smsService;
+        this.connectionRepository = connectionRepository;
     }
 
     public UserResponse getUserById(String id) {
@@ -198,17 +201,22 @@ public class UserServiceImpl implements UserService {
         List<ExperienceResponse> experiences = experienceService.getExperienceByUserId(id);
         List<EducationResponse> educationDetails = educationService.getEducationByUserId(id);
         List<SkillResponse> skills = skillService.getSkillsByUserId(id);
-        return getUserProfile(user, experiences, educationDetails, skills);
+        List<UserResponse> connections = connectionRepository.listConnectionsForUser(id).stream()
+                .map(connection -> getUserById(connection.getFollower().getId()))
+                .collect(Collectors.toList());
+        return getUserProfile(user, experiences, educationDetails, skills, connections);
     }
 
     private UserProfile getUserProfile(UserResponse user, List<ExperienceResponse> experiences,
-                                       List<EducationResponse> educationDetails, List<SkillResponse> skills) {
+                                       List<EducationResponse> educationDetails, List<SkillResponse> skills,
+                                       List<UserResponse> connections) {
         LOG.debug("Start of getUserProfile method - UserServiceImpl");
         UserProfile userProfile = new UserProfile();
         userProfile.setUser(user);
         userProfile.setExperiences(experiences);
         userProfile.setEducationDetails(educationDetails);
         userProfile.setSkills(skills);
+        userProfile.setConnections(connections);
         LOG.debug("End of getUserProfile method - UserServiceImpl");
         return userProfile;
     }

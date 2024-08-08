@@ -23,4 +23,6 @@ public class UserProfile {
     private List<ExperienceResponse> experiences;
 
     private List<SkillResponse> skills;
+
+    private List<UserResponse> connections;
 }
