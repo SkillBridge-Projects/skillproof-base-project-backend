@@ -170,7 +170,6 @@ public class UserServiceImpl implements UserService {
             profilePictureUrl = awss3Service.uploadFile(profilePicture);
         }
         user.setProfilePicture(profilePictureUrl);
-        user.setUpdatedDate(LocalDateTime.now());
         userRepository.updateUser(user);
         return getUserProfileByUserId(id);
     }
@@ -234,8 +233,6 @@ public class UserServiceImpl implements UserService {
         user.setCity(createUserRequest.getCity());
         user.setPassword(encoder.encode(createUserRequest.getPassword()));
         user.setRole(createUserRequest.getRole());
-        user.setCreatedDate(LocalDateTime.now());
-        user.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of createUserEntity method - UserServiceImpl");
         return user;
     }
@@ -257,7 +254,6 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotEmpty(updateUserRequest.getBio())) {
             user.setBio(updateUserRequest.getBio());
         }
-        user.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of prepareUserEntity method - UserServiceImpl");
     }
 

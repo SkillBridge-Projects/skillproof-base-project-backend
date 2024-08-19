@@ -116,8 +116,6 @@ public class ExperienceServiceImpl implements ExperienceService {
         experience.setDesignation(createExperienceRequest.getDesignation());
         experience.setStartDate(createExperienceRequest.getStartDate());
         experience.setEndDate(createExperienceRequest.getEndDate());
-        experience.setCreatedDate(LocalDateTime.now());
-        experience.setUpdatedDate(LocalDateTime.now());
         experience.setUser(user);
         LOG.debug("End of createExperienceEntity method - ExperienceServiceImpl");
         return experience;
@@ -140,7 +138,6 @@ public class ExperienceServiceImpl implements ExperienceService {
         if (updateExperienceRequest.getEndDate() != null) {
             experience.setEndDate(updateExperienceRequest.getEndDate());
         }
-        experience.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of prepareEductionEntity method - experienceServiceImpl");
     }
 

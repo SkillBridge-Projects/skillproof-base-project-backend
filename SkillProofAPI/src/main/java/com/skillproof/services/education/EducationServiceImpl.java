@@ -117,8 +117,6 @@ public class EducationServiceImpl implements EducationService {
         education.setDescription(createEducationRequest.getDescription());
         education.setStartDate(createEducationRequest.getStartDate());
         education.setEndDate(createEducationRequest.getEndDate());
-        education.setCreatedDate(LocalDateTime.now());
-        education.setUpdatedDate(LocalDateTime.now());
         education.setUser(user);
         LOG.debug("End of createEducationEntity method - EducationServiceImpl");
         return education;
@@ -147,7 +145,6 @@ public class EducationServiceImpl implements EducationService {
         if (updateEducationRequest.getEndDate() != null) {
             education.setEndDate(updateEducationRequest.getEndDate());
         }
-        education.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of prepareEductionEntity method - EducationServiceImpl");
     }
 

@@ -58,8 +58,6 @@ public class SkillServiceImpl implements SkillService {
         skill.setTechnology(createSkillRequest.getTechnology());
         skill.setTools(StringUtils.join(createSkillRequest.getTools(), ","));
         skill.setUser(user);
-        skill.setCreatedDate(LocalDateTime.now());
-        skill.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of createSkillEntity method - SkillServiceImpl");
         return skill;
     }
@@ -116,7 +114,6 @@ public class SkillServiceImpl implements SkillService {
         if (CollectionUtils.isNotEmpty(updateSkillRequest.getTools())) {
             skill.setTools(StringUtils.join(updateSkillRequest.getTools(), ","));
         }
-        skill.setUpdatedDate(LocalDateTime.now());
         LOG.debug("End of prepareSkillEntity method - SkillServiceImpl");
     }
 

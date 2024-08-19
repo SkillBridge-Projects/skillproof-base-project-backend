@@ -77,4 +77,15 @@ public class User {
 
     @ManyToMany(mappedBy = "participants")
     private List<Conversation> conversations;
+
+    @PrePersist
+    protected void onCreate() {
+        createdDate = LocalDateTime.now();
+        updatedDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedDate = LocalDateTime.now();
+    }
 }
