@@ -3,6 +3,7 @@ package com.skillproof;
 import com.skillproof.enums.RoleType;
 import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.model.entity.User;
+import com.skillproof.utils.Utils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -73,6 +74,7 @@ public class SkillProofApplication {
         user.setPassword(password);
         user.setFirstName(firstName);
         user.setLastName(lastName);
+        user.setUserName(Utils.getUserName(firstName, lastName));
         user.setRole(role);
         user.setCity("Something");
         user.setCreatedDate(LocalDateTime.now());
