@@ -206,6 +206,25 @@ public class UserServiceImpl implements UserService {
         return getUserProfile(user, experiences, educationDetails, skills, connections);
     }
 
+    @Override
+    public void deleteUserProfilePicture(String id) {
+        LOG.debug("Start of deleteUserProfilePicture method - UserServiceImpl");
+        User user = userRepository.getUserById(id);
+        if (ObjectUtils.isEmpty(user)) {
+            LOG.error("User with id {} not found.", id);
+            throw new UserNotFoundException(ObjectConstants.ID, id);
+        }
+
+        String profilePictureUrl = user.getProfilePicture();
+
+        // Delete the profile picture from S3 Bucket
+        if (StringUtils.isNotEmpty(profilePictureUrl)) {
+            LOG.debug("Deleting user profile picture");
+            awss3Service.deleteFile(profilePictureUrl);
+        }
+        LOG.debug("End of deleteUserProfilePicture method - UserServiceImpl");
+    }
+
     private UserProfile getUserProfile(UserResponse user, List<ExperienceResponse> experiences,
                                        List<EducationResponse> educationDetails, List<SkillResponse> skills,
                                        List<UserResponse> connections) {

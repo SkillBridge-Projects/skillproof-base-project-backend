@@ -68,4 +68,6 @@ public interface UserService {
     List<UserResponse> listUsersByRole(RoleType role);
 
     UserProfile getUserProfileByUserId(String id);
+
+    void deleteUserProfilePicture(String id);
 }

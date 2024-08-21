@@ -176,6 +176,18 @@ public class UserController extends AbstractController {
         return ok();
     }
 
+    @DeleteMapping(value = "/users/{id}/profile-picture", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Delete user's profile",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_DELETE)
+            }
+    )
+    public ResponseEntity<?> deleteUserProfilePicture(@PathVariable String id) {
+        userService.deleteUserProfilePicture(id);
+        return ok();
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "/users/roles/{role}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Get users by role",
