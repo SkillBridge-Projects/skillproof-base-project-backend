@@ -1,5 +1,6 @@
 package com.skillproof.repositories.post;
 
+import com.skillproof.model.entity.Portfolio;
 import com.skillproof.model.entity.Post;
 
 import java.util.List;

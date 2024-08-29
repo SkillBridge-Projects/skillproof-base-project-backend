@@ -180,3 +180,15 @@ CREATE TABLE IF NOT EXISTS conversation_users (
         FOREIGN KEY (user_id)
             REFERENCES user(id)
 );
+
+CREATE TABLE IF NOT EXISTS portfolio (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(20) NOT NULL,
+    video_url TEXT NOT NULL,
+    post_ids TEXT NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    CONSTRAINT `FK_PORTFOLIO_USER`
+        FOREIGN KEY (user_id)
+            REFERENCES user(id)
+);

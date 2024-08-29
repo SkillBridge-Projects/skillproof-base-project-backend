@@ -4,13 +4,16 @@ import com.skillproof.constants.ObjectConstants;
 import com.skillproof.exceptions.InvalidRequestException;
 import com.skillproof.exceptions.ResourceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
+import com.skillproof.model.entity.Portfolio;
 import com.skillproof.model.entity.Post;
 import com.skillproof.model.entity.User;
 import com.skillproof.model.request.comment.CommentResponse;
 import com.skillproof.model.request.like.LikeResponse;
 import com.skillproof.model.request.post.Feed;
+import com.skillproof.model.request.post.PortfolioResponse;
 import com.skillproof.model.request.post.PostDTO;
 import com.skillproof.model.request.post.PostResponse;
+import com.skillproof.repositories.portfolio.PortfolioRepository;
 import com.skillproof.repositories.post.PostRepository;
 import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.services.AWSS3Service;
@@ -41,6 +44,7 @@ public class PostServiceImpl implements PostService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final PortfolioRepository portfolioRepository;
     private final AWSS3Service awss3Service;
     private final NotificationService notificationService;
     private final LikeService likeService;
@@ -48,9 +52,12 @@ public class PostServiceImpl implements PostService {
 
 
     public PostServiceImpl(UserRepository userRepository, PostRepository postRepository,
-                           AWSS3Service awss3Service, NotificationService notificationService, LikeService likeService, CommentService commentService) {
+                           PortfolioRepository portfolioRepository, AWSS3Service awss3Service,
+                           NotificationService notificationService, LikeService likeService,
+                           CommentService commentService) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
+        this.portfolioRepository = portfolioRepository;
         this.awss3Service = awss3Service;
         this.notificationService = notificationService;
         this.likeService = likeService;
@@ -214,6 +221,73 @@ public class PostServiceImpl implements PostService {
             }
         }
         return feed;
+    }
+
+    @Override
+    public void addPortfolioVideo(String userId, List<Long> postIds, MultipartFile video) throws Exception {
+        User user = userRepository.getUserById(userId);
+        if (ObjectUtils.isEmpty(user)) {
+            LOG.error("User with id {} not found.", userId);
+            throw new UserNotFoundException(ObjectConstants.USER, userId);
+        }
+        String videoUrl = awss3Service.uploadFile(video);
+
+        Portfolio portfolio = createPortfolioEntity(user, postIds, videoUrl);
+        portfolioRepository.addPortfolioVideo(portfolio);
+    }
+
+    @Override
+    public PortfolioResponse getPortfolioByUserId(String userId) {
+        User user = userRepository.getUserById(userId);
+        if (ObjectUtils.isEmpty(user)) {
+            LOG.error("User with id {} not found.", userId);
+            throw new UserNotFoundException(ObjectConstants.USER, userId);
+        }
+
+        Portfolio portfolio = portfolioRepository.getPortfolioByUserId(userId);
+        if (ObjectUtils.isEmpty(portfolio)) {
+            LOG.error("There is no portfolio video found for this user {} ", userId);
+            throw new ResourceNotFoundException("There is no portfolio video found for this user with id " + userId);
+        }
+
+        return getPortfolioResponse(portfolio);
+    }
+
+    @Override
+    public PortfolioResponse updatePortfolio(Long id, MultipartFile video) throws Exception {
+        Portfolio portfolio = portfolioRepository.getPortfolioById(id);
+        if (ObjectUtils.isEmpty(portfolio)) {
+            LOG.error("Portfolio with id {} not found", id);
+            throw new ResourceNotFoundException(ObjectConstants.PORTFOLIO, ObjectConstants.ID, id);
+        }
+
+        String newVideoUrl = null;
+        if (ObjectUtils.isNotEmpty(video)) {
+            awss3Service.deleteFile(portfolio.getVideoUrl());
+            newVideoUrl = awss3Service.uploadFile(video);
+        }
+
+        if (StringUtils.isNotEmpty(newVideoUrl)){
+            portfolio.setVideoUrl(newVideoUrl);
+        }
+
+        Portfolio updatedPortfolio = portfolioRepository.updatePortfolio(portfolio);
+        return getPortfolioResponse(updatedPortfolio);
+    }
+
+    private PortfolioResponse getPortfolioResponse(Portfolio portfolio) {
+        PortfolioResponse response = ResponseConverter.copyProperties(portfolio, PortfolioResponse.class);
+        String preSignedVideoUrl = awss3Service.getPresignedUrl(response.getVideoUrl());
+        response.setVideoUrl(preSignedVideoUrl);
+        return response;
+    }
+
+    private Portfolio createPortfolioEntity(User user, List<Long> postIds, String videoUrl) {
+        Portfolio portfolio = new Portfolio();
+        portfolio.setUser(user);
+        portfolio.setPostIds(StringUtils.join(postIds, ","));
+        portfolio.setVideoUrl(videoUrl);
+        return portfolio;
     }
 
     private PostDTO convertToDTO(Post post) {

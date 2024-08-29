@@ -1,9 +1,6 @@
 package com.skillproof.services.post;
 
-import com.skillproof.model.request.post.CreatePostRequest;
-import com.skillproof.model.request.post.Feed;
-import com.skillproof.model.request.post.PostResponse;
-import com.skillproof.model.request.post.UpdatePostRequest;
+import com.skillproof.model.request.post.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -22,5 +19,11 @@ public interface PostService {
     void deletePostById(Long id);
 
     Feed listAllFeed(List<String> userIds);
+
+    void addPortfolioVideo(String userId, List<Long> postIds, MultipartFile video) throws Exception;
+
+    PortfolioResponse getPortfolioByUserId(String userId);
+
+    PortfolioResponse updatePortfolio(Long id, MultipartFile video) throws Exception;
 }
 

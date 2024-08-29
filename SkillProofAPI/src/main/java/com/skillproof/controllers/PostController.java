@@ -2,6 +2,7 @@ package com.skillproof.controllers;
 
 import com.skillproof.constants.SwaggerConstants;
 import com.skillproof.model.request.post.Feed;
+import com.skillproof.model.request.post.PortfolioResponse;
 import com.skillproof.model.request.post.PostDTO;
 import com.skillproof.model.request.post.PostResponse;
 import com.skillproof.services.AWSS3Service;
@@ -31,7 +32,7 @@ public class PostController extends AbstractController {
     private final AWSS3Service AWSS3Service;
     private final PostService postService;
 
-    public PostController(AWSS3Service AWSS3Service, PostService postService){
+    public PostController(AWSS3Service AWSS3Service, PostService postService) {
         this.AWSS3Service = AWSS3Service;
         this.postService = postService;
     }
@@ -79,7 +80,7 @@ public class PostController extends AbstractController {
         return ok(feed);
     }
 
-    @PatchMapping(value = "/posts/{id}", produces = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(value = "/posts/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Operation(summary = "Edit post of an user",
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
@@ -120,6 +121,50 @@ public class PostController extends AbstractController {
     public ResponseEntity<?> deletePostById(@PathVariable Long id) {
         postService.deletePostById(id);
         return ok();
+    }
+
+    @PostMapping(value = "/posts/{userId}/portfolio", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Save Portfolio video of an user",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
+                            content = @Content(schema = @Schema(implementation = PostResponse.class)))
+            }
+    )
+    public ResponseEntity<?> addPortfolioVideo(@PathVariable(name = "userId") String userId,
+                                               @RequestParam List<Long> postIds,
+                                               @RequestParam MultipartFile video) throws Exception {
+        postService.addPortfolioVideo(userId, postIds, video);
+        return ok();
+    }
+
+    @GetMapping(value = "/posts/{userId}/portfolio", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get Portfolio of a user By Id",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
+                            content = @Content(schema = @Schema(implementation = PortfolioResponse.class)))
+            }
+    )
+    public ResponseEntity<PortfolioResponse> getPortfolioByUserId(@PathVariable(name = "userId") String userId) {
+        LOG.debug("Start of getPortfolioByUserId method.");
+        PortfolioResponse portfolio = postService.getPortfolioByUserId(userId);
+        LOG.debug("End of getPortfolioByUserId method.");
+        return ok(portfolio);
+    }
+
+    @PatchMapping(value = "/posts/{id}/portfolio", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "Edit portfolio of an user",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_UPDATE,
+                            content = @Content(schema = @Schema(implementation = PortfolioResponse.class)))
+            }
+    )
+    public ResponseEntity<PortfolioResponse> updatePortfolio(@PathVariable Long id,
+                                                             @RequestParam MultipartFile video) throws Exception {
+        PortfolioResponse portfolio = postService.updatePortfolio(id, video);
+        return ok(portfolio);
     }
 }
 
