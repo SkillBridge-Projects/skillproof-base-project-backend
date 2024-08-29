@@ -267,7 +267,7 @@ public class PostServiceImpl implements PostService {
             newVideoUrl = awss3Service.uploadFile(video);
         }
 
-        if (StringUtils.isNotEmpty(newVideoUrl)){
+        if (StringUtils.isNotEmpty(newVideoUrl)) {
             portfolio.setVideoUrl(newVideoUrl);
         }
 
@@ -279,6 +279,11 @@ public class PostServiceImpl implements PostService {
         PortfolioResponse response = ResponseConverter.copyProperties(portfolio, PortfolioResponse.class);
         String preSignedVideoUrl = awss3Service.getPresignedUrl(response.getVideoUrl());
         response.setVideoUrl(preSignedVideoUrl);
+        String postIds = portfolio.getPostIds();
+        List<Long> postIdList = Arrays.stream(postIds.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+        response.setPostIds(postIdList);
         return response;
     }
 
