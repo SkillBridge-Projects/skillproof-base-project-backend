@@ -5,10 +5,12 @@ import com.skillproof.exceptions.InvalidRequestException;
 import com.skillproof.exceptions.ResourceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
 import com.skillproof.model.entity.Portfolio;
+import com.skillproof.model.entity.PortfolioMedia;
 import com.skillproof.model.entity.Post;
 import com.skillproof.model.entity.User;
 import com.skillproof.model.request.comment.CommentResponse;
 import com.skillproof.model.request.like.LikeResponse;
+import com.skillproof.model.request.portfolio.CreatePortfolioMediaRequest;
 import com.skillproof.model.request.post.Feed;
 import com.skillproof.model.request.post.PortfolioResponse;
 import com.skillproof.model.request.post.PostDTO;
@@ -224,7 +226,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void addPortfolioVideo(String userId, List<Long> postIds, MultipartFile video) throws Exception {
+    public PortfolioResponse addPortfolioVideo(String userId, List<CreatePortfolioMediaRequest> requests, MultipartFile video) throws Exception {
         User user = userRepository.getUserById(userId);
         if (ObjectUtils.isEmpty(user)) {
             LOG.error("User with id {} not found.", userId);
@@ -232,8 +234,34 @@ public class PostServiceImpl implements PostService {
         }
         String videoUrl = awss3Service.uploadFile(video);
 
-        Portfolio portfolio = createPortfolioEntity(user, postIds, videoUrl);
-        portfolioRepository.addPortfolioVideo(portfolio);
+        Portfolio portfolio = createPortfolioEntity(user, videoUrl);
+        Portfolio savedPortfolio = portfolioRepository.addPortfolioVideo(portfolio);
+
+        List<PortfolioMedia> mediaList = requests.stream()
+                .map(mediaRequest -> {
+                    Post post = postRepository.getPostById(mediaRequest.getPostId());
+                    if (ObjectUtils.isEmpty(post)) {
+                        LOG.error("Post with id {} not found.", mediaRequest.getPostId());
+                        throw new ResourceNotFoundException(ObjectConstants.POST, ObjectConstants.ID, mediaRequest.getPostId());
+                    }
+                    return createPortfolioMediaEntity(mediaRequest, post, savedPortfolio);
+                })
+                .collect(Collectors.toList());
+
+        portfolioRepository.addPortfolioMedia(mediaList);
+
+        return getPortfolioResponse(savedPortfolio);
+    }
+
+    private PortfolioMedia createPortfolioMediaEntity(CreatePortfolioMediaRequest request, Post post,
+                                                      Portfolio portfolio) {
+        PortfolioMedia portfolioMedia = new PortfolioMedia();
+        portfolioMedia.setPortfolio(portfolio);
+        portfolioMedia.setPost(post);
+        portfolioMedia.setMediaUrl(request.getMediaUrl());
+        portfolioMedia.setMediaIndex(request.getMediaIndex());
+        portfolioMedia.setDuration(request.getDuration());
+        return portfolioMedia;
     }
 
     @Override
@@ -279,18 +307,12 @@ public class PostServiceImpl implements PostService {
         PortfolioResponse response = ResponseConverter.copyProperties(portfolio, PortfolioResponse.class);
         String preSignedVideoUrl = awss3Service.getPresignedUrl(response.getVideoUrl());
         response.setVideoUrl(preSignedVideoUrl);
-        String postIds = portfolio.getPostIds();
-        List<Long> postIdList = Arrays.stream(postIds.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-        response.setPostIds(postIdList);
         return response;
     }
 
-    private Portfolio createPortfolioEntity(User user, List<Long> postIds, String videoUrl) {
+    private Portfolio createPortfolioEntity(User user, String videoUrl) {
         Portfolio portfolio = new Portfolio();
         portfolio.setUser(user);
-        portfolio.setPostIds(StringUtils.join(postIds, ","));
         portfolio.setVideoUrl(videoUrl);
         return portfolio;
     }

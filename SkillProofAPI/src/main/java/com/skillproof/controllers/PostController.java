@@ -1,6 +1,7 @@
 package com.skillproof.controllers;
 
 import com.skillproof.constants.SwaggerConstants;
+import com.skillproof.model.request.portfolio.CreatePortfolioMediaRequest;
 import com.skillproof.model.request.post.Feed;
 import com.skillproof.model.request.post.PortfolioResponse;
 import com.skillproof.model.request.post.PostDTO;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -132,10 +134,10 @@ public class PostController extends AbstractController {
             }
     )
     public ResponseEntity<?> addPortfolioVideo(@PathVariable(name = "userId") String userId,
-                                               @RequestParam List<Long> postIds,
+                                               @RequestBody @Valid List<CreatePortfolioMediaRequest> mediaRequests,
                                                @RequestParam MultipartFile video) throws Exception {
-        postService.addPortfolioVideo(userId, postIds, video);
-        return ok();
+        PortfolioResponse response = postService.addPortfolioVideo(userId, mediaRequests, video);
+        return ok(response);
     }
 
     @GetMapping(value = "/posts/{userId}/portfolio", produces = MediaType.APPLICATION_JSON_VALUE)

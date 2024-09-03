@@ -4,32 +4,38 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "portfolio")
-public class Portfolio {
+@Table(name = "portfolio_media")
+public class PortfolioMedia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PortfolioMedia> mediaList;
+    @Basic
+    @Column(name = "media_index", nullable = false)
+    private Integer mediaIndex;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "post_id", referencedColumnName = "id", nullable = false)
+    private Post post;
 
     @Basic
-    @Column(name = "video_url", nullable = false)
-    private String videoUrl; // URL for video
+    @Column(name = "media_url", nullable = false)
+    private String mediaUrl;
 
-    @NotNull
+    @Basic
+    @Column(name = "duration", nullable = false)
+    private Float duration;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User user;
+    @JoinColumn(name = "portfolio_id", referencedColumnName = "id", nullable = false)
+    private Portfolio portfolio;
 
     @Basic
     @Column(name = "created_date")
