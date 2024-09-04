@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -148,9 +149,12 @@ public class PostController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = PortfolioResponse.class)))
             }
     )
-    public ResponseEntity<PortfolioResponse> getPortfolioByUserId(@PathVariable(name = "userId") String userId) {
+    public ResponseEntity<?> getPortfolioByUserId(@PathVariable(name = "userId") String userId) {
         LOG.debug("Start of getPortfolioByUserId method.");
         PortfolioResponse portfolio = postService.getPortfolioByUserId(userId);
+        if (ObjectUtils.isEmpty(portfolio)){
+            return noContent();
+        }
         LOG.debug("End of getPortfolioByUserId method.");
         return ok(portfolio);
     }

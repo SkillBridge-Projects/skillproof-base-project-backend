@@ -274,8 +274,7 @@ public class PostServiceImpl implements PostService {
 
         Portfolio portfolio = portfolioRepository.getPortfolioByUserId(userId);
         if (ObjectUtils.isEmpty(portfolio)) {
-            LOG.error("There is no portfolio video found for this user {} ", userId);
-            throw new ResourceNotFoundException("There is no portfolio video found for this user with id " + userId);
+            return null;
         }
 
         return getPortfolioResponse(portfolio);
