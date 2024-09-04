@@ -1,6 +1,7 @@
 package com.skillproof.services.post;
 
 import com.skillproof.model.request.portfolio.CreatePortfolioMediaRequest;
+import com.skillproof.model.request.portfolio.PortFolioMediaRequest;
 import com.skillproof.model.request.post.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +22,7 @@ public interface PostService {
 
     Feed listAllFeed(List<String> userIds);
 
-    PortfolioResponse addPortfolioVideo(String userId, List<CreatePortfolioMediaRequest> requests, MultipartFile video) throws Exception;
+    PortfolioResponse addPortfolioVideo(String userId, PortFolioMediaRequest requests, MultipartFile video) throws Exception;
 
     PortfolioResponse getPortfolioByUserId(String userId);
 

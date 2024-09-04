@@ -2,6 +2,7 @@ package com.skillproof.controllers;
 
 import com.skillproof.constants.SwaggerConstants;
 import com.skillproof.model.request.portfolio.CreatePortfolioMediaRequest;
+import com.skillproof.model.request.portfolio.PortFolioMediaRequest;
 import com.skillproof.model.request.post.Feed;
 import com.skillproof.model.request.post.PortfolioResponse;
 import com.skillproof.model.request.post.PostDTO;
@@ -135,7 +136,7 @@ public class PostController extends AbstractController {
             }
     )
     public ResponseEntity<?> addPortfolioVideo(@PathVariable(name = "userId") String userId,
-                                               @RequestBody @Valid List<CreatePortfolioMediaRequest> mediaRequests,
+                                               @RequestBody @Valid PortFolioMediaRequest mediaRequests,
                                                @RequestParam MultipartFile video) throws Exception {
         PortfolioResponse response = postService.addPortfolioVideo(userId, mediaRequests, video);
         return ok(response);

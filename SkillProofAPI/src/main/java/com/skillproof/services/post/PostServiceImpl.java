@@ -11,6 +11,7 @@ import com.skillproof.model.entity.User;
 import com.skillproof.model.request.comment.CommentResponse;
 import com.skillproof.model.request.like.LikeResponse;
 import com.skillproof.model.request.portfolio.CreatePortfolioMediaRequest;
+import com.skillproof.model.request.portfolio.PortFolioMediaRequest;
 import com.skillproof.model.request.post.Feed;
 import com.skillproof.model.request.post.PortfolioResponse;
 import com.skillproof.model.request.post.PostDTO;
@@ -226,7 +227,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PortfolioResponse addPortfolioVideo(String userId, List<CreatePortfolioMediaRequest> requests, MultipartFile video) throws Exception {
+    public PortfolioResponse addPortfolioVideo(String userId, PortFolioMediaRequest requests, MultipartFile video) throws Exception {
         User user = userRepository.getUserById(userId);
         if (ObjectUtils.isEmpty(user)) {
             LOG.error("User with id {} not found.", userId);
@@ -237,7 +238,7 @@ public class PostServiceImpl implements PostService {
         Portfolio portfolio = createPortfolioEntity(user, videoUrl);
         Portfolio savedPortfolio = portfolioRepository.addPortfolioVideo(portfolio);
 
-        List<PortfolioMedia> mediaList = requests.stream()
+        List<PortfolioMedia> mediaList = requests.getPortfolioMediaRequests().stream()
                 .map(mediaRequest -> {
                     Post post = postRepository.getPostById(mediaRequest.getPostId());
                     if (ObjectUtils.isEmpty(post)) {
