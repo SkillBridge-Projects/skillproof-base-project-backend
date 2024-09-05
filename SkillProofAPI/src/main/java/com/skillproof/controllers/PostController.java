@@ -132,13 +132,13 @@ public class PostController extends AbstractController {
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
                             responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
-                            content = @Content(schema = @Schema(implementation = PostResponse.class)))
+                            content = @Content(schema = @Schema(implementation = PortfolioResponse.class)))
             }
     )
     public ResponseEntity<?> addPortfolioVideo(@PathVariable(name = "userId") String userId,
-                                               @RequestBody @Valid PortFolioMediaRequest mediaRequests,
+                                               @RequestParam String mediaRequestsJson,
                                                @RequestParam MultipartFile video) throws Exception {
-        PortfolioResponse response = postService.addPortfolioVideo(userId, mediaRequests, video);
+        PortfolioResponse response = postService.addPortfolioVideo(userId, mediaRequestsJson, video);
         return ok(response);
     }
 
@@ -153,7 +153,7 @@ public class PostController extends AbstractController {
     public ResponseEntity<?> getPortfolioByUserId(@PathVariable(name = "userId") String userId) {
         LOG.debug("Start of getPortfolioByUserId method.");
         PortfolioResponse portfolio = postService.getPortfolioByUserId(userId);
-        if (ObjectUtils.isEmpty(portfolio)){
+        if (ObjectUtils.isEmpty(portfolio)) {
             return noContent();
         }
         LOG.debug("End of getPortfolioByUserId method.");

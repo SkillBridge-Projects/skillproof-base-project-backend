@@ -22,7 +22,7 @@ public interface PostService {
 
     Feed listAllFeed(List<String> userIds);
 
-    PortfolioResponse addPortfolioVideo(String userId, PortFolioMediaRequest requests, MultipartFile video) throws Exception;
+    PortfolioResponse addPortfolioVideo(String userId, String mediaRequestsJson, MultipartFile video) throws Exception;
 
     PortfolioResponse getPortfolioByUserId(String userId);
 

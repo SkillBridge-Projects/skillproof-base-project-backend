@@ -1,5 +1,6 @@
 package com.skillproof.services.post;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skillproof.constants.ObjectConstants;
 import com.skillproof.exceptions.InvalidRequestException;
 import com.skillproof.exceptions.ResourceNotFoundException;
@@ -227,7 +228,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PortfolioResponse addPortfolioVideo(String userId, PortFolioMediaRequest requests, MultipartFile video) throws Exception {
+    public PortfolioResponse addPortfolioVideo(String userId, String mediaRequestsJson, MultipartFile video) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        PortFolioMediaRequest mediaRequests = objectMapper.readValue(mediaRequestsJson, PortFolioMediaRequest.class);
         User user = userRepository.getUserById(userId);
         if (ObjectUtils.isEmpty(user)) {
             LOG.error("User with id {} not found.", userId);
@@ -238,7 +241,7 @@ public class PostServiceImpl implements PostService {
         Portfolio portfolio = createPortfolioEntity(user, videoUrl);
         Portfolio savedPortfolio = portfolioRepository.addPortfolioVideo(portfolio);
 
-        List<PortfolioMedia> mediaList = requests.getPortfolioMediaRequests().stream()
+        List<PortfolioMedia> mediaList = mediaRequests.getPortfolioMediaRequests().stream()
                 .map(mediaRequest -> {
                     Post post = postRepository.getPostById(mediaRequest.getPostId());
                     if (ObjectUtils.isEmpty(post)) {
