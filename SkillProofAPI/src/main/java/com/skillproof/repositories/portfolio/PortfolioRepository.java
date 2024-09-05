@@ -16,4 +16,8 @@ public interface PortfolioRepository {
     Portfolio updatePortfolio(Portfolio portfolio);
 
     List<PortfolioMedia> addPortfolioMedia(List<PortfolioMedia> mediaList);
+
+    List<PortfolioMedia> getPortfolioMediaById(Long id);
+
+    void deletePortfolioById(Long id);
 }

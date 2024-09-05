@@ -173,5 +173,17 @@ public class PostController extends AbstractController {
         PortfolioResponse portfolio = postService.updatePortfolio(id, video);
         return ok(portfolio);
     }
+
+    @DeleteMapping(value = "/portfolio/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Delete Portfolio of an user by id",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_DELETE)
+            }
+    )
+    public ResponseEntity<?> deletePortfolioById(@PathVariable Long id) {
+        postService.deletePortfolioById(id);
+        return ok();
+    }
 }
 

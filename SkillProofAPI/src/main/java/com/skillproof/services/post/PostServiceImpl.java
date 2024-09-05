@@ -13,6 +13,7 @@ import com.skillproof.model.request.comment.CommentResponse;
 import com.skillproof.model.request.like.LikeResponse;
 import com.skillproof.model.request.portfolio.CreatePortfolioMediaRequest;
 import com.skillproof.model.request.portfolio.PortFolioMediaRequest;
+import com.skillproof.model.request.portfolio.PortfolioMediaResponse;
 import com.skillproof.model.request.post.Feed;
 import com.skillproof.model.request.post.PortfolioResponse;
 import com.skillproof.model.request.post.PostDTO;
@@ -252,9 +253,9 @@ public class PostServiceImpl implements PostService {
                 })
                 .collect(Collectors.toList());
 
-        portfolioRepository.addPortfolioMedia(mediaList);
-
-        return getPortfolioResponse(savedPortfolio);
+        List<PortfolioMedia> portfolioMediaList = portfolioRepository.addPortfolioMedia(mediaList);
+        List<PortfolioMediaResponse> portfolioMediaResponses = getPortfolioMediaResponses(portfolioMediaList);
+        return getPortfolioResponse(savedPortfolio, portfolioMediaResponses);
     }
 
     private PortfolioMedia createPortfolioMediaEntity(CreatePortfolioMediaRequest request, Post post,
@@ -281,7 +282,20 @@ public class PostServiceImpl implements PostService {
             return null;
         }
 
-        return getPortfolioResponse(portfolio);
+        List<PortfolioMedia> portfolioMediaList = portfolioRepository.getPortfolioMediaById(portfolio.getId());
+        List<PortfolioMediaResponse> portfolioMediaResponses = getPortfolioMediaResponses(portfolioMediaList);
+        return getPortfolioResponse(portfolio, portfolioMediaResponses);
+    }
+
+    private List<PortfolioMediaResponse> getPortfolioMediaResponses(List<PortfolioMedia> portfolioMediaList) {
+        return portfolioMediaList.stream().map(this::getPortfolioMediaResponse).collect(Collectors.toList());
+    }
+
+    private PortfolioMediaResponse getPortfolioMediaResponse(PortfolioMedia portfolioMedia){
+        PortfolioMediaResponse response = ResponseConverter.copyProperties(portfolioMedia, PortfolioMediaResponse.class);
+        response.setPortfolioId(portfolioMedia.getPortfolio().getId());
+        response.setPostId(portfolioMedia.getPost().getId());
+        return response;
     }
 
     @Override
@@ -294,7 +308,9 @@ public class PostServiceImpl implements PostService {
 
         String newVideoUrl = null;
         if (ObjectUtils.isNotEmpty(video)) {
+            LOG.debug("Deleting old portfolio video of id {} from S3 bucket", id);
             awss3Service.deleteFile(portfolio.getVideoUrl());
+            LOG.debug("Uploading new portfolio video for id {} to S3 bucket", id);
             newVideoUrl = awss3Service.uploadFile(video);
         }
 
@@ -303,13 +319,29 @@ public class PostServiceImpl implements PostService {
         }
 
         Portfolio updatedPortfolio = portfolioRepository.updatePortfolio(portfolio);
-        return getPortfolioResponse(updatedPortfolio);
+        return getPortfolioResponse(updatedPortfolio, new ArrayList<>());
     }
 
-    private PortfolioResponse getPortfolioResponse(Portfolio portfolio) {
+    @Override
+    public void deletePortfolioById(Long id) {
+        Portfolio portfolio = portfolioRepository.getPortfolioById(id);
+        if (ObjectUtils.isEmpty(portfolio)) {
+            LOG.error("Portfolio with id {} not found", id);
+            throw new ResourceNotFoundException(ObjectConstants.PORTFOLIO, ObjectConstants.ID, id);
+        }
+
+        if (StringUtils.isNotEmpty(portfolio.getVideoUrl())) {
+            LOG.debug("Deleting portfolio video of id {} from S3 bucket", id);
+            awss3Service.deleteFile(portfolio.getVideoUrl());
+        }
+        portfolioRepository.deletePortfolioById(id);
+    }
+
+    private PortfolioResponse getPortfolioResponse(Portfolio portfolio, List<PortfolioMediaResponse> mediaResponses) {
         PortfolioResponse response = ResponseConverter.copyProperties(portfolio, PortfolioResponse.class);
         String preSignedVideoUrl = awss3Service.getPresignedUrl(response.getVideoUrl());
         response.setVideoUrl(preSignedVideoUrl);
+        response.setPortfolioResponses(mediaResponses);
         return response;
     }
 

@@ -27,5 +27,7 @@ public interface PostService {
     PortfolioResponse getPortfolioByUserId(String userId);
 
     PortfolioResponse updatePortfolio(Long id, MultipartFile video) throws Exception;
+
+    void deletePortfolioById(Long id);
 }
 

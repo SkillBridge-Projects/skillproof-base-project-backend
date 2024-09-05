@@ -43,4 +43,14 @@ public class PortfolioRepositoryImpl implements PortfolioRepository {
     public List<PortfolioMedia> addPortfolioMedia(List<PortfolioMedia> mediaList) {
         return portfolioMediaDao.saveAllAndFlush(mediaList);
     }
+
+    @Override
+    public List<PortfolioMedia> getPortfolioMediaById(Long id) {
+        return portfolioMediaDao.findAllByPortfolioId(id);
+    }
+
+    @Override
+    public void deletePortfolioById(Long id) {
+        portfolioDao.deleteById(id);
+    }
 }
