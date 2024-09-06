@@ -22,7 +22,7 @@ public class PortfolioMedia {
     private Integer mediaIndex;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "post_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
     private Post post;
 
     @Basic

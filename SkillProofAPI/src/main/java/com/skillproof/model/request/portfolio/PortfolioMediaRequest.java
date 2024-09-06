@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PortFolioMediaRequest {
+public class PortfolioMediaRequest {
 
     List<CreatePortfolioMediaRequest> portfolioMediaRequests;
 }

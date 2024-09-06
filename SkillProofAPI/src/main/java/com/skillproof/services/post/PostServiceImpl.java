@@ -12,7 +12,7 @@ import com.skillproof.model.entity.User;
 import com.skillproof.model.request.comment.CommentResponse;
 import com.skillproof.model.request.like.LikeResponse;
 import com.skillproof.model.request.portfolio.CreatePortfolioMediaRequest;
-import com.skillproof.model.request.portfolio.PortFolioMediaRequest;
+import com.skillproof.model.request.portfolio.PortfolioMediaRequest;
 import com.skillproof.model.request.portfolio.PortfolioMediaResponse;
 import com.skillproof.model.request.post.Feed;
 import com.skillproof.model.request.post.PortfolioResponse;
@@ -231,7 +231,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PortfolioResponse addPortfolioVideo(String userId, String mediaRequestsJson, MultipartFile video) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        PortFolioMediaRequest mediaRequests = objectMapper.readValue(mediaRequestsJson, PortFolioMediaRequest.class);
+        PortfolioMediaRequest mediaRequests = objectMapper.readValue(mediaRequestsJson, PortfolioMediaRequest.class);
         User user = userRepository.getUserById(userId);
         if (ObjectUtils.isEmpty(user)) {
             LOG.error("User with id {} not found.", userId);
@@ -244,10 +244,13 @@ public class PostServiceImpl implements PostService {
 
         List<PortfolioMedia> mediaList = mediaRequests.getPortfolioMediaRequests().stream()
                 .map(mediaRequest -> {
-                    Post post = postRepository.getPostById(mediaRequest.getPostId());
-                    if (ObjectUtils.isEmpty(post)) {
-                        LOG.error("Post with id {} not found.", mediaRequest.getPostId());
-                        throw new ResourceNotFoundException(ObjectConstants.POST, ObjectConstants.ID, mediaRequest.getPostId());
+                    Post post = null;
+                    if (mediaRequest.getPostId() != null) {
+                        post = postRepository.getPostById(mediaRequest.getPostId());
+                        if (ObjectUtils.isEmpty(post)) {
+                            LOG.error("Post with id {} not found.", mediaRequest.getPostId());
+                            throw new ResourceNotFoundException(ObjectConstants.POST, ObjectConstants.ID, mediaRequest.getPostId());
+                        }
                     }
                     return createPortfolioMediaEntity(mediaRequest, post, savedPortfolio);
                 })
@@ -299,7 +302,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PortfolioResponse updatePortfolio(Long id, MultipartFile video) throws Exception {
+    public PortfolioResponse updatePortfolio(Long id, String mediaRequestsJson, MultipartFile video) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        PortfolioMediaRequest mediaRequests = objectMapper.readValue(mediaRequestsJson, PortfolioMediaRequest.class);
         Portfolio portfolio = portfolioRepository.getPortfolioById(id);
         if (ObjectUtils.isEmpty(portfolio)) {
             LOG.error("Portfolio with id {} not found", id);

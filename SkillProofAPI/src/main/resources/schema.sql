@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS portfolio (
 CREATE TABLE IF NOT EXISTS portfolio_media (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     portfolio_id BIGINT NOT NULL,
-    post_id BIGINT NOT NULL,
+    post_id BIGINT NULL,
     media_url TEXT NOT NULL,
     media_index INTEGER NOT NULL,
     duration FLOAT NOT NULL,
