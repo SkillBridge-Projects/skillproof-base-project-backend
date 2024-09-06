@@ -2,6 +2,7 @@ package com.skillproof.services.post;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skillproof.constants.ObjectConstants;
+import com.skillproof.constants.UserConstants;
 import com.skillproof.exceptions.InvalidRequestException;
 import com.skillproof.exceptions.ResourceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
@@ -28,6 +29,7 @@ import com.skillproof.services.notification.NotificationService;
 import com.skillproof.utils.ResponseConverter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -243,17 +245,7 @@ public class PostServiceImpl implements PostService {
         Portfolio savedPortfolio = portfolioRepository.addPortfolioVideo(portfolio);
 
         List<PortfolioMedia> mediaList = mediaRequests.getPortfolioMediaRequests().stream()
-                .map(mediaRequest -> {
-                    Post post = null;
-                    if (mediaRequest.getPostId() != null) {
-                        post = postRepository.getPostById(mediaRequest.getPostId());
-                        if (ObjectUtils.isEmpty(post)) {
-                            LOG.error("Post with id {} not found.", mediaRequest.getPostId());
-                            throw new ResourceNotFoundException(ObjectConstants.POST, ObjectConstants.ID, mediaRequest.getPostId());
-                        }
-                    }
-                    return createPortfolioMediaEntity(mediaRequest, post, savedPortfolio);
-                })
+                .map(mediaRequest -> createPortfolioMediaEntity(mediaRequest, savedPortfolio))
                 .collect(Collectors.toList());
 
         List<PortfolioMedia> portfolioMediaList = portfolioRepository.addPortfolioMedia(mediaList);
@@ -261,15 +253,19 @@ public class PostServiceImpl implements PostService {
         return getPortfolioResponse(savedPortfolio, portfolioMediaResponses);
     }
 
-    private PortfolioMedia createPortfolioMediaEntity(CreatePortfolioMediaRequest request, Post post,
-                                                      Portfolio portfolio) {
+    private PortfolioMedia createPortfolioMediaEntity(CreatePortfolioMediaRequest request, Portfolio portfolio) {
         PortfolioMedia portfolioMedia = new PortfolioMedia();
         portfolioMedia.setPortfolio(portfolio);
-        portfolioMedia.setPost(post);
+        String url = StringUtils.isNotEmpty(request.getUrl()) ? request.getUrl() : getRandomUrl();
+        portfolioMedia.setUrl(url);
         portfolioMedia.setMediaUrl(request.getMediaUrl());
         portfolioMedia.setMediaIndex(request.getMediaIndex());
         portfolioMedia.setDuration(request.getDuration());
         return portfolioMedia;
+    }
+
+    private String getRandomUrl() {
+        return UserConstants.COMMON_CUSTOM_MEDIA_URL_PREFIX + RandomStringUtils.randomAlphanumeric(20);
     }
 
     @Override
@@ -297,7 +293,6 @@ public class PostServiceImpl implements PostService {
     private PortfolioMediaResponse getPortfolioMediaResponse(PortfolioMedia portfolioMedia){
         PortfolioMediaResponse response = ResponseConverter.copyProperties(portfolioMedia, PortfolioMediaResponse.class);
         response.setPortfolioId(portfolioMedia.getPortfolio().getId());
-        response.setPostId(portfolioMedia.getPost().getId());
         return response;
     }
 
@@ -305,6 +300,7 @@ public class PostServiceImpl implements PostService {
     public PortfolioResponse updatePortfolio(Long id, String mediaRequestsJson, MultipartFile video) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         PortfolioMediaRequest mediaRequests = objectMapper.readValue(mediaRequestsJson, PortfolioMediaRequest.class);
+        List<PortfolioMedia> portfolioMediaList = portfolioRepository.getPortfolioMediaById(id);
         Portfolio portfolio = portfolioRepository.getPortfolioById(id);
         if (ObjectUtils.isEmpty(portfolio)) {
             LOG.error("Portfolio with id {} not found", id);

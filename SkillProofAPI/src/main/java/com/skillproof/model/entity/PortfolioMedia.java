@@ -21,9 +21,9 @@ public class PortfolioMedia {
     @Column(name = "media_index", nullable = false)
     private Integer mediaIndex;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
-    private Post post;
+    @Basic
+    @Column(name = "url")
+    private String url;
 
     @Basic
     @Column(name = "media_url", nullable = false)

@@ -9,5 +9,6 @@ public class UserConstants {
     public static final String CITY = "City";
     public static final String USER_ID = "id";
     public static final String COMMON_USERID_PREFIX = "SB";
+    public static final String COMMON_CUSTOM_MEDIA_URL_PREFIX = "CUSTOM_";
     public static final String SKILLS = "Skills";
 }

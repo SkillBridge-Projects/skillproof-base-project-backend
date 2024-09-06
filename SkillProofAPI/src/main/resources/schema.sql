@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS portfolio (
 CREATE TABLE IF NOT EXISTS portfolio_media (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     portfolio_id BIGINT NOT NULL,
-    post_id BIGINT NULL,
+    url TEXT NULL,
     media_url TEXT NOT NULL,
     media_index INTEGER NOT NULL,
     duration FLOAT NOT NULL,
@@ -203,9 +203,6 @@ CREATE TABLE IF NOT EXISTS portfolio_media (
     updated_date TIMESTAMP NULL,
     CONSTRAINT FK_PORTFOLIO_MEDIA_PORTFOLIO
         FOREIGN KEY (portfolio_id)
-            REFERENCES portfolio(id) ON DELETE CASCADE,
-    CONSTRAINT FK_PORTFOLIO_MEDIA_POST
-        FOREIGN KEY (post_id)
-            REFERENCES post(id)
+            REFERENCES portfolio(id) ON DELETE CASCADE
 );
 

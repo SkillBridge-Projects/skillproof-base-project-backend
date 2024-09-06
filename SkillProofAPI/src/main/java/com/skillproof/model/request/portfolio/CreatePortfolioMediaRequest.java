@@ -11,9 +11,9 @@ import javax.validation.constraints.NotBlank;
 @Setter
 public class CreatePortfolioMediaRequest {
 
-    @Schema(name = "postId", example = "123")
+    @Schema(name = "mediaUrl", example = "http://someimage.png")
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
-    private Long postId;
+    private String url;
 
     @Schema(name = "mediaUrl", example = "http://someimage.png")
     @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
