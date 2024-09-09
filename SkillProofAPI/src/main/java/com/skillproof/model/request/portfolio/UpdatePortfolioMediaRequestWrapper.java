@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class PortfolioMediaRequest {
+public class UpdatePortfolioMediaRequestWrapper {
 
-    List<CreatePortfolioMediaRequest> portfolioMediaRequests;
+    List<UpdatePortfolioMediaRequest> portfolioMediaRequests;
 }

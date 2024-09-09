@@ -12,9 +12,7 @@ import com.skillproof.model.entity.Post;
 import com.skillproof.model.entity.User;
 import com.skillproof.model.request.comment.CommentResponse;
 import com.skillproof.model.request.like.LikeResponse;
-import com.skillproof.model.request.portfolio.CreatePortfolioMediaRequest;
-import com.skillproof.model.request.portfolio.PortfolioMediaRequest;
-import com.skillproof.model.request.portfolio.PortfolioMediaResponse;
+import com.skillproof.model.request.portfolio.*;
 import com.skillproof.model.request.post.Feed;
 import com.skillproof.model.request.post.PortfolioResponse;
 import com.skillproof.model.request.post.PostDTO;
@@ -136,7 +134,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse updatePost(Long id, String content, List<MultipartFile> images, List<MultipartFile> videos) throws Exception {
+    public PostResponse updatePost(Long id, String content, List<MultipartFile> images, List<MultipartFile> videos) {
         LOG.debug("Start of updatePost method.");
         Post post = postRepository.getPostById(id);
         if (ObjectUtils.isEmpty(post)) {
@@ -233,7 +231,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PortfolioResponse addPortfolioVideo(String userId, String mediaRequestsJson, MultipartFile video) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        PortfolioMediaRequest mediaRequests = objectMapper.readValue(mediaRequestsJson, PortfolioMediaRequest.class);
+        CreatePortfolioMediaRequestWrapper mediaRequests = objectMapper.readValue(mediaRequestsJson, CreatePortfolioMediaRequestWrapper.class);
         User user = userRepository.getUserById(userId);
         if (ObjectUtils.isEmpty(user)) {
             LOG.error("User with id {} not found.", userId);
@@ -264,6 +262,17 @@ public class PostServiceImpl implements PostService {
         return portfolioMedia;
     }
 
+    private PortfolioMedia preparePortfolioMediaEntity(UpdatePortfolioMediaRequest request, Portfolio portfolio) {
+        PortfolioMedia portfolioMedia = new PortfolioMedia();
+        portfolioMedia.setPortfolio(portfolio);
+        String url = StringUtils.isNotEmpty(request.getUrl()) ? request.getUrl() : getRandomUrl();
+        portfolioMedia.setUrl(url);
+        portfolioMedia.setMediaUrl(request.getMediaUrl());
+        portfolioMedia.setMediaIndex(request.getMediaIndex());
+        portfolioMedia.setDuration(request.getDuration());
+        return portfolioMedia;
+    }
+
     private String getRandomUrl() {
         return UserConstants.COMMON_CUSTOM_MEDIA_URL_PREFIX + RandomStringUtils.randomAlphanumeric(20);
     }
@@ -281,7 +290,7 @@ public class PostServiceImpl implements PostService {
             return null;
         }
 
-        List<PortfolioMedia> portfolioMediaList = portfolioRepository.getPortfolioMediaById(portfolio.getId());
+        List<PortfolioMedia> portfolioMediaList = portfolioRepository.getPortfolioMediaByPortfolioId(portfolio.getId());
         List<PortfolioMediaResponse> portfolioMediaResponses = getPortfolioMediaResponses(portfolioMediaList);
         return getPortfolioResponse(portfolio, portfolioMediaResponses);
     }
@@ -299,8 +308,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public PortfolioResponse updatePortfolio(Long id, String mediaRequestsJson, MultipartFile video) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        PortfolioMediaRequest mediaRequests = objectMapper.readValue(mediaRequestsJson, PortfolioMediaRequest.class);
-        List<PortfolioMedia> portfolioMediaList = portfolioRepository.getPortfolioMediaById(id);
+        UpdatePortfolioMediaRequestWrapper mediaRequests = objectMapper.readValue(mediaRequestsJson, UpdatePortfolioMediaRequestWrapper.class);
+        List<UpdatePortfolioMediaRequest> mediaRequestsToUpdate = mediaRequests.getPortfolioMediaRequests();
+
         Portfolio portfolio = portfolioRepository.getPortfolioById(id);
         if (ObjectUtils.isEmpty(portfolio)) {
             LOG.error("Portfolio with id {} not found", id);
@@ -320,7 +330,17 @@ public class PostServiceImpl implements PostService {
         }
 
         Portfolio updatedPortfolio = portfolioRepository.updatePortfolio(portfolio);
-        return getPortfolioResponse(updatedPortfolio, new ArrayList<>());
+        List<PortfolioMedia> mediaList = new ArrayList<>();
+        for (UpdatePortfolioMediaRequest request : mediaRequestsToUpdate) {
+            if(request.getId() != null){
+                PortfolioMedia portfolioMedia = portfolioRepository.getPortfolioMediaById(request.getId());
+                mediaList.add(portfolioMedia);
+            } else {
+                mediaList.add(preparePortfolioMediaEntity(request, updatedPortfolio));
+            }
+        }
+        List<PortfolioMedia> updatedMediaList = portfolioRepository.addPortfolioMedia(mediaList);
+        return getPortfolioResponse(updatedPortfolio, getPortfolioMediaResponses(updatedMediaList));
     }
 
     @Override
@@ -342,7 +362,7 @@ public class PostServiceImpl implements PostService {
         PortfolioResponse response = ResponseConverter.copyProperties(portfolio, PortfolioResponse.class);
         String preSignedVideoUrl = awss3Service.getPresignedUrl(response.getVideoUrl());
         response.setVideoUrl(preSignedVideoUrl);
-        response.setPortfolioResponses(mediaResponses);
+        response.setPortfolioMediaResponses(mediaResponses);
         return response;
     }
 

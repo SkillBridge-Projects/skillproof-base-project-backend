@@ -20,7 +20,7 @@ public class PortfolioResponse {
     @Schema(name = "videoUrl", example = "http://somevideo.mp4", accessMode = Schema.AccessMode.READ_ONLY)
     private String videoUrl;
 
-    private List<PortfolioMediaResponse> portfolioResponses;
+    private List<PortfolioMediaResponse> portfolioMediaResponses;
 
     @Schema(name = "createdDate", example = "2024-03-01T12:00:00.000",
             type = "String", accessMode = Schema.AccessMode.READ_ONLY)

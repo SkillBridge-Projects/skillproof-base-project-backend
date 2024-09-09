@@ -45,8 +45,13 @@ public class PortfolioRepositoryImpl implements PortfolioRepository {
     }
 
     @Override
-    public List<PortfolioMedia> getPortfolioMediaById(Long id) {
+    public List<PortfolioMedia> getPortfolioMediaByPortfolioId(Long id) {
         return portfolioMediaDao.findAllByPortfolioId(id);
+    }
+
+    @Override
+    public PortfolioMedia getPortfolioMediaById(Long id) {
+        return portfolioMediaDao.findById(id).orElse(null);
     }
 
     @Override

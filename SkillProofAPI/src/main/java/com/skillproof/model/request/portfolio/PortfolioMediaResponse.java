@@ -1,12 +1,10 @@
 package com.skillproof.model.request.portfolio;
 
-import com.skillproof.validators.Messages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,7 +20,10 @@ public class PortfolioMediaResponse extends CreatePortfolioMediaRequest {
             type = "String", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime updatedDate;
 
-    @Schema(name = "id", example = "123", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(name = "portfolioId", example = "123", accessMode = Schema.AccessMode.READ_ONLY)
     private Long portfolioId;
+
+    @Schema(name = "id", example = "123", accessMode = Schema.AccessMode.READ_ONLY)
+    private Long id;
 }
 
