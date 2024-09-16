@@ -1,9 +1,7 @@
 package com.skillproof.controllers;
 
 import com.skillproof.constants.SwaggerConstants;
-import com.skillproof.model.request.comment.CommentResponse;
-import com.skillproof.model.request.comment.CreateCommentRequest;
-import com.skillproof.model.request.comment.UpdateCommentRequest;
+import com.skillproof.model.request.comment.*;
 import com.skillproof.services.comment.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -95,8 +93,7 @@ public class CommentController extends AbstractController {
         return ok(commentResponses);
     }
 
-    @PatchMapping(value = "/comments/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/comments/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update comment of a post of a user",
             responses = {
                     @ApiResponse(description = SwaggerConstants.SUCCESS,
@@ -120,7 +117,65 @@ public class CommentController extends AbstractController {
             }
     )
     public ResponseEntity<?> deleteCommentById(@PathVariable Long id) {
+        LOG.debug("Start of deleteCommentById method.");
         commentService.deleteCommentById(id);
         return ok();
     }
+
+    @PostMapping(value = "/comments/likes", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Save like for a Comment for a post of a user",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
+                            content = @Content(schema = @Schema(implementation = CommentLikeResponse.class)))
+            }
+    )
+    public ResponseEntity<CommentLikeResponse> saveLikeForComment(@Valid @RequestBody CreateCommentLikeRequest request) {
+        LOG.debug("Start of saveLikeForComment method.");
+        CommentLikeResponse response = commentService.likeComment(request);
+        LOG.debug("End of saveLikeForComment method.");
+        return created(response);
+    }
+
+    @PostMapping(value = "/comments/replies", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Save reply for a Comment for a post of a user",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_CREATE,
+                            content = @Content(schema = @Schema(implementation = CommentReplyResponse.class)))
+            }
+    )
+    public ResponseEntity<CommentReplyResponse> saveReplyForComment(@Valid @RequestBody CreateCommentReplyRequest request) {
+        LOG.debug("Start of saveReplyForComment method.");
+        CommentReplyResponse response = commentService.replyToComment(request);
+        LOG.debug("End of saveReplyForComment method.");
+        return created(response);
+    }
+
+    @GetMapping(value = "/comments/{id}/likes", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "List All likes of a comment",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
+                            content = @Content(schema = @Schema(implementation = CommentLikeResponse.class)))
+            }
+    )
+    public ResponseEntity<List<CommentLikeResponse>> listAllLikesForComments(@PathVariable("id") Long commentId) {
+        List<CommentLikeResponse> likesForComment = commentService.listAllLikesForComments(commentId);
+        return ok(likesForComment);
+    }
+
+    @GetMapping(value = "/comments/{id}/replies", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "List All replies of a comment",
+            responses = {
+                    @ApiResponse(description = SwaggerConstants.SUCCESS,
+                            responseCode = SwaggerConstants.SUCCESS_RESPONSE_CODE_LIST,
+                            content = @Content(schema = @Schema(implementation = CommentReplyResponse.class)))
+            }
+    )
+    public ResponseEntity<List<CommentReplyResponse>> listAllRepliesForComments(@PathVariable("id") Long commentId) {
+        List<CommentReplyResponse> repliesForComment = commentService.listAllRepliesForComments(commentId);
+        return ok(repliesForComment);
+    }
+
 }

@@ -206,3 +206,32 @@ CREATE TABLE IF NOT EXISTS portfolio_media (
             REFERENCES portfolio(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS comment_like (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    comment_id BIGINT NOT NULL,
+    user_id VARCHAR(20) NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    CONSTRAINT `FK_COMMENT_LIKE_COMMENT`
+        FOREIGN KEY (comment_id)
+            REFERENCES comment(id),
+    CONSTRAINT `FK_COMMENT_LIKE_USER`
+        FOREIGN KEY (user_id)
+            REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS comment_reply (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    comment_id BIGINT NOT NULL,
+    user_id VARCHAR(20) NOT NULL,
+    content TEXT NOT NULL,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP NULL,
+    CONSTRAINT `FK_COMMENT_REPLY_COMMENT`
+        FOREIGN KEY (comment_id)
+            REFERENCES comment(id),
+    CONSTRAINT `FK_COMMENT_REPLY_USER`
+        FOREIGN KEY (user_id)
+            REFERENCES user(id)
+);
+

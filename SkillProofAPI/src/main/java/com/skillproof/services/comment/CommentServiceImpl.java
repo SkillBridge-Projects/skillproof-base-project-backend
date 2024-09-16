@@ -3,12 +3,8 @@ package com.skillproof.services.comment;
 import com.skillproof.constants.ObjectConstants;
 import com.skillproof.exceptions.ResourceNotFoundException;
 import com.skillproof.exceptions.UserNotFoundException;
-import com.skillproof.model.entity.Comment;
-import com.skillproof.model.entity.Post;
-import com.skillproof.model.entity.User;
-import com.skillproof.model.request.comment.CommentResponse;
-import com.skillproof.model.request.comment.CreateCommentRequest;
-import com.skillproof.model.request.comment.UpdateCommentRequest;
+import com.skillproof.model.entity.*;
+import com.skillproof.model.request.comment.*;
 import com.skillproof.repositories.comment.CommentRepository;
 import com.skillproof.repositories.post.PostRepository;
 import com.skillproof.repositories.user.UserRepository;
@@ -123,6 +119,84 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteComment(id);
     }
 
+    @Override
+    public CommentLikeResponse likeComment(CreateCommentLikeRequest request) {
+        User user = userRepository.getUserById(request.getUserId());
+        if (ObjectUtils.isEmpty(user)) {
+            LOG.error("User with id {} not found.", request.getUserId());
+            throw new UserNotFoundException(ObjectConstants.USER, request.getUserId());
+        }
+        Comment comment = commentRepository.getCommentById(request.getCommentId());
+        if (ObjectUtils.isEmpty(comment)) {
+            LOG.error("Comment with {} not found", request.getCommentId());
+            throw new ResourceNotFoundException(ObjectConstants.LIKE, ObjectConstants.ID, request.getCommentId());
+        }
+
+        CommentLike commentLike = new CommentLike();
+        commentLike.setUser(user);
+        commentLike.setComment(comment);
+
+        CommentLike savedLike = commentRepository.saveCommentLike(commentLike);
+
+        return convertToCommentLikeResponse(savedLike);
+    }
+
+    @Override
+    public CommentReplyResponse replyToComment(CreateCommentReplyRequest request) {
+        User user = userRepository.getUserById(request.getUserId());
+        if (ObjectUtils.isEmpty(user)) {
+            LOG.error("User with id {} not found.", request.getUserId());
+            throw new UserNotFoundException(ObjectConstants.USER, request.getUserId());
+        }
+        Comment comment = commentRepository.getCommentById(request.getCommentId());
+        if (ObjectUtils.isEmpty(comment)) {
+            LOG.error("Comment with {} not found", request.getCommentId());
+            throw new ResourceNotFoundException(ObjectConstants.LIKE, ObjectConstants.ID, request.getCommentId());
+        }
+
+        CommentReply commentReply = new CommentReply();
+        commentReply.setUser(user);
+        commentReply.setComment(comment);
+        commentReply.setContent(request.getContent());
+
+        CommentReply savedReply = commentRepository.saveReplyToComment(commentReply);
+
+        return convertToCommentReplyResponse(savedReply);
+    }
+
+    @Override
+    public List<CommentLikeResponse> listAllLikesForComments(Long commentId) {
+        List<CommentLike> likes = commentRepository.listAllLikesForComments(commentId);
+        return likes.stream().map(this::convertToCommentLikeResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CommentReplyResponse> listAllRepliesForComments(Long commentId) {
+        List<CommentReply> replies = commentRepository.listAllRepliesForComments(commentId);
+        return replies.stream().map(this::convertToCommentReplyResponse).collect(Collectors.toList());
+    }
+
+    private CommentLikeResponse convertToCommentLikeResponse(CommentLike commentLike) {
+        CommentLikeResponse response = ResponseConverter
+                .copyProperties(commentLike, CommentLikeResponse.class);
+        response.setId(commentLike.getId());
+        response.setCommentId(commentLike.getComment().getId());
+        response.setUserId(commentLike.getUser().getId());
+        response.setUserName(commentLike.getUser().getFirstName() + " " + commentLike.getUser().getLastName());
+        response.setProfilePicture(awss3Service.getPresignedUrl(commentLike.getUser().getProfilePicture()));
+        return response;
+    }
+
+    private CommentReplyResponse convertToCommentReplyResponse(CommentReply commentReply) {
+        CommentReplyResponse response = ResponseConverter
+                .copyProperties(commentReply, CommentReplyResponse.class);
+        response.setCommentId(commentReply.getComment().getId());
+        response.setUserId(commentReply.getUser().getId());
+        response.setUserName(commentReply.getUser().getFirstName() + " " + commentReply.getUser().getLastName());
+        response.setProfilePicture(awss3Service.getPresignedUrl(commentReply.getUser().getProfilePicture()));
+        return response;
+    }
+
     private Comment createCommentEntity(String content, Post post, User user) {
         LOG.debug("Start of createCommentEntity method - CommentServiceImpl");
         Comment comment = new Comment();
@@ -134,8 +208,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentResponse getResponse(Comment comment) {
-        CommentResponse commentResponse = ResponseConverter
-                .copyProperties(comment, CommentResponse.class);
+        CommentResponse commentResponse = ResponseConverter.copyProperties(comment, CommentResponse.class);
         commentResponse.setUserId(comment.getUser().getId());
         commentResponse.setPostId(comment.getPost().getId());
         commentResponse.setUserName(comment.getUser().getUserName());

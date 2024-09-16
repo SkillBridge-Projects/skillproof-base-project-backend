@@ -1,8 +1,6 @@
 package com.skillproof.services.comment;
 
-import com.skillproof.model.request.comment.CommentResponse;
-import com.skillproof.model.request.comment.CreateCommentRequest;
-import com.skillproof.model.request.comment.UpdateCommentRequest;
+import com.skillproof.model.request.comment.*;
 
 import java.util.List;
 
@@ -18,4 +16,12 @@ public interface CommentService {
     List<CommentResponse> listAllComments();
 
     void deleteCommentById(Long id);
+
+    CommentLikeResponse likeComment(CreateCommentLikeRequest request);
+
+    CommentReplyResponse replyToComment(CreateCommentReplyRequest request);
+
+    List<CommentLikeResponse> listAllLikesForComments(Long commentId);
+
+    List<CommentReplyResponse> listAllRepliesForComments(Long commentId);
 }
