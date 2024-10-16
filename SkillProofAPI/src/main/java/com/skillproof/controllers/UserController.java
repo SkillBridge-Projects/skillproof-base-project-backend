@@ -76,11 +76,11 @@ public class UserController extends AbstractController {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String bio,
             @RequestParam(required = false) RoleType roleType,
-            @RequestParam(required = false) List<String> skills,
-            @Parameter(description = "Creation date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")
-            @RequestParam(required = false) LocalDateTime createdDate,
-            @Parameter(description = "Updated date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")
-            @RequestParam(required = false) LocalDateTime updatedDate,
+//            @RequestParam(required = false) List<String> skills,
+//            @Parameter(description = "Creation date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")
+//            @RequestParam(required = false) LocalDateTime createdDate,
+//            @Parameter(description = "Updated date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")
+//            @RequestParam(required = false) LocalDateTime updatedDate,
             @Parameter(description = "Page number, starts at 1")
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @Parameter(description = "Page size, should be at least 1")
