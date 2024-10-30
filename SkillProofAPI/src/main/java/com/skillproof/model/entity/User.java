@@ -47,24 +47,38 @@ public class User {
     @Column(name = "phone")
     private Long phone;
 
-//    @Basic
-//    @Column(name = "created_date")
-//    private LocalDateTime createdDate;
-
-//    @Basic
-//    @Column(name = "updated_date")
-//    private LocalDateTime updatedDate;
-
     @Basic
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
-//    @Basic
-//    @Column(name = "skills")
-//    private String skills;
-
     @Basic
     @Column(name = "bio")
     private String bio;
+
+    @Basic
+    @Column(name = "profile_picture_url")
+    private String profilePicture;
+
+    @Basic
+    @Column(name = "created_date")
+    private LocalDateTime createdDate;
+
+    @Basic
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
+
+    @PrePersist
+    protected void onCreate() {
+        createdDate = LocalDateTime.now();
+        updatedDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedDate =LocalDateTime.now();
+    }
 }
+
+
+

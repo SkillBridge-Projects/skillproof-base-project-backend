@@ -1,8 +1,8 @@
 package com.skillproof.repositories.user;
 
 import com.skillproof.enums.RoleType;
-import com.skillproof.repositories.UserDao;
 import com.skillproof.model.entity.User;
+import com.skillproof.repositories.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;

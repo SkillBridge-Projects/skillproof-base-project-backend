@@ -12,7 +12,6 @@ import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.exceptions.ResourceFoundException;
 import com.skillproof.utils.ResponseConverter;
 import lombok.AllArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,8 +68,8 @@ public class UserServiceImpl implements UserService {
         user.setCity(createUserRequest.getCity());
         user.setPassword(encoder.encode(createUserRequest.getPassword()));
         user.setRole(createUserRequest.getRole());
-//        user.setCreatedDate(LocalDateTime.now());
-//        user.setUpdatedDate(LocalDateTime.now());
+        user.setCreatedDate(LocalDateTime.now());
+        user.setUpdatedDate(LocalDateTime.now());
         user = userRepository.createUser(user);
         return getUserResponse(user);
     }
@@ -110,7 +108,7 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotEmpty(updateUserRequest.getBio())){
             user.setBio(updateUserRequest.getBio());
         }
-//        user.setUpdatedDate(LocalDateTime.now());
+        user.setUpdatedDate(LocalDateTime.now());
     }
 
     @Override

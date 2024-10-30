@@ -1,8 +1,8 @@
 package com.skillproof;
 
 import com.skillproof.enums.RoleType;
-import com.skillproof.repositories.user.UserRepository;
 import com.skillproof.model.entity.User;
+import com.skillproof.repositories.user.UserRepository;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +16,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.time.LocalDateTime;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.skillproof.*"})
