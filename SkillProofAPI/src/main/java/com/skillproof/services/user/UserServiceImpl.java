@@ -70,11 +70,8 @@ public class UserServiceImpl implements UserService {
         user.setCity(createUserRequest.getCity());
         user.setPassword(encoder.encode(createUserRequest.getPassword()));
         user.setRole(createUserRequest.getRole());
-        if (CollectionUtils.isNotEmpty(createUserRequest.getSkills())) {
-            user.setSkills(StringUtils.join(createUserRequest.getSkills(), ","));
-        }
-        user.setCreatedDate(LocalDateTime.now());
-        user.setUpdatedDate(LocalDateTime.now());
+//        user.setCreatedDate(LocalDateTime.now());
+//        user.setUpdatedDate(LocalDateTime.now());
         user = userRepository.createUser(user);
         return getUserResponse(user);
     }
@@ -106,16 +103,14 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isNotEmpty(updateUserRequest.getCity())){
             user.setCity(updateUserRequest.getCity());
         }
-        if (StringUtils.isNotEmpty(updateUserRequest.getPhone())){
+        if (updateUserRequest.getPhone() != null && updateUserRequest.getPhone() > 0) {
             user.setPhone(updateUserRequest.getPhone());
         }
+
         if (StringUtils.isNotEmpty(updateUserRequest.getBio())){
             user.setBio(updateUserRequest.getBio());
         }
-        if (CollectionUtils.isNotEmpty(updateUserRequest.getSkills())){
-            user.setSkills(StringUtils.join(updateUserRequest.getSkills(), ","));
-        }
-        user.setUpdatedDate(LocalDateTime.now());
+//        user.setUpdatedDate(LocalDateTime.now());
     }
 
     @Override
@@ -147,9 +142,6 @@ public class UserServiceImpl implements UserService {
 
     private UserResponse getUserResponse(User user) {
         UserResponse response = ResponseConverter.copyProperties(user, UserResponse.class);
-        if (StringUtils.isNotEmpty(user.getSkills())) {
-            response.setSkills(Arrays.asList(user.getSkills().split(",")));
-        }
         response.setPassword(null);
         return response;
     }

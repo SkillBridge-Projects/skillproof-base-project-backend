@@ -44,26 +44,25 @@ public class User {
     private String city;
 
     @Basic
-    @Size(max = 20)
     @Column(name = "phone")
-    private String phone;
+    private Long phone;
 
-    @Basic
-    @Column(name = "created_date")
-    private LocalDateTime createdDate;
+//    @Basic
+//    @Column(name = "created_date")
+//    private LocalDateTime createdDate;
 
-    @Basic
-    @Column(name = "updated_date")
-    private LocalDateTime updatedDate;
+//    @Basic
+//    @Column(name = "updated_date")
+//    private LocalDateTime updatedDate;
 
     @Basic
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
-    @Basic
-    @Column(name = "skills")
-    private String skills;
+//    @Basic
+//    @Column(name = "skills")
+//    private String skills;
 
     @Basic
     @Column(name = "bio")

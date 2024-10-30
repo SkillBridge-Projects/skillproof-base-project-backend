@@ -75,8 +75,8 @@ public class SkillProofApplication {
         user.setLastName(lastName);
         user.setRole(role);
         user.setCity("Something");
-        user.setCreatedDate(LocalDateTime.now());
-        user.setUpdatedDate(LocalDateTime.now());
+//        user.setCreatedDate(LocalDateTime.now());
+//        user.setUpdatedDate(LocalDateTime.now());
         return user;
     }
 
