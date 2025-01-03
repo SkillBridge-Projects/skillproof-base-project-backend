@@ -15,4 +15,6 @@ public interface UserDao extends JpaRepository<User, String> {
     Optional<User> findByEmailAddressIgnoreCase(String userName);
 
     List<User> findAllByRole(RoleType roleType);
+
+    Optional<User> findByProfilePicture(String profilePicture);
 }

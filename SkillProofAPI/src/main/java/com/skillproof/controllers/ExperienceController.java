@@ -1,8 +1,10 @@
 package com.skillproof.controllers;
 
 import com.skillproof.constants.SwaggerConstants;
+import com.skillproof.exceptions.ExperienceTooLowException;
 import com.skillproof.model.request.experience.CreateExperienceRequest;
 import com.skillproof.model.request.experience.ExperienceResponse;
+import com.skillproof.repositories.experience.ExperienceRepository;
 import com.skillproof.services.experience.ExperienceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -27,9 +31,11 @@ public class ExperienceController extends AbstractController {
     private static final Logger LOG = LoggerFactory.getLogger(ExperienceController.class);
 
     private final ExperienceService experienceService;
+    private final ExperienceRepository experienceRepository;
 
-    public ExperienceController(ExperienceService experienceService) {
+    public ExperienceController(ExperienceService experienceService, ExperienceRepository experienceRepository) {
         this.experienceService = experienceService;
+        this.experienceRepository = experienceRepository;
     }
 
     @PostMapping(value = "/experiences", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,7 +46,7 @@ public class ExperienceController extends AbstractController {
                             content = @Content(schema = @Schema(implementation = CreateExperienceRequest.class)))
             }
     )
-    public ResponseEntity<ExperienceResponse> createExperience(@RequestBody @Valid CreateExperienceRequest createExperienceRequest){
+    public ResponseEntity<ExperienceResponse> createExperience(@RequestBody @Valid CreateExperienceRequest createExperienceRequest) {
         LOG.info("Start of createExperience method.");
         ExperienceResponse experienceResponse = experienceService.createExperience(createExperienceRequest);
         LOG.info("End of createExperience method.");

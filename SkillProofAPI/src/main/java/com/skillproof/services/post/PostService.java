@@ -7,9 +7,6 @@ import java.util.List;
 
 public interface PostService {
 
-    PostResponse createPost(String content, String userId, List<MultipartFile> image,
-                            List<MultipartFile> video) throws Exception;
-
-
+    PostResponse createPost(String content, String userId, List<MultipartFile> images,
+                            List<MultipartFile> videos) throws Exception;
 }
-

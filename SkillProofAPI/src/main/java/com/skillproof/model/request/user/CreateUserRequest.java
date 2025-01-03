@@ -1,6 +1,6 @@
-
 package com.skillproof.model.request.user;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.skillproof.enums.RoleType;
 import com.skillproof.validators.Messages;
 import com.skillproof.validators.RegEx;
@@ -40,7 +40,7 @@ public class CreateUserRequest {
     @Schema(name = "password", format = "password")
     private String password;
 
-    @Size(max = 20, message = Messages.SIZE_VALIDATION_PROPERTY)
+    @Size(min = 10, max = 10, message = Messages.SIZE_VALIDATION_PROPERTY)
     @Schema(name = "phone", example = "9087654321", format = "phone")
     private Long phone;
 
@@ -53,13 +53,18 @@ public class CreateUserRequest {
     @Schema(name = "city", example = "bangalore", format = "city")
     private String city;
 
+    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
+    @Schema(name = "profilePicture", example = "http://someimage.png", accessMode = Schema.AccessMode.READ_ONLY)
+    private String profilePicture;
+
     @NotNull(message = Messages.NO_EMPTY_PROPERTY)
     @Schema(name = "role", example = "EMPLOYEE")
     private RoleType role;
 
-//    @Valid
-//    @NotNull(message = Messages.NO_EMPTY_PROPERTY)
-//    @Schema(name = "skills", example = "[\"Java\",\"SQL\"]")
-//    private List<@NotBlank(message = Messages.NO_EMPTY_PROPERTY)
-//    @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY) String> skills;
+    @NotBlank(message = Messages.NO_EMPTY_PROPERTY)
+    @Size(max = 100, message = Messages.SIZE_VALIDATION_PROPERTY)
+    @Pattern(regexp = RegEx.STRING_CHARACTERS_REGEX, message = Messages.NO_WHITESPACE_PROPERTY)
+    @Schema(name = "skills", example = "java", format = "skills")
+    private String skills;
+
 }

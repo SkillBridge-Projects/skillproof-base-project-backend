@@ -17,10 +17,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     private final UserDao userDao;
 
-    public UserRepositoryImpl(UserDao userDao){
+    public UserRepositoryImpl(UserDao userDao) {
         this.userDao = userDao;
     }
-
 
     @Override
     public User createUser(User user) {
@@ -30,7 +29,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User getUserById(String id) {
-        LOG.info("Start of createUser method.");
+        LOG.info("Start of getUserById method.");
         return userDao.findById(id).orElse(null);
     }
 
@@ -58,5 +57,25 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> listUsersByRole(RoleType roleType) {
         return userDao.findAllByRole(roleType);
+    }
+
+    @Override
+    public Optional<User> getUserByProfilePicture(String profilePicture) {
+        return userDao.findByProfilePicture(profilePicture);
+    }
+
+    @Override
+    public User updateProfilePicture(String userId, String profilePicturePath) {
+        LOG.info("Start of updateProfilePicture method for userId: {}", userId);
+
+        Optional<User> optionalUser = userDao.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setProfilePicturePath(profilePicturePath);
+            return userDao.saveAndFlush(user);
+        } else {
+            LOG.warn("User not found with id: {}", userId);
+            return null;
+        }
     }
 }

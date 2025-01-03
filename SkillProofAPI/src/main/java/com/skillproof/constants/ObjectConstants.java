@@ -11,4 +11,5 @@ public class ObjectConstants {
     public static final String ROLE = "Role";
     public static final String NOTIFICATION = "notification";
     public static final String ID = "id";
+    public static final Object EDUCATION = "education";
 }

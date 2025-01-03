@@ -32,18 +32,22 @@ public class ExperienceServiceImpl implements ExperienceService {
         this.userRepository = userRepository;
     }
 
-
     @Override
     public ExperienceResponse createExperience(CreateExperienceRequest createExperienceRequest) {
         LOG.debug("Start of createExperience method - ExperienceServiceImpl");
+        // Fetch user by ID
         User user = userRepository.getUserById(createExperienceRequest.getUserId());
-        if (user == null){
+        // Handle case where user is not found
+        if (user == null) {
             LOG.error("User with id {} not found.", createExperienceRequest.getUserId());
             throw new UserNotFoundException(ObjectConstants.USER, createExperienceRequest.getUserId());
         }
+        // Create Experience entity
         Experience experience = createExperienceEntity(createExperienceRequest, user);
+        // Save experience entity
         experience = experienceRepository.createExperience(experience);
         LOG.debug("End of createExperience method - ExperienceServiceImpl");
+        // Convert entity to response object and return
         return getResponse(experience);
     }
 
@@ -60,17 +64,38 @@ public class ExperienceServiceImpl implements ExperienceService {
         return getResponseList(experiences);
     }
 
-    private Experience createExperienceEntity(CreateExperienceRequest createExperienceRequest,
-                                              User user) {
+    private Experience createExperienceEntity(CreateExperienceRequest createExperienceRequest, User user) {
         LOG.debug("Start of createExperienceEntity method - ExperienceServiceImpl");
+
+        // Ensure that the required fields are not null
+        if (createExperienceRequest.getCompanyName() == null || createExperienceRequest.getCompanyName().isEmpty()) {
+            throw new IllegalArgumentException("Company name cannot be null or empty");
+        }
+        if (createExperienceRequest.getDescription() == null || createExperienceRequest.getDescription().isEmpty()) {
+            throw new IllegalArgumentException("Description cannot be null or empty");
+        }
+        if (createExperienceRequest.getDesignation() == null || createExperienceRequest.getDesignation().isEmpty()) {
+            throw new IllegalArgumentException("Designation cannot be null or empty");
+        }
+
+        // Create a new Experience object and set the values
         Experience experience = new Experience();
         experience.setCompanyName(createExperienceRequest.getCompanyName());
         experience.setDescription(createExperienceRequest.getDescription());
         experience.setDesignation(createExperienceRequest.getDesignation());
         experience.setExperience(createExperienceRequest.getExperience());
-        experience.setCreatedDate(LocalDateTime.now());
-        experience.setUpdatedDate(LocalDateTime.now());
+
+        // Set current date for createdDate and updatedDate
+        LocalDateTime currentDate = LocalDateTime.now();
+        experience.setCreatedDate(currentDate);
+        experience.setUpdatedDate(currentDate);
+
+        // Ensure user is not null and assign
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         experience.setUser(user);
+
         LOG.debug("End of createExperienceEntity method - ExperienceServiceImpl");
         return experience;
     }
