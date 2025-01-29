@@ -1,10 +1,9 @@
-//package com.skillproof.skillproofapi.repositories.userRole;
+//package com.skillproof.repositories.userRole;
 //
-//import com.skillproof.skillproofapi.exceptions.InvalidRequestException;
-//import com.skillproof.skillproofapi.model.entity.Role;
-//import com.skillproof.skillproofapi.model.entity.User;
-//import com.skillproof.skillproofapi.model.entity.UserRole;
-//import com.skillproof.skillproofapi.repositories.UserRoleDao;
+//import com.skillproof.model.entity.Role;
+//import com.skillproof.model.entity.User;
+//import com.skillproof.model.entity.UserRole;
+//import com.skillproof.repositories.UserRoleDao;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //import org.springframework.stereotype.Repository;

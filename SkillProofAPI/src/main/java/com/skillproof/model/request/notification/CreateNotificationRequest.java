@@ -19,7 +19,7 @@ public class CreateNotificationRequest {
     private NotificationType type;
 
     @NotBlank(message = "UserId field is required.")
-    private Long userId;
+    private String userId;
 
     private Long connectionId;
     private Long commentId;

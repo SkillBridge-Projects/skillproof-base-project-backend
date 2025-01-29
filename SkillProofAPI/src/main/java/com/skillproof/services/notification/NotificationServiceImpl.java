@@ -1,78 +1,54 @@
-//package com.skillproof.skillproofapi.services.notification;
-//
-//import com.skillproof.skillproofapi.constants.ObjectConstants;
-//import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
-//import com.skillproof.skillproofapi.model.entity.Notification;
-//import com.skillproof.skillproofapi.model.entity.User;
-//import com.skillproof.skillproofapi.model.request.notification.CreateNotificationRequest;
-//import com.skillproof.skillproofapi.model.request.notification.NotificationResponse;
-//import com.skillproof.skillproofapi.repositories.notification.NotificationRepository;
-//import com.skillproof.skillproofapi.repositories.user.UserRepository;
-//import com.skillproof.skillproofapi.utils.ResponseConverter;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.time.LocalDateTime;
-//import java.util.List;
-//import java.util.stream.Collectors;
-//
-//@Service
-//@Transactional
-//public class NotificationServiceImpl implements NotificationService {
-//
-//    private final UserRepository userRepository;
-//    private final NotificationRepository notificationRepository;
-//
-//    public NotificationServiceImpl(UserRepository userRepository, NotificationRepository notificationRepository) {
-//        this.userRepository = userRepository;
-//        this.notificationRepository = notificationRepository;
-//    }
-//
-//    @Override
-//    public List<NotificationResponse> listNotifications(Long userId) {
-//        User currentUser = userRepository.getUserById(userId);
-//        if (currentUser == null) {
-//            throw new UserNotFoundException(ObjectConstants.USER, userId);
-//        }
-//        List<Notification> notifications = notificationRepository.getNotifications(userId);
-//        return getNotificationResponseList(notifications);
-//    }
-//
-//    @Override
-//    public NotificationResponse createNotification(CreateNotificationRequest createNotificationRequest) {
-//        User user = userRepository.getUserById(createNotificationRequest.getUserId());
-//        if (user == null) {
-//            throw new UserNotFoundException(ObjectConstants.USER, createNotificationRequest.getUserId());
-//        }
-//        Notification notification = notificationRepository.createNotification(createNotificationEntity(createNotificationRequest, user));
-//        return getNotificationResponse(notification);
-//    }
-//
-//    private NotificationResponse getNotificationResponse(Notification notification) {
-//        NotificationResponse notificationResponse = ResponseConverter
-//                .copyProperties(notification, NotificationResponse.class);
-//        notificationResponse.setUserId(1L);
-//        return notificationResponse;
-//    }
-//
-//    private Notification createNotificationEntity(CreateNotificationRequest createNotificationRequest, User user) {
-//        Notification notification = new Notification();
-//        notification.setIsShown(createNotificationRequest.isShown());
-//        notification.setNotificationType(createNotificationRequest.getType());
-////        notification.setUser(user);
-//        notification.setCreatedDate(LocalDateTime.now());
-//        notification.setUpdatedDate(LocalDateTime.now());
-//        return notification;
-//    }
-//
-//    private List<NotificationResponse> getNotificationResponseList(List<Notification> notifications){
-//        return notifications.stream()
-//                .map(entity -> {
-//                    NotificationResponse notificationResponse = ResponseConverter
-//                            .copyProperties(entity, NotificationResponse.class);
-//                    notificationResponse.setUserId(1L);
-//                    return notificationResponse;
-//                })
-//                .collect(Collectors.toList());
-//    }
-//}
+package com.skillproof.services.notification;
+
+import com.skillproof.enums.NotificationStatus;
+import com.skillproof.model.entity.Notification;
+import com.skillproof.model.entity.User;
+import com.skillproof.repositories.notification.NotificationRepo;
+import com.skillproof.repositories.user.UserRepository;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class NotificationServiceImpl implements NotificationService {
+
+    private final JavaMailSender mailSender;
+    private final NotificationRepo notificationRepo;
+    private final UserRepository userRepository;
+
+    public NotificationServiceImpl(JavaMailSender mailSender, NotificationRepo notificationRepo, UserRepository userRepository) {
+        this.mailSender = mailSender;
+        this.notificationRepo = notificationRepo;
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public void sendNotification(String userId, String message) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+        Notification notification = new Notification();
+        notification.setUser(user);
+        notification.setMessage(message);
+        notification.setStatus(NotificationStatus.UNREAD);
+        notificationRepo.save(notification);
+        sendEmail(user.getEmailAddress(), "Notification Alert", notification.getMessage());
+    }
+
+    private void sendEmail(String emailAddress, String notificationAlert, String message) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(emailAddress);
+        mailMessage.setSubject(notificationAlert);
+        mailMessage.setText(message);
+        mailSender.send(mailMessage);
+    }
+
+    @Override
+    public void updateNotificationStatus(Long notificationId, NotificationStatus status) throws Exception {
+        Notification notification = notificationRepo.findById(notificationId)
+                .orElseThrow(() -> new  Exception("Notification not found for ID: " + notificationId));
+        notification.setStatus(status);
+        notificationRepo.save(notification);
+    }
+}

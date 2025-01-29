@@ -1,7 +1,7 @@
-//package com.skillproof.skillproofapi.repositories.role;
+//package com.skillproof.repositories.role;
 //
-//import com.skillproof.skillproofapi.model.entity.Role;
-//import com.skillproof.skillproofapi.repositories.RoleDao;
+//import com.skillproof.model.entity.Role;
+//import com.skillproof.repositories.RoleDao;
 //import org.springframework.stereotype.Repository;
 //
 //import java.util.List;

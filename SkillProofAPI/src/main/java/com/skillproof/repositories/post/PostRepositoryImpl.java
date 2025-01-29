@@ -4,7 +4,7 @@ import com.skillproof.model.entity.Post;
 import com.skillproof.repositories.PostDao;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class PostRepositoryImpl implements PostRepository {
@@ -21,4 +21,18 @@ public class PostRepositoryImpl implements PostRepository {
         return postDao.saveAndFlush(post);
     }
 
+    @Override
+    public Optional<Post> findById(Long postId) {
+        return postDao.findById(postId);
+    }
+
+    @Override
+    public Post sharePostToUser(Post sharedPost) {
+        return postDao.save(sharedPost);
+    }
+
+    @Override
+    public void deletePost(Long postId) {
+        postDao.deleteById(postId);
+    }
 }

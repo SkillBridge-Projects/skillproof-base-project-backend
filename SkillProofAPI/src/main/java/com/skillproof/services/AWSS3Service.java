@@ -56,7 +56,7 @@ public class AWSS3Service {
         }
     }
 
-    public String generatePresignedUrl(String fileName) {
+    public String generatePreSignedUrl(String fileName) {
 //        Date expiration = new Date();
 //        long expTimeMillis = expiration.getTime();
 //        expTimeMillis += 1000 * 60 * 60; // 1 hour
@@ -70,11 +70,11 @@ public class AWSS3Service {
         return url.toString();
     }
 
-    public String getPresignedUrl(String profilePictureUrl) {
-        LOG.debug("Start of getPresignedUrlForProfile method - UserServiceImpl");
+    public String getPreSignedUrl(String profilePictureUrl) {
+        LOG.debug("Start of getPreSignedUrlForProfile method - UserServiceImpl");
         String preSignedUrl = null;
         if (StringUtils.isNotEmpty(profilePictureUrl)) {
-            preSignedUrl = generatePresignedUrl(getFileName(profilePictureUrl));
+            preSignedUrl = generatePreSignedUrl(getFileName(profilePictureUrl));
         }
         return preSignedUrl;
     }
@@ -85,14 +85,11 @@ public class AWSS3Service {
         FileOutputStream outputStream = null;
 
         try {
-            // Get the S3 object from the bucket
             s3Object = amazonS3.getObject(bucketName, fileName);
             inputStream = s3Object.getObjectContent();
 
-            // Define default destination path (temporary directory)
             String destinationPath = System.getProperty("java.io.tmpdir") + File.separator + fileName;
 
-            // Create file and write to it
             File file = new File(destinationPath);
             outputStream = new FileOutputStream(file);
 

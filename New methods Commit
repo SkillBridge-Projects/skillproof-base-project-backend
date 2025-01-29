@@ -1,0 +1,194 @@
+[33mcommit 181440eeea25258b7efb90a5a52578fe883caf5d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev-saif-profilepictureupdate[m[33m)[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Fri Jan 3 09:57:05 2025 +0530
+
+    New methods Commit
+
+[33mcommit e6e05ef9e52fd5c19fdabad90ec0316bbfc860e5[m[33m ([m[1;31morigin/dev-saif-profilepictureupdate[m[33m)[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Wed Oct 30 15:00:45 2024 +0530
+
+    ProfilePictureUpdate Commit
+
+[33mcommit 4367cf5188b311c820ecf6a62c558f4c0970b437[m[33m ([m[1;31morigin/DEVELOPMENT[m[33m, [m[1;32mDEVELOPMENT[m[33m)[m
+Merge: 27c5ddb 9e77f1a
+Author: Saifuddin10 <145104890+Saifuddin10@users.noreply.github.com>
+Date:   Wed Oct 30 13:05:57 2024 +0530
+
+    Merge pull request #1 from SkillBridge-Projects/dev-saif-updateuser
+    
+    updateUser
+
+[33mcommit 9e77f1a18305e4c2f954f7ed7a1358a872befee5[m[33m ([m[1;31morigin/dev-saif-updateuser[m[33m)[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Wed Oct 16 15:14:21 2024 +0530
+
+    updateUser
+
+[33mcommit 27c5ddb457b595c88370f1cd0e66eb78076e061f[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jul 25 15:19:58 2024 +0530
+
+    Header changes added
+
+[33mcommit 3c6e96d93d8dd95f096ccbe5a68194f42b06e6f4[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jul 25 11:21:44 2024 +0530
+
+    package rename to com.skillproof
+
+[33mcommit d887074b70aad4967f8b1c92a51fd7e5bd3afde6[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jul 25 11:19:18 2024 +0530
+
+    Merge branch 'skillproof.1.0' into skillproof.1.0-Performance_related_changes
+
+[33mcommit c3a023005a31ff771a7b8785b77ae082eeac8859[m
+Merge: 253ae61 95bb0cb
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jul 25 11:11:54 2024 +0530
+
+    merge conflicts
+
+[33mcommit 95bb0cb82bf3fec21db3a51f8675f581c5bdf3f7[m[33m ([m[1;31morigin/skillproof.1.0[m[33m, [m[1;31morigin/newcommit[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mskillproof.1.0[m[33m)[m
+Merge: fa0e7e8 cb8558f
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jul 25 10:57:03 2024 +0530
+
+    Merge pull request #7 from skillbridge-learning/skillproof.1.0-Moving_Folder
+    
+    Moved the repo folder and readme file
+
+[33mcommit cb8558fe976bdc86c0bfe56ebfafa2a4cf8bac7b[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jul 25 10:53:08 2024 +0530
+
+    Moved the repo folder and readme file
+
+[33mcommit 253ae613cc80fea2182f642c5bd89f690c071642[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jul 25 10:45:48 2024 +0530
+
+    Experience Controller
+
+[33mcommit 64ae2cb7d7fb07119f5448e4077c767b3bca873c[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jul 18 19:13:31 2024 +0530
+
+    Basic changes like exception handling and cleaning up of controllers
+
+[33mcommit 4148bdae2f92ef641068c1ba93bc312d90a49c60[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Wed Jul 10 18:12:06 2024 +0530
+
+    Basic changes like exception handling and cleaning up of controllers
+
+[33mcommit 47d8485159b47a98c0efcfc8227b49a32514580f[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Sun Mar 17 12:27:41 2024 +0530
+
+    Performance related changes
+
+[33mcommit fa0e7e875f72eb8637c8815c6ea6d8611bcf78b6[m
+Merge: 16344b1 c138269
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Fri Mar 8 10:21:22 2024 +0530
+
+    Merge pull request #6 from skillbridge-learning/skillproof.1.0-added-app-property
+    
+    added app property for hiding the empty objects from the response
+
+[33mcommit c13826988a17be030e43734046623ff4e809d331[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Mar 7 18:24:02 2024 +0530
+
+    added app property for hiding the empty objects from the response
+
+[33mcommit 16344b173f4b231b39c3eb83548a4ff1ffa8f706[m
+Merge: 516aea6 37bbf38
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Tue Feb 20 18:33:16 2024 +0530
+
+    Merge pull request #5 from skillbridge-learning/skillproof.1.0-code-refactoring_2
+    
+    code refactoring of Entity objects
+
+[33mcommit 37bbf38d098c82fc3b02487abdc36b8f25b29591[m[33m ([m[1;31morigin/skillproof.1.0-code-refactoring_2[m[33m)[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Tue Feb 20 18:30:43 2024 +0530
+
+    code refactoring of Entity objects
+
+[33mcommit 516aea63583812250f8557d6144ae8d1253e4ff3[m
+Merge: 7d6b34d a698e1e
+Author: vinaykumar0339 <66993050+vinaykumar0339@users.noreply.github.com>
+Date:   Tue Feb 13 16:43:12 2024 +0530
+
+    Merge pull request #4 from skillbridge-learning/production
+    
+    Update application.properties
+
+[33mcommit a698e1e62a2048d31aa42c7c90fa94bac7e1c226[m[33m ([m[1;31morigin/production[m[33m)[m
+Author: vinaykumar0339 <66993050+vinaykumar0339@users.noreply.github.com>
+Date:   Tue Feb 13 16:42:46 2024 +0530
+
+    Update application.properties
+    
+    changing the database user from root to jenkins
+
+[33mcommit 7d6b34dd420d78ffd511fdbcc7d9659028279dbe[m
+Merge: 0712ccd 64f0d53
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Wed Feb 7 12:07:22 2024 +0530
+
+    Merge pull request #3 from skillbridge-learning/skillproof.1.0-remove_tests
+    
+    commented test classes
+
+[33mcommit 64f0d530a5b4ff8c933761a4b0b20d325cbe4ad5[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Wed Feb 7 12:05:29 2024 +0530
+
+    commented test classes
+
+[33mcommit 0712ccd05d8d930bfe38c5d82469de0ab0de8a43[m
+Merge: cf6168f 767e7b0
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jan 25 18:10:59 2024 +0530
+
+    Merge pull request #2 from skillbridge-learning/skillproof.1.0-code_refactoring_and_added_swagger
+    
+    code refactoring and swagger added
+
+[33mcommit 767e7b031a7f470ac8ebd508d6e2982074d6e9d5[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Thu Jan 25 18:05:05 2024 +0530
+
+    code refactoring and swagger added
+
+[33mcommit cf6168fe0ffccaf869264c2dd14a78aad703080d[m
+Author: vinay kumar <vinay.kumar@getvymo.com>
+Date:   Sat Nov 18 12:01:24 2023 +0530
+
+    Refactored the code and removed ssl security
+
+[33mcommit d45807c6a704b41eea1bf5cfc6dfc808c8018454[m
+Merge: 8233eac 1bc9075
+Author: Saifuddin10 <145104890+Saifuddin10@users.noreply.github.com>
+Date:   Wed Nov 1 17:44:01 2023 +0530
+
+    Merge pull request #1 from SkillBridge-Projects/skillproof.1.0_sub_branch_add_proj
+    
+    added api project
+
+[33mcommit 1bc907584d23f522d935a031a471b17a1db0614d[m
+Author: Saifuddin05 <saifuddin@skillbridge.tech>
+Date:   Wed Nov 1 17:42:50 2023 +0530
+
+    added api project
+
+[33mcommit 8233eac538a135068b5d58fc45cb0bef8fa7cf4d[m
+Author: SkillBridge-Projects <149353936+SkillBridge-Projects@users.noreply.github.com>
+Date:   Mon Oct 30 10:41:33 2023 +0530
+
+    Initial commit

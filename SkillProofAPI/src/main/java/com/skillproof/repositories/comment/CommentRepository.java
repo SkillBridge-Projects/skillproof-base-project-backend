@@ -1,4 +1,4 @@
-package com.skillproof.repositories.comment;
-
-public interface CommentRepository {
-}
+//package com.skillproof.repositories.comment;
+//
+//public interface CommentRepository {
+//}

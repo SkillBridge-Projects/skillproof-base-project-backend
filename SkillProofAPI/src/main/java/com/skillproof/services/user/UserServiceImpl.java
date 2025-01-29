@@ -76,13 +76,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserByEmailAddress(String emailAddress) {
-        LOG.debug("Start of getUserById method - UserServiceImpl");
+        LOG.debug("Start of getUserByEmailAddress method - UserServiceImpl");
         User user = userRepository.getUserByUsername(emailAddress);
         if (ObjectUtils.isEmpty(user)) {
             LOG.error("User with emailAddress {} not found.", emailAddress);
             throw new UserNotFoundException(UserConstants.USER_EMAIL, emailAddress);
         }
-        LOG.debug("End of getUserById method - UserServiceImpl");
+        LOG.debug("End of getUserByEmailAddress method - UserServiceImpl");
         return getUserResponse(user);
     }
 
@@ -172,13 +172,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void sendUserCreationEmail(String emailAddress) {
-        User user = new User();
-        String toEmail = emailAddress; // Use the provided emailAddress directly
+        User user = userRepository.getUserByUsername(emailAddress);
+
+        if (user == null) {
+            LOG.error("User with email {} not found. Cannot send email.", emailAddress);
+            throw new UserNotFoundException(UserConstants.USER_EMAIL, emailAddress);
+        }
+
+        String username = user.getFirstName();
+        username = username.trim();
+
+        String toEmail = emailAddress;
         String subject = "Welcome to SkillProof";
-        String text = "Hello " + user.getUsername() + ", \n\n" +
+        String text = "Hello " + (!username.isEmpty() ? username : "User") + ",\n\n" +
                 "Welcome to SkillProof! We are excited to have you in our community.\n\n" +
-                "Best Regards, \n" +
+                "Best Regards,\n" +
                 "SkillProof Team";
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -187,7 +197,7 @@ public class UserServiceImpl implements UserService {
             helper.setText(text);
 
             mailSender.send(message);
-            LOG.info("Welcome Email sent to: {}", toEmail);
+            LOG.info("Welcome email sent to: {}", toEmail);
         } catch (MessagingException e) {
             LOG.error("Error sending email to {}: {}", toEmail, e.getMessage());
             throw new RuntimeException("Failed to send email", e);
@@ -197,7 +207,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(String id) {
         User user = userRepository.getUserById(id);
-        if (ObjectUtils.isEmpty(user)){
+        if (ObjectUtils.isEmpty(user)) {
             throw new UserNotFoundException(ObjectConstants.ID, id);
         }
         userRepository.deleteUserById(id);

@@ -1,7 +1,8 @@
-//package com.skillproof.skillproofapi.repositories.userRole;
+//package com.skillproof.repositories.userRole;
 //
-//import com.skillproof.skillproofapi.model.entity.Role;
-//import com.skillproof.skillproofapi.model.entity.User;
+//
+//import com.skillproof.model.entity.Role;
+//import com.skillproof.model.entity.User;
 //
 //import java.util.List;
 //

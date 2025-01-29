@@ -83,19 +83,12 @@ public class UserController extends AbstractController {
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String bio,
             @RequestParam(required = false) RoleType roleType,
-//            @RequestParam(required = false) List<String> skills,
-//            @Parameter(description = "Creation date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")
-//            @RequestParam(required = false) LocalDateTime createdDate,
-//            @Parameter(description = "Updated date of user in 'yyyy-MM-dd'T'HH:mm:ss:SSSS' format")
-//            @RequestParam(required = false) LocalDateTime updatedDate,
             @Parameter(description = "Page number, starts at 1")
             @RequestParam(required = false, defaultValue = "1") Integer page,
             @Parameter(description = "Page size, should be at least 1")
             @RequestParam(required = false, defaultValue = "10") Integer size,
             @Parameter(description = "Page size, should be at least 1")
             @RequestParam(required = false) List<UserSortType> sort) {
-//        List<UserResponse> userResponses = userService.listAllUsers(id, firstName, lastName, emailAddress, city,
-//                phone, roleType, skills, createdDate, updatedDate, page, size, sort);
         List<UserResponse> userResponses = userService.listAllUsers();
         return ok(userResponses);
     }
@@ -194,7 +187,7 @@ public class UserController extends AbstractController {
     )
     public ResponseEntity<?> downloadFileFromS3(@PathVariable String id, @RequestParam("fileName") String fileName) {
         try {
-            S3Object s3Object = awss3Service.downloadFile(fileName); // Assuming AWSS3Service.downloadFile() returns S3Object
+            S3Object s3Object = awss3Service.downloadFile(fileName);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)

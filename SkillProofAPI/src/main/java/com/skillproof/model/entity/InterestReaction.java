@@ -1,4 +1,4 @@
-//package com.skillproof.skillproofapi.model.entity;
+//package com.skillproof.model.entity;
 //
 //import lombok.*;
 //import org.hibernate.annotations.OnDelete;

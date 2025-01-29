@@ -1,20 +1,16 @@
-//package com.skillproof.skillproofapi.controllers;
+//package com.skillproof.controllers;
 //
-//import com.skillproof.skillproofapi.constants.SwaggerConstants;
-//import com.skillproof.skillproofapi.model.request.role.CreateRoleRequest;
-//import com.skillproof.skillproofapi.model.request.role.RoleResponse;
-//import com.skillproof.skillproofapi.model.request.role.UpdateRoleRequest;
-//import com.skillproof.skillproofapi.model.request.skillsAndExperience.CreateSkillsAndExperienceRequest;
-//import com.skillproof.skillproofapi.model.request.skillsAndExperience.SkillsAndExperienceResponse;
-//import com.skillproof.skillproofapi.services.role.RoleService;
-//import com.skillproof.skillproofapi.services.role.RoleServiceImpl;
-//import com.skillproof.skillproofapi.services.userRole.UserRoleService;
+//import com.skillproof.constants.SwaggerConstants;
+//import com.skillproof.model.request.role.CreateRoleRequest;
+//import com.skillproof.model.request.role.RoleResponse;
+//import com.skillproof.model.request.role.UpdateRoleRequest;
+//import com.skillproof.services.role.RoleService;
+//import com.skillproof.services.userRole.UserRoleService;
 //import io.swagger.v3.oas.annotations.Operation;
 //import io.swagger.v3.oas.annotations.media.Content;
 //import io.swagger.v3.oas.annotations.media.Schema;
 //import io.swagger.v3.oas.annotations.responses.ApiResponse;
 //import io.swagger.v3.oas.annotations.tags.Tag;
-//import lombok.AllArgsConstructor;
 //import org.apache.commons.collections4.CollectionUtils;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;

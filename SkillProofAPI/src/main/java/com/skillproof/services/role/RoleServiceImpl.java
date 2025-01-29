@@ -1,14 +1,14 @@
-//package com.skillproof.skillproofapi.services.role;
+//package com.skillproof.services.role;
 //
-//import com.skillproof.skillproofapi.constants.ObjectConstants;
-//import com.skillproof.skillproofapi.exceptions.ResourceNotFoundException;
-//import com.skillproof.skillproofapi.model.entity.Role;
-//import com.skillproof.skillproofapi.model.request.role.CreateRoleRequest;
-//import com.skillproof.skillproofapi.model.request.role.RoleResponse;
-//import com.skillproof.skillproofapi.model.request.role.UpdateRoleRequest;
-//import com.skillproof.skillproofapi.repositories.role.RoleRepository;
-//import com.skillproof.skillproofapi.services.user.UserService;
-//import com.skillproof.skillproofapi.utils.ResponseConverter;
+//import com.skillproof.constants.ObjectConstants;
+//import com.skillproof.exceptions.ResourceNotFoundException;
+//import com.skillproof.model.entity.Role;
+//import com.skillproof.model.request.role.CreateRoleRequest;
+//import com.skillproof.model.request.role.RoleResponse;
+//import com.skillproof.model.request.role.UpdateRoleRequest;
+//import com.skillproof.repositories.role.RoleRepository;
+//import com.skillproof.services.user.UserService;
+//import com.skillproof.utils.ResponseConverter;
 //import org.apache.commons.lang3.ObjectUtils;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;

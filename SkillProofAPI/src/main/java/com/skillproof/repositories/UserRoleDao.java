@@ -1,14 +1,12 @@
-//package com.skillproof.skillproofapi.repositories;
+//package com.skillproof.repositories;
 //
-//import com.skillproof.skillproofapi.model.entity.Role;
-//import com.skillproof.skillproofapi.model.entity.User;
-//import com.skillproof.skillproofapi.model.entity.UserRole;
-//import org.springframework.data.jpa.repository.JpaRepository;
+//import com.skillproof.model.entity.Role;
+//import com.skillproof.model.entity.User;
 //
 //import java.util.List;
 //
 //public interface UserRoleDao extends JpaRepository<UserRole, Long> {
-////    List<Role> findByUserId(Long userId);
-////
-////    List<User> findByRoleId(Long roleId);
+//    List<Role> findByUserId(Long userId);
+//
+//    List<User> findByRoleId(Long roleId);
 //}

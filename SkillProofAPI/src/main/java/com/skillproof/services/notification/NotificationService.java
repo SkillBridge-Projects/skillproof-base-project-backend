@@ -1,15 +1,11 @@
-//package com.skillproof.skillproofapi.services.notification;
-//
-//import com.skillproof.skillproofapi.model.entity.Notification;
-//import com.skillproof.skillproofapi.model.request.notification.CreateNotificationRequest;
-//import com.skillproof.skillproofapi.model.request.notification.NotificationResponse;
-//
-//import java.util.List;
-//import java.util.Set;
-//
-//public interface NotificationService {
-//
-//    List<NotificationResponse> listNotifications(Long userId);
-//
-//    NotificationResponse createNotification(CreateNotificationRequest createNotificationRequest);
-//}
+package com.skillproof.services.notification;
+
+import com.skillproof.enums.NotificationStatus;
+
+public interface NotificationService {
+
+    void sendNotification(String userId, String message) ;
+
+    void updateNotificationStatus(Long notificationId, NotificationStatus status) throws Exception;
+
+}

@@ -78,4 +78,24 @@ public class UserRepositoryImpl implements UserRepository {
             return null;
         }
     }
+
+    @Override
+    public Optional<User> sender(String senderId) {
+        return userDao.findById(senderId);
+    }
+
+    @Override
+    public Optional<User> receiver(String receiverId) {
+        return userDao.findById(receiverId);
+    }
+
+    @Override
+    public List<User> findByEmailAddressContaining(String message) {
+        return userDao.findByEmailAddressContaining(message);
+    }
+
+    @Override
+    public Optional<User> findById(String userId) {
+        return userDao.findById(userId);
+    }
 }

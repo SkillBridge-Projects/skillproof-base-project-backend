@@ -1,6 +1,6 @@
-//package com.skillproof.skillproofapi.model.entity;
+//package com.skillproof.model.entity;
 //
-//import com.skillproof.skillproofapi.enumerations.RoleType;
+//import com.skillproof.enums.RoleType;
 //import lombok.Getter;
 //import lombok.NonNull;
 //import lombok.Setter;

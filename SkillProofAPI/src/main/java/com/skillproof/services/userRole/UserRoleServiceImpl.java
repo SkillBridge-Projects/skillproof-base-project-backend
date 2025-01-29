@@ -1,15 +1,15 @@
-//package com.skillproof.skillproofapi.services.userRole;
+//package com.skillproof.services.userRole;
 //
-//import com.skillproof.skillproofapi.constants.ObjectConstants;
-//import com.skillproof.skillproofapi.constants.UserConstants;
-//import com.skillproof.skillproofapi.exceptions.InvalidRequestException;
-//import com.skillproof.skillproofapi.exceptions.ResourceNotFoundException;
-//import com.skillproof.skillproofapi.exceptions.UserNotFoundException;
-//import com.skillproof.skillproofapi.model.entity.Role;
-//import com.skillproof.skillproofapi.model.entity.User;
-//import com.skillproof.skillproofapi.repositories.role.RoleRepository;
-//import com.skillproof.skillproofapi.repositories.user.UserRepository;
-//import com.skillproof.skillproofapi.repositories.userRole.UserRoleRepository;
+//import com.skillproof.constants.ObjectConstants;
+//import com.skillproof.constants.UserConstants;
+//import com.skillproof.exceptions.InvalidRequestException;
+//import com.skillproof.exceptions.ResourceNotFoundException;
+//import com.skillproof.exceptions.UserNotFoundException;
+//import com.skillproof.model.entity.Role;
+//import com.skillproof.model.entity.User;
+//import com.skillproof.repositories.role.RoleRepository;
+//import com.skillproof.repositories.user.UserRepository;
+//import com.skillproof.repositories.userRole.UserRoleRepository;
 //import org.apache.commons.lang3.ObjectUtils;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@
 //            LOG.error("Role with id {} not found", roleId);
 //            throw new ResourceNotFoundException(ObjectConstants.ROLE, ObjectConstants.ID, roleId);
 //        }
-//        Boolean success = userRoleRepository.grantUserToRole(user.getId(), role.getId());
+//        Boolean success = userRoleRepository.grantUserToRole(Long.valueOf(user.getId()), role.getId());
 //        if (!success) {
 //            throw new InvalidRequestException("Granting User to Role failed.");
 //        }

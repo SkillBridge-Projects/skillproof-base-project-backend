@@ -24,6 +24,13 @@ public interface UserRepository {
 
     Optional<User> getUserByProfilePicture(String profilePicture);
 
-    // New method to update profile picture
     User updateProfilePicture(String userId, String profilePicturePath);
+
+    Optional<User> sender(String senderId);
+
+    Optional<User> receiver(String receiverId);
+
+    List<User> findByEmailAddressContaining(String message);
+
+    Optional<User> findById(String userId);
 }
